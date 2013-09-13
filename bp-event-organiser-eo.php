@@ -268,14 +268,15 @@ class BuddyPress_Event_Organiser_EO {
 			
 		}
 		
-		// trace
-		//print_r( $_POST['bp_group_organizer_groups'] ); die();
-		
 		// convert to string to be safe
 		$string = implode( ',', $value );
 		
+		// trace
+		//print_r( $string ); die();
+		//print_r( $value ); die();
+		
 		// update event meta
-		update_post_meta( $event_id,  '_bpeo_event_groups', $value );
+		update_post_meta( $event_id,  '_bpeo_event_groups', $string );
 		
 	}
 	
