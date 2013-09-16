@@ -82,7 +82,10 @@ class BuddyPress_Event_Organiser {
 		// load our Walker class
 		require( BUDDYPRESS_EVENT_ORGANISER_PATH . 'bp-event-organiser-walker.php' );
 		
-		// load our Event Organiser utility functions class
+		// load our BuddyPress Group class
+		require( BUDDYPRESS_EVENT_ORGANISER_PATH . 'bp-event-organiser-groups.php' );
+		
+		// load our Event Organiser class
 		require( BUDDYPRESS_EVENT_ORGANISER_PATH . 'bp-event-organiser-eo.php' );
 		
 		// initialise

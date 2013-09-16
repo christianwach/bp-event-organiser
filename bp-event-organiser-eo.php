@@ -62,6 +62,9 @@ class BuddyPress_Event_Organiser_EO {
 		// intercept save event
 		add_action( 'eventorganiser_save_event', array( $this, 'intercept_save_event' ), 10, 1 );
 		
+		// intercept Calendar display
+		add_filter( 'eventorganiser_fullcalendar_event', array( $this, 'intercept_calendar' ), 10, 3 );
+		
 	}
 	
 	
@@ -345,6 +348,41 @@ class BuddyPress_Event_Organiser_EO {
 		
 		// return an empty array by default
 		return array();
+		
+	}
+	
+	
+	
+	//##########################################################################
+	
+	
+	
+	/**
+	 * @description: intercept display of group calendar
+	 * @param object $post the WP post object
+	 * @param int $post_id the numeric ID of the WP post
+	 * @param int $occurrence_id the numeric ID of the EO occurrence
+	 * @return nothing
+	 */
+	public function intercept_calendar( $post, $post_id, $occurrence_id ) {
+		
+		/*
+		// are we one a group?
+		if ( bp_get_current_group_id() ) {
+	
+			// trace
+			print_r( array(
+				'post' => $post,
+				'post_id' => $post_id,
+				'occurrence_id' => $occurrence_id,
+				'group_id' => bp_get_current_group_id()
+			) ); die();
+		
+		}
+		*/
+		
+		// --<
+		return $post;
 		
 	}
 	

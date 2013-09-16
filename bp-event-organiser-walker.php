@@ -84,11 +84,11 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 		if ( isset( $item->status ) && 'private' == $item->status ) {
 			$classes[] = 'status-private';
 			/* translators: %s: title of private group */
-			$title = sprintf( __( '%s (Private)', 'bp-group-organizer' ), $title );
+			$title = sprintf( __( '%s (Private)', 'bp-event-organizer' ), $title );
 		} elseif ( isset( $item->status ) && 'hidden' == $item->status ) {
 			$classes[] = 'status-hidden';
 			/* translators: %s: title of hidden group */
-			$title = sprintf( __('%s (Hidden)', 'bp-group-organizer' ), $title );
+			$title = sprintf( __('%s (Hidden)', 'bp-event-organizer' ), $title );
 		}
 		
 		// init checked
