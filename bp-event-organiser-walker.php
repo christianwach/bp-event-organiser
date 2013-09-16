@@ -31,7 +31,7 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 *
 	 * @param string $output Passed by reference.
 	 */
-	function start_lvl(&$output) {}
+	function start_lvl( &$output ) {}
 
 	/**
 	 * @see Walker_Nav_Menu::end_lvl()
@@ -39,7 +39,7 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 *
 	 * @param string $output Passed by reference.
 	 */
-	function end_lvl(&$output) {
+	function end_lvl( &$output ) {
 	}
 
 	/**
@@ -56,7 +56,7 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 		// if the user is not an admin
 		if ( !is_super_admin OR !current_user_can( 'manage_options' ) ) {
 			
-			// if a public group
+			// if not a public group
 			if ( isset( $item->status ) AND 'public' != $item->status ) {
 
 				// kick out if not member
@@ -91,10 +91,26 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 			$title = sprintf( __('%s (Hidden)', 'bp-group-organizer' ), $title );
 		}
 		
+		// init checked
+		$checked = '';
+		
+		// access array of group IDs for this event
+		$groups_for_this_event = bp_event_organiser_get_group_ids();
+		
+		//print_r( $groups_for_this_event ); die();
+		
+		// is this item checked?
+		if ( in_array( $item->id, $groups_for_this_event ) ) {
+		
+			// override checked
+			$checked = ' checked="checked"';
+		
+		}
+		
 		// create markup
 		?>
 		<li id="menu-item-<?php echo $item_id; ?>" class="<?php echo implode(' ', $classes ); ?>">
-			<span class="item-title"><input type="checkbox" value="<?php echo $item_id ?>" id="bp-group-organizer-group-<?php echo $item_id ?>" name="bp_group_organizer_groups[]" /> <label for="bp-group-organizer-group-<?php echo $item_id ?>"><?php echo esc_html( stripslashes( $title ) ); ?></label></span>
+			<span class="item-title"><input type="checkbox" value="<?php echo $item_id ?>" id="bp-group-organizer-group-<?php echo $item_id ?>" name="bp_group_organizer_groups[]"<?php echo $checked; ?> /> <label for="bp-group-organizer-group-<?php echo $item_id ?>"><?php echo esc_html( stripslashes( $title ) ); ?></label></span>
 		<?php
 		
 		// collapse buffer into output

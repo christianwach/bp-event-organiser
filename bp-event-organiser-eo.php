@@ -13,6 +13,9 @@ class BuddyPress_Event_Organiser_EO {
 	// parent object
 	public $plugin;
 	
+	// group IDs
+	public $group_ids;
+	
 	
 	
 	/** 
@@ -208,6 +211,11 @@ class BuddyPress_Event_Organiser_EO {
 			
 		}
 		
+		//print_r( $groups_list ); die();
+		
+		// get array of checked IDs for this event
+		$this->group_ids = $this->get_event_groups( $event->ID );
+		
 		// define walker
 		$walker = new Walker_BPEO_Group;
 		
@@ -233,8 +241,6 @@ class BuddyPress_Event_Organiser_EO {
 		// close scroller
 		$result .= '</div>'."\n\n\n";
 	
-		//print_r( $groups_list ); die();
-
 		// show meta box
 		echo '
 		
@@ -324,6 +330,31 @@ class BuddyPress_Event_Organiser_EO {
 	
 	
 	/**
+	 * @description: getter method for accessing group IDs for metabox list walker
+	 * @return array $group_ids array of group IDs
+	 */
+	public function get_group_ids() {
+	
+		// do we have the property?
+		if ( isset( $this->group_ids ) AND is_array( $this->group_ids ) ) {
+			
+			// yup, send it back
+			return $this->group_ids;
+			
+		}
+		
+		// return an empty array by default
+		return array();
+		
+	}
+	
+	
+	
+	//##########################################################################
+	
+	
+	
+	/**
 	 * @description: debugging
 	 * @param array $msg
 	 * @return string
@@ -342,5 +373,34 @@ class BuddyPress_Event_Organiser_EO {
 	
 } // class ends
 
+
+
+/**
+ * @description: get list of groups for an event
+ * @return array $groups comma-delimited 
+ */
+function bp_event_organiser_get_groups( $post_id ) {
+	
+	// access plugin global
+	global $buddypress_event_organiser;
+	
+	// --<
+	return $buddypress_event_organiser->eo->get_event_groups( $post_id );
+	
+}
+
+
+/**
+ * @description: get list of group IDs for an event's metabox
+ */
+function bp_event_organiser_get_group_ids() {
+	
+	// access plugin global
+	global $buddypress_event_organiser;
+	
+	// --<
+	return $buddypress_event_organiser->eo->get_group_ids();
+	
+}
 
 
