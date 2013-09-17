@@ -67,7 +67,7 @@ class BuddyPress_Event_Organiser {
 		$this->enable_translation();
 		
 		// add action for CBOX theme compatibility
-		add_action( 'wp_head', array( $this, 'cbox_theme_compatibility' ) );
+		//add_action( 'wp_head', array( $this, 'cbox_theme_compatibility' ) );
 
 		// --<
 		return $this;

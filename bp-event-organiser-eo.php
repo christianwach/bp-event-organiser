@@ -366,18 +366,6 @@ class BuddyPress_Event_Organiser_EO {
 	 */
 	public function intercept_calendar( $post, $post_id, $occurrence_id ) {
 		
-		/*
-			// trace
-			print_r( array(
-				'post' => $post,
-				'post_id' => $post_id,
-				'occurrence_id' => $occurrence_id,
-				'group_id' => bp_get_current_group_id()
-			) ); die();
-		
-		}
-		*/
-		
 		// pass if not on a group
 		if ( 0 == bp_get_current_group_id() ) return $post;
 	
