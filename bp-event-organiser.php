@@ -64,8 +64,11 @@ class BuddyPress_Event_Organiser {
 		$this->initialise();
 		
 		// use translation files
-		add_action( 'plugins_loaded', array( $this, 'enable_translation' ) );
+		$this->enable_translation();
 		
+		// add action for CBOX theme compatibility
+		add_action( 'wp_head', array( $this, 'cbox_theme_compatibility' ) );
+
 		// --<
 		return $this;
 		
@@ -148,6 +151,32 @@ class BuddyPress_Event_Organiser {
 	
 	
 	
+	/** 
+	 * @description: adds icon to menu in CBOX theme
+	 */
+	function cbox_theme_compatibility() {
+	
+		// is CBOX theme active?
+		if ( function_exists( 'cbox_theme_register_widgets' ) ) {
+
+			// output style in head
+			?>
+		
+			<style type="text/css">
+			/* <![CDATA[ */
+			#nav-<?php echo apply_filters( 'bpeo_extension_slug', 'events' ) ?>:before 
+			{
+				content: "R";
+			}
+			/* ]]> */
+			</style>
+
+			<?php
+		
+		}
+
+	}
+
 } // class ends
 
 
@@ -168,6 +197,5 @@ function buddypress_event_organiser_init() {
 
 // init 
 add_action( 'plugins_loaded', 'buddypress_event_organiser_init' );
-
 
 

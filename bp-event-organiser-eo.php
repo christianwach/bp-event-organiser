@@ -367,9 +367,6 @@ class BuddyPress_Event_Organiser_EO {
 	public function intercept_calendar( $post, $post_id, $occurrence_id ) {
 		
 		/*
-		// are we one a group?
-		if ( bp_get_current_group_id() ) {
-	
 			// trace
 			print_r( array(
 				'post' => $post,
@@ -381,8 +378,52 @@ class BuddyPress_Event_Organiser_EO {
 		}
 		*/
 		
+		// pass if not on a group
+		if ( 0 == bp_get_current_group_id() ) return $post;
+	
+		/*
+		throw new Exception( print_r( array( 
+			'gid' => bp_get_current_group_id() ), 
+		true ) );
+		*/
+		//throw new Exception(print_r( $post, true ));
+	
+		// get groups for this post
+		$groups = $this->get_calendar_groups( $post_id );
+		
+		// do we show this post?
+		if ( in_array( bp_get_current_group_id(), $groups ) ) {
+	
+			// --<
+			return $post;
+	
+		}
+		
 		// --<
-		return $post;
+		return null;
+	
+	}
+	
+	
+	
+	/**
+	 * @description: get all event groups
+	 * @param int $post_id the numeric ID of the WP post
+	 * @return bool $event_groups_array the event groups event
+	 */
+	public function get_calendar_groups( $post_id ) {
+		
+		// get the meta value
+		$event_groups = get_post_meta( $post_id, '_bpeo_event_groups', true );
+		
+		// if it's not yet set it will be an empty string, so cast as array
+		if ( $event_groups === '' ) return array();
+		
+		// convert to array
+		$event_groups_array = explode( ',', $event_groups );
+		
+		// --<
+		return $event_groups_array;
 		
 	}
 	

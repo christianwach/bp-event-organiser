@@ -75,7 +75,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	function __construct() {
 		
 		// init vars with filters applied
-		$name = apply_filters( 'bpeo_extension_title', __( 'Events', 'bp-event-organizer' ) );
+		$name = apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) );
 		$slug = apply_filters( 'bpeo_extension_slug', 'events' );
 		$pos = apply_filters( 'bpeo_extension_pos', 31 );
 		
@@ -114,9 +114,12 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	 */
 	function display() {
 		
-		// hand off to function
-		echo bpeo_get_extension_display();
-		
+		// show header
+		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
+	
+		// show events calendar, filtered by meta value
+		echo eo_get_event_fullcalendar( array() );
+	
 	}
 	
 	
@@ -127,21 +130,6 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 
 // register our class
 bp_register_group_extension( 'BP_Event_Organiser_Group_Extension' );
-
-
-
-/** 
- * @description: the content of the public extension page
- */
-function bpeo_get_extension_display() {
-	
-	// show something
-	echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Events', 'bp-event-organizer' ) ).'</h3>';
-	
-	// show events calendar, filtered by meta value
-	echo eo_get_event_fullcalendar( array() );
-	
-}
 
 
 
