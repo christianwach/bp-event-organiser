@@ -117,8 +117,10 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// show header
 		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
 	
-		// show events calendar, filtered by meta value
-		echo eo_get_event_fullcalendar( array() );
+		// show events calendar, filtered by meta value in eo->intercept_calendar()
+		echo eo_get_event_fullcalendar( array(
+			'headerright' => 'prev,next today,month,agendaWeek',
+		) );
 	
 	}
 	
