@@ -166,7 +166,8 @@ class BuddyPress_Event_Organiser {
 			'bp_event_organiser_js', 
 			BUDDYPRESS_EVENT_ORGANISER_URL . 'assets/js/bp-event-organiser.js',
 			array( 'jquery' ),
-			BUDDYPRESS_EVENT_ORGANISER_VERSION
+			BUDDYPRESS_EVENT_ORGANISER_VERSION,
+			true // in footer
 
 		);
 		

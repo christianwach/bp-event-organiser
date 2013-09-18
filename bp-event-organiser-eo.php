@@ -366,6 +366,13 @@ class BuddyPress_Event_Organiser_EO {
 	 */
 	public function intercept_calendar( $post, $post_id, $occurrence_id ) {
 		
+		/*
+		bp_get_current_group_id() reports incorrect IDs for BP Group Hierarchy 
+		sub groups - it only reports the top level group's ID presumably because 
+		BuddyPress is parsing the URL to get the group ID. As a result, we need to
+		parse $_GET, which has our injected value.
+		*/
+		
 		// init
 		$group_id = 0;
 	
@@ -384,19 +391,16 @@ class BuddyPress_Event_Organiser_EO {
 		), true ) );
 		*/
 		
-		// pass if not on a group, because bp_get_current_group_id() reports
-		// incorrectly with Group Hierarchy
 		if ( 0 == $group_id ) return $post;
 		
 		/*
 		global $bp, $_POST, $_GET, $_SERVER;
 		throw new Exception( print_r( array( 
-			'gid' => bp_get_current_group_id(),
 			//'post' => $post, 
 			//'bp' => $bp->groups,
 			//'referrer' => $_SERVER['HTTP_REFERER'],
 			//'query' => $_SERVER['REQUEST_URI'],
-			'GET' => $_GET,
+			//'GET' => $_GET,
 		), true ) );
 		*/
 		
