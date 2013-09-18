@@ -66,6 +66,9 @@ class BuddyPress_Event_Organiser {
 		// use translation files
 		$this->enable_translation();
 		
+		// register any public scripts
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+	
 		// add action for CBOX theme compatibility
 		add_action( 'wp_head', array( $this, 'cbox_theme_compatibility' ) );
 
@@ -147,6 +150,35 @@ class BuddyPress_Event_Organiser {
 			
 		);
 		
+	}
+	
+	
+	
+	/**
+	 * @description: add our global scripts
+	 * @return nothing
+	 */
+	public function enqueue_scripts() {
+	
+		// enqueue script to amend EO Calendar
+		wp_enqueue_script(
+
+			'bp_event_organiser_js', 
+			BUDDYPRESS_EVENT_ORGANISER_URL . 'assets/js/bp-event-organiser.js',
+			array( 'jquery' ),
+			BUDDYPRESS_EVENT_ORGANISER_VERSION
+
+		);
+		
+		// get vars
+		$vars = array(
+			'group_id' => bp_get_current_group_id()
+		);
+		//print_r( $vars ); die();
+	
+		// localise with wp function
+		wp_localize_script( 'bp_event_organiser_js', 'BpEventOrganiserSettings', $vars );
+	
 	}
 	
 	

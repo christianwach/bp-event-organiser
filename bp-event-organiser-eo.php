@@ -366,21 +366,53 @@ class BuddyPress_Event_Organiser_EO {
 	 */
 	public function intercept_calendar( $post, $post_id, $occurrence_id ) {
 		
-		// pass if not on a group
-		if ( 0 == bp_get_current_group_id() ) return $post;
+		// init
+		$group_id = 0;
 	
+		// get group ID from $_GET
+		if ( isset( $_GET['bp_group_id'] ) AND is_numeric( $_GET['bp_group_id'] ) ) {
+		
+			// set variable
+			$group_id = absint( $_GET['bp_group_id'] );
+		
+		}
+		
 		/*
 		throw new Exception( print_r( array( 
-			'gid' => bp_get_current_group_id() ), 
-		true ) );
+			'group_id' => $group_id,
+			'GET' => $_GET,
+		), true ) );
 		*/
-		//throw new Exception(print_r( $post, true ));
-	
+		
+		// pass if not on a group, because bp_get_current_group_id() reports
+		// incorrectly with Group Hierarchy
+		if ( 0 == $group_id ) return $post;
+		
+		/*
+		global $bp, $_POST, $_GET, $_SERVER;
+		throw new Exception( print_r( array( 
+			'gid' => bp_get_current_group_id(),
+			//'post' => $post, 
+			//'bp' => $bp->groups,
+			//'referrer' => $_SERVER['HTTP_REFERER'],
+			//'query' => $_SERVER['REQUEST_URI'],
+			'GET' => $_GET,
+		), true ) );
+		*/
+		
 		// get groups for this post
 		$groups = $this->get_calendar_groups( $post_id );
 		
+		/*
+		throw new Exception( print_r( array( 
+			'group_id' => $group_id,
+			'groups' => $groups, 
+			'post' => $post, 
+		), true ) );
+		*/
+		
 		// do we show this post?
-		if ( in_array( bp_get_current_group_id(), $groups ) ) {
+		if ( in_array( $group_id, $groups ) ) {
 	
 			// --<
 			return $post;
