@@ -62,6 +62,12 @@ class BuddyPress_Event_Organiser_EO {
 		// intercept save event
 		add_action( 'eventorganiser_save_event', array( $this, 'intercept_save_event' ), 10, 1 );
 		
+		// intercept before break occurrence
+		add_action( 'eventorganiser_pre_break_occurrence', array( $this, 'pre_break_occurrence' ), 10, 2 );
+		
+		// intercept after break occurrence, because a new post is created
+		//add_action( 'eventorganiser_occurrence_broken', array( $this, 'occurrence_broken' ), 10, 3 );
+		
 		// intercept calendar display
 		add_filter( 'eventorganiser_fullcalendar_event', array( $this, 'intercept_calendar' ), 10, 3 );
 		
@@ -152,6 +158,64 @@ class BuddyPress_Event_Organiser_EO {
 		
 		// save BP groups for this EO event
 		$this->update_event_groups( $post_id );
+		
+	}
+	
+	
+	
+	/**
+	 * @description: intercept before break occurrence
+	 * @param int $post_id the numeric ID of the WP post
+	 * @param int $occurrence_id the numeric ID of the occurrence
+	 * @return nothing
+	 */
+	public function pre_break_occurrence( $post_id, $occurrence_id ) {
+		
+		/*
+		// eg ( [post_id] => 31 [occurrence_id] => 2 )
+		print_r( array(
+			'method' => 'bpeo->pre_break_occurrence',
+			'post_id' => $post_id,
+			'occurrence_id' => $occurrence_id,
+		) ); die();
+		*/
+		
+		// init or die
+		if ( ! $this->is_active() ) return;
+		
+		// unhook eventorganiser_save_event, because EO copies across post-meta
+		remove_action( 'eventorganiser_save_event', array( $this, 'intercept_save_event' ), 10 );
+		
+	}
+	
+	
+	
+	/**
+	 * @description: intercept after break occurrence
+	 * @param int $post_id the numeric ID of the WP post
+	 * @param int $occurrence_id the numeric ID of the occurrence
+	 * @param int $new_event_id the numeric ID of the new WP post
+	 * @return nothing
+	 */
+	public function occurrence_broken( $post_id, $occurrence_id, $new_event_id ) {
+		
+		/*
+		print_r( array(
+			'method' => 'bpeo->occurrence_broken',
+			'post_id' => $post_id,
+			'occurrence_id' => $occurrence_id,
+			'new_event_id' => $new_event_id,
+		) ); die();
+		*/
+		
+		// --<
+		return;
+		
+		// get existing event groups
+		$existing = $this->get_event_groups( $post_id );
+		
+		// transfer to new event
+		$this->set_event_groups( $new_event_id, $existing );
 		
 	}
 	
@@ -279,6 +343,20 @@ class BuddyPress_Event_Organiser_EO {
 			$value = is_array( $_POST['bp_group_organizer_groups'] ) ? $_POST['bp_group_organizer_groups'] : array();
 			
 		}
+		
+		// save
+		$this->set_event_groups( $event_id, $value );
+		
+	}
+	
+	
+	
+	/**
+	 * @description: update event groups array
+	 * @param int $event_id the numeric ID of the event
+	 * @return nothing
+	 */
+	public function set_event_groups( $event_id, $value = array() ) {
 		
 		// convert to string to be safe
 		$string = implode( ',', $value );
