@@ -16,7 +16,7 @@ Plugin URI: http://haystack.co.uk
 define( 'BUDDYPRESS_EVENT_ORGANISER_DEBUG', false );
 
 // set our version here
-define( 'BUDDYPRESS_EVENT_ORGANISER_VERSION', '0.1' );
+define( 'BUDDYPRESS_EVENT_ORGANISER_VERSION', '0.2' );
 
 // store reference to this file
 if ( !defined( 'BUDDYPRESS_EVENT_ORGANISER_FILE' ) ) {

@@ -24,7 +24,9 @@ class Walker_BPEO extends Walker {
  * Create HTML list of items with checkboxes.
  */
 class Walker_BPEO_Group extends Walker_BPEO  {
-
+	
+	
+	
 	/**
 	 * @see Walker_Nav_Menu::start_lvl()
 	 * @since 3.0.0
@@ -32,7 +34,9 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 * @param string $output Passed by reference.
 	 */
 	function start_lvl( &$output ) {}
-
+	
+	
+	
 	/**
 	 * @see Walker_Nav_Menu::end_lvl()
 	 * @since 3.0.0
@@ -41,7 +45,9 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 */
 	function end_lvl( &$output ) {
 	}
-
+	
+	
+	
 	/**
 	 * @see Walker::start_el()
 	 * @since 3.0.0
@@ -117,7 +123,9 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 		$output .= ob_get_clean();
 		
 	}
-
+	
+	
+	
 } // class ends
 
 

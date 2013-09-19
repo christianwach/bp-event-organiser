@@ -103,6 +103,9 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			// set position in navigation
 			$this->nav_item_position = $pos;
 		
+			// disable create step
+			$this->enable_create_step = false;
+		
 		}
 		
 	}

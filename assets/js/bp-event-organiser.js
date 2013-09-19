@@ -13,7 +13,6 @@ if ( 'undefined' !== typeof BpEventOrganiserSettings ) {
 
 /** 
  * @description: define what happens when the page is ready
- *
  */
 jQuery(document).ready( function($) {
 
@@ -43,8 +42,4 @@ jQuery(document).ready( function($) {
 		
 	);
 	
-	//var blah = wp.hooks.applyFilters( 'eventorganiser.fullcalendar_request', 'r', 'a', 'b', 'c', 'd' ); 
-	
-	//alert('here:' + blah );
-
 });
