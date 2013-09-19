@@ -62,8 +62,11 @@ class BuddyPress_Event_Organiser_EO {
 		// intercept save event
 		add_action( 'eventorganiser_save_event', array( $this, 'intercept_save_event' ), 10, 1 );
 		
-		// intercept Calendar display
+		// intercept calendar display
 		add_filter( 'eventorganiser_fullcalendar_event', array( $this, 'intercept_calendar' ), 10, 3 );
+		
+		// intercept post content - try to catch calendar shortcodes
+		add_filter( 'the_content', array( $this, 'intercept_content' ), 10, 1 );
 		
 	}
 	
@@ -391,6 +394,7 @@ class BuddyPress_Event_Organiser_EO {
 		), true ) );
 		*/
 		
+		// pass if not in group
 		if ( 0 == $group_id ) return $post;
 		
 		/*
@@ -448,6 +452,31 @@ class BuddyPress_Event_Organiser_EO {
 		
 		// --<
 		return $event_groups_array;
+		
+	}
+	
+	
+	
+	//##########################################################################
+	
+	
+	
+	/**
+	 * @description: intercept content and clear calendar cache if shortcode is present
+	 * @return string $content the post content
+	 */
+	public function intercept_content( $content ) {
+	
+		// do we have the shortcode?
+		if ( has_shortcode( $content, 'eo_fullcalendar' ) ) {
+			
+			// yup, bust cache
+			delete_transient( 'eo_full_calendar_public' );
+			
+		}
+		
+		// pass content on
+		return $content;
 		
 	}
 	
