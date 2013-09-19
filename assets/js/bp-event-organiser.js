@@ -16,30 +16,35 @@ if ( 'undefined' !== typeof BpEventOrganiserSettings ) {
  */
 jQuery(document).ready( function($) {
 
-	// add filter for AJAX request so that the group ID is passed
-	wp.hooks.addFilter(
+	// test if we have wp.hooks
+	if ( 'undefined' !== typeof wp && 'undefined' !== typeof wp.hooks ) {
+
+		// add filter for AJAX request so that the group ID is passed
+		wp.hooks.addFilter(
 	
-		'eventorganiser.fullcalendar_request', 
-		function( request, a, b, c, d ) {
+			'eventorganiser.fullcalendar_request', 
+			function( request, a, b, c, d ) {
 			
-			// add our variable to the request
-			request['bp_group_id'] = bp_event_organiser_group_id;
+				// add our variable to the request
+				request['bp_group_id'] = bp_event_organiser_group_id;
 			
-			/*
-			// trace
-			console.log( 'HERE' );
-			console.log( request );
-			console.log( a );
-			console.log( b );
-			console.log( c );
-			console.log( d );
-			*/
+				/*
+				// trace
+				console.log( 'HERE' );
+				console.log( request );
+				console.log( a );
+				console.log( b );
+				console.log( c );
+				console.log( d );
+				*/
 			
-			// --<
-			return request;
+				// --<
+				return request;
 		
-		}
+			}
 		
-	);
+		);
+	
+	}
 	
 });
