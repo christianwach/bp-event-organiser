@@ -60,7 +60,7 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	function start_el( &$output, $item, $depth, $args ) {
 	
 		// if the user is not an admin
-		if ( !is_super_admin OR !current_user_can( 'manage_options' ) ) {
+		if ( !is_super_admin() OR !current_user_can( 'manage_options' ) ) {
 			
 			// if not a public group
 			if ( isset( $item->status ) AND 'public' != $item->status ) {

@@ -264,9 +264,23 @@ class BuddyPress_Event_Organiser_EO {
 			$groups_list['total'] = count( $groups_list['groups'] );
 			
 		} else {
-		
+			
+			// init params
+			$params = array( 
+				'type' => 'alphabetical',
+				'show_hidden' => true,
+			);
+			
+			// if not super admin (or admin in single site install)
+			if ( ! is_super_admin() ) {
+				
+				// restrict groups to those the user is a member of
+				$params['user_id'] = bp_loggedin_user_id();
+			
+			}
+			
 			// get flat list
-			$groups_list = BP_Groups_Group::get( 'alphabetical' );
+			$groups_list = BP_Groups_Group::get( $params );
 			
 		}
 		
