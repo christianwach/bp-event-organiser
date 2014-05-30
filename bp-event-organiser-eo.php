@@ -268,7 +268,8 @@ class BuddyPress_Event_Organiser_EO {
 			// init params
 			$params = array( 
 				'type' => 'alphabetical',
-				'show_hidden' => true,
+				'per_page' => 1000, // avoid pagination cutoff
+				//'show_hidden' => true, // removed this since events always show up
 			);
 			
 			// if not super admin (or admin in single site install)
