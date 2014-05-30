@@ -72,6 +72,12 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 		
 		}
 		
+		// allow plugins to reject an item by returning boolean true
+		$override = apply_filters( 'bp_event_organiser_reject_item', false, $item );
+		
+		// did we get a response?
+		if ( $override ) return;
+				
 		// start buffer
 		ob_start();
 		
