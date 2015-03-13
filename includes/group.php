@@ -60,7 +60,16 @@ function bpeo_connect_event_to_group( $event_id, $group_id ) {
 	if ( ! ( $event instanceof WP_Post ) || 'event' !== $event->post_type ) {
 		return new WP_Error( 'event_not_found', __( 'No event found by that ID.', 'bp-event-organiser' ) );
 	}
- }
+
+	$event_groups = bpeo_get_group_events( $group_id );
+	if ( ! in_array( $event_id, $event_groups ) ) {
+		return new WP_Error( 'event_not_found_for_group', __( 'No event found by that ID connected to this group.', 'bp-event-organiser' ) );
+	}
+
+	$removed = wp_remove_object_terms( $event_id, 'group_' . $group_id , 'bpeo_event_group' );
+
+	return $removed;
+}
 
 /**
  * Get event IDs associated with a group.
