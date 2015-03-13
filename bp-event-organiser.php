@@ -28,9 +28,19 @@ if ( !defined( 'BUDDYPRESS_EVENT_ORGANISER_URL' ) ) {
 	define( 'BUDDYPRESS_EVENT_ORGANISER_URL', plugin_dir_url( BUDDYPRESS_EVENT_ORGANISER_FILE ) );
 }
 // store PATH to this plugin's directory
-if ( !defined( 'BUDDYPRESS_EVENT_ORGANISER_PATH' ) ) {
-	define( 'BUDDYPRESS_EVENT_ORGANISER_PATH', plugin_dir_path( BUDDYPRESS_EVENT_ORGANISER_FILE ) );
+if ( !defined( 'BPEO_PATH' ) ) {
+	define( 'BPEO_PATH', plugin_dir_path( BUDDYPRESS_EVENT_ORGANISER_FILE ) );
 }
+
+/**
+ * Include BuddyPress-specific functionality.
+ */
+function bpeo_include() {
+	if ( bp_is_active( 'groups' ) ) {
+		require( BPEO_PATH . '/includes/group.php' );
+	}
+}
+add_action( 'bp_include', 'bpeo_include' );
 
 
 
