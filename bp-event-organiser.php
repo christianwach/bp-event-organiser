@@ -31,6 +31,8 @@ if ( !defined( 'BUDDYPRESS_EVENT_ORGANISER_URL' ) ) {
 if ( !defined( 'BPEO_PATH' ) ) {
 	define( 'BPEO_PATH', plugin_dir_path( BUDDYPRESS_EVENT_ORGANISER_FILE ) );
 }
+// backward compatibility
+define( 'BUDDYPRESS_EVENT_ORGANISER_PATH', constant( 'BPEO_PATH' ) );
 
 /**
  * Include BuddyPress-specific functionality.
