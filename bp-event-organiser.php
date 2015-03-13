@@ -238,7 +238,7 @@ function buddypress_event_organiser_init() {
 
 }
 
-// init 
-add_action( 'plugins_loaded', 'buddypress_event_organiser_init' );
+// init
+//add_action( 'plugins_loaded', 'buddypress_event_organiser_init' );
 
 
