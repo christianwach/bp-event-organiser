@@ -23,30 +23,7 @@ class Walker_BPEO extends Walker {
 /**
  * Create HTML list of items with checkboxes.
  */
-class Walker_BPEO_Group extends Walker_BPEO  {
-	
-	
-	
-	/**
-	 * @see Walker_Nav_Menu::start_lvl()
-	 * @since 3.0.0
-	 *
-	 * @param string $output Passed by reference.
-	 */
-	function start_lvl( &$output ) {}
-	
-	
-	
-	/**
-	 * @see Walker_Nav_Menu::end_lvl()
-	 * @since 3.0.0
-	 *
-	 * @param string $output Passed by reference.
-	 */
-	function end_lvl( &$output ) {
-	}
-	
-	
+class Walker_BPEO_Group extends Walker_BPEO  {	
 	
 	/**
 	 * @see Walker::start_el()
@@ -57,7 +34,7 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 * @param int $depth Depth of menu item. Used for padding.
 	 * @param object $args
 	 */
-	function start_el( &$output, $item, $depth, $args ) {
+	function start_el( &$output, $object, $depth = 0, $args = array(), $current_object_id = 0 ) {
 	
 		// if the user is not an admin
 		if ( !is_super_admin() OR !current_user_can( 'manage_options' ) ) {

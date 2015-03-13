@@ -115,7 +115,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	/**
 	 * @description display our content when the nav item is selected
 	 */
-	function display() {
+	function display( $group_id = null ) {
 		
 		// show header
 		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
