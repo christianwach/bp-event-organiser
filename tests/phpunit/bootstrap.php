@@ -1,7 +1,7 @@
 <?php
 
 if ( ! defined( 'BP_TESTS_DIR' ) ) {
-	define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../buddypress/tests/phpunit' );
+	define( 'BP_TESTS_DIR', dirname( __FILE__ ) . '/../../../buddypress/tests/phpunit' );
 }
 
 if ( file_exists( BP_TESTS_DIR . '/bootstrap.php' ) ) :
@@ -17,11 +17,11 @@ if ( file_exists( BP_TESTS_DIR . '/bootstrap.php' ) ) :
 	// Hack: setup_theme is late enough to ensure WP_Rewrite, but earlier than 'init'.
 	function _bootstrap_bpeo() {
 		// Bootstrap EO.
-		require dirname( __FILE__ ) . '/../../event-organiser/event-organiser.php';
+		require dirname( __FILE__ ) . '/../../../event-organiser/event-organiser.php';
 		eventorganiser_install();
 
 		// Then load BPEO.
-		require dirname( __FILE__ ) . '/../bp-event-organiser.php';
+		require dirname( __FILE__ ) . '/../../bp-event-organiser.php';
 	}
 	tests_add_filter( 'setup_theme', '_bootstrap_bpeo' );
 
