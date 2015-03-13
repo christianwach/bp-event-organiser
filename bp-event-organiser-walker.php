@@ -9,11 +9,11 @@ Kudos to the fantastic Group Organiser plugin for the code framework
  * Amend Walker to include parent field
  */
 class Walker_BPEO extends Walker {
-	
+
 	// update db fields
-	var $db_fields = array( 
-		'parent' => 'parent_id', 
-		'id' => 'id' 
+	var $db_fields = array(
+		'parent' => 'parent_id',
+		'id' => 'id'
 	);
 
 }
@@ -23,8 +23,8 @@ class Walker_BPEO extends Walker {
 /**
  * Create HTML list of items with checkboxes.
  */
-class Walker_BPEO_Group extends Walker_BPEO  {	
-	
+class Walker_BPEO_Group extends Walker_BPEO  {
+
 	/**
 	 * @see Walker::start_el()
 	 * @since 3.0.0
@@ -35,40 +35,40 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 * @param object $args
 	 */
 	function start_el( &$output, $object, $depth = 0, $args = array(), $current_object_id = 0 ) {
-	
+
 		// if the user is not an admin
 		if ( !is_super_admin() OR !current_user_can( 'manage_options' ) ) {
-			
+
 			// if not a public group
 			if ( isset( $item->status ) AND 'public' != $item->status ) {
 
 				// kick out if not member
 				if ( !bp_group_is_member( $item ) ) return;
-				
+
 			}
-		
+
 		}
-		
+
 		// allow plugins to reject an item by returning boolean true
 		$override = apply_filters( 'bp_event_organiser_reject_item', false, $item );
-		
+
 		// did we get a response?
 		if ( $override ) return;
-				
+
 		// start buffer
 		ob_start();
-		
+
 		// sanitise ID
 		$item_id = esc_attr( $item->id );
-		
+
 		// define classes
 		$classes = array(
 			'menu-item menu-item-depth-' . $depth
 		);
-		
+
 		// get title
 		$title = $item->name;
-		
+
 		// update title based on ststus
 		if ( isset( $item->status ) && 'private' == $item->status ) {
 			$classes[] = 'status-private';
@@ -79,36 +79,36 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 			/* translators: %s: title of hidden group */
 			$title = sprintf( __('%s (Hidden)', 'bp-event-organizer' ), $title );
 		}
-		
+
 		// init checked
 		$checked = '';
-		
+
 		// access array of group IDs for this event
 		$groups_for_this_event = bp_event_organiser_get_group_ids();
-		
+
 		//print_r( $groups_for_this_event ); die();
-		
+
 		// is this item checked?
 		if ( in_array( $item->id, $groups_for_this_event ) ) {
-		
+
 			// override checked
 			$checked = ' checked="checked"';
-		
+
 		}
-		
+
 		// create markup
 		?>
 		<li id="menu-item-<?php echo $item_id; ?>" class="<?php echo implode(' ', $classes ); ?>">
 			<span class="item-title"><input type="checkbox" value="<?php echo $item_id ?>" id="bp-group-organizer-group-<?php echo $item_id ?>" name="bp_group_organizer_groups[]"<?php echo $checked; ?> /> <label for="bp-group-organizer-group-<?php echo $item_id ?>"><?php echo esc_html( stripslashes( $title ) ); ?></label></span>
 		<?php
-		
+
 		// collapse buffer into output
 		$output .= ob_get_clean();
-		
+
 	}
-	
-	
-	
+
+
+
 } // class ends
 
 
