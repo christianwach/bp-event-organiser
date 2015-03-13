@@ -34,7 +34,7 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 * @param int $depth Depth of menu item. Used for padding.
 	 * @param object $args
 	 */
-	function start_el( &$output, $object, $depth = 0, $args = array(), $current_object_id = 0 ) {
+	function start_el( &$output, $item, $depth = 0, $args = array(), $current_object_id = 0 ) {
 
 		// if the user is not an admin
 		if ( !is_super_admin() OR !current_user_can( 'manage_options' ) ) {
