@@ -152,7 +152,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	/**
 	 * Single event screen handler.
 	 */
-	public function single_event_screen() {
+	protected function single_event_screen() {
 		if ( false === bp_is_current_action( $this->slug ) ) {
 			return;
 		}
@@ -190,7 +190,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	 *
 	 * @todo Move part of this functionality into a template part so theme devs can customize.
 	 */
-	protected function display_single_event() {
+	public function display_single_event() {
 		if ( empty( $this->queried_event ) ) {
 			return;
 		}
