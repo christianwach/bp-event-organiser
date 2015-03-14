@@ -120,8 +120,13 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// show header
 		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
 		
-		// delete the transient cache
-		delete_transient( 'eo_full_calendar_public' );
+		// delete the calendar transient cache depending on user cap
+		// @todo EO's calendar transient cache needs overhauling
+		if( current_user_can( 'read_private_events' ) ){
+			delete_transient( 'eo_full_calendar_public_priv' );
+		} else {
+			delete_transient( 'eo_full_calendar_public' );
+		}
 	
 		// show events calendar, filtered by meta value in eo->intercept_calendar()
 		echo eo_get_event_fullcalendar( array(
