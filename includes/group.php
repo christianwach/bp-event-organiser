@@ -102,3 +102,26 @@ function bpeo_get_group_events( $group_id, $args = array() ) {
 
 	return $q->posts;
 }
+
+/** TEMPLATE ************************************************************/
+
+/**
+ * Get the permalink to a group's events page.
+ *
+ * @param  BP_Groups_Group|int $group The group object or the group ID to fetch the group for.
+ * @return string
+ */
+function bpeo_get_group_permalink( $group = 0 ) {
+	if ( empty( $group ) ) {
+		$group = groups_get_current_group();
+	}
+
+	if ( ! empty( $group ) && ! $group instanceof BP_Groups_Group && is_int( $group ) ) {
+		$group = groups_get_group( array(
+			'group_id'        => $group,
+			'populate_extras' => false
+		) );
+	}
+
+	return trailingslashit( bp_get_group_permalink( $group ) . bpeo_get_events_slug() );
+}
