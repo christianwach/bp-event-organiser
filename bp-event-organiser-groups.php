@@ -76,7 +76,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		
 		// init vars with filters applied
 		$name = apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) );
-		$slug = apply_filters( 'bpeo_extension_slug', 'events' );
+		$slug = apply_filters( 'bpeo_extension_slug', bpeo_get_events_slug() );
 		$pos = apply_filters( 'bpeo_extension_pos', 31 );
 		
 		// test for BP 1.8+

@@ -34,10 +34,17 @@ if ( !defined( 'BPEO_PATH' ) ) {
 // backward compatibility
 define( 'BUDDYPRESS_EVENT_ORGANISER_PATH', constant( 'BPEO_PATH' ) );
 
+// group events slug
+if ( ! defined( 'BPEO_EVENTS_SLUG' ) ) {
+	define( 'BPEO_EVENTS_SLUG', 'events' );
+}
+
 /**
  * Include BuddyPress-specific functionality.
  */
 function bpeo_include() {
+	require( BPEO_PATH . '/includes/functions.php' );
+
 	if ( bp_is_active( 'groups' ) ) {
 		require( BPEO_PATH . '/includes/group.php' );
 	}
