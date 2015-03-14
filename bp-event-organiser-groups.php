@@ -110,13 +110,27 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		
 	}
 	
-	
+	/**
+	 * Override parent _display_hook() method to add logic for single events.
+	 */
+	public function _display_hook() {
+		// single event
+		if ( ! empty( buddypress()->action_variables ) ) {
+			$this->single_event_screen();
+			add_action( 'bp_template_content', array( $this, 'display_single_event' ) );
+
+		// default behavior
+		} else{
+			add_action( 'bp_template_content', array( $this, 'call_display' ) );
+		}
+
+		bp_core_load_template( apply_filters( 'bp_core_template_plugin', $this->template_file ) );
+	}
 	
 	/**
 	 * @description display our content when the nav item is selected
 	 */
 	function display( $group_id = null ) {
-		
 		// show header
 		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
 		
@@ -134,7 +148,84 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		) );
 	
 	}
-	
+
+	/**
+	 * Single event screen handler.
+	 */
+	public function single_event_screen() {
+		if ( false === bp_is_current_action( $this->slug ) ) {
+			return;
+		}
+
+		if ( empty( buddypress()->action_variables ) ) {
+			return;
+		}
+
+		// query for the event
+		$event = eo_get_events( array(
+			'post_slug' => bp_action_variable()
+		) );
+
+		// check if event exists
+		if ( empty( $event ) ) {
+			bp_core_add_message( __( 'Event does not exist.', 'bp-event-organiser' ), 'error' );
+			bp_core_redirect( bpeo_get_group_permalink() );
+			die();
+		}
+
+		// check if event belongs to group
+		// this needs to be edited once boone finishes new schema
+		if ( false == in_array( bp_get_current_group_id(), $GLOBALS['buddypress_event_organiser']->eo->get_calendar_groups( $event[0]->ID ) ) ) {
+			bp_core_add_message( __( 'Event does not belong to this group.', 'bp-event-organiser' ), 'error' );
+			bp_core_redirect( bpeo_get_group_permalink() );
+			die();
+		}
+
+		// save event
+		$this->queried_event = $event[0];
+	}
+
+	/**
+	 * Display a single event within a group.
+	 *
+	 * @todo Move part of this functionality into a template part so theme devs can customize.
+	 */
+	function display_single_event() {
+		if ( empty( $this->queried_event ) ) {
+			return;
+		}
+
+		global $post;
+
+		// save $post global temporarily
+		$_post = false;
+		if ( ! empty( $post ) ) {
+			$_post = $post;
+		}
+
+		// override the $post global so EO can use its functions
+		$post = $this->queried_event;
+
+		/**
+		 * Move this logic into a template part
+		 */
+		echo '<h2> ' . get_the_title() . '</h2>';
+
+		echo '<h4>' . __( 'Event Description', 'bp-event-organizer' ) . '</h4>';
+
+		// Make this better... have to juggle the_content filters...
+		echo wpautop( $post->post_content );
+		eo_get_template_part( 'event-meta-event-single' );
+
+		// Action links
+		// @todo Add 'Edit' link
+		echo '<a href="' . bpeo_get_group_permalink() . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
+
+		// revert $post global
+		if ( ! empty( $_post ) ) {
+			$post = $_post;
+		}
+	}
 	
 	
 } // class ends

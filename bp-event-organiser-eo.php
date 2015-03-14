@@ -514,6 +514,12 @@ class BuddyPress_Event_Organiser_EO {
 
 		// do we show this post?
 		if ( in_array( $group_id, $groups ) ) {
+			// this is to avoid requerying the event just for the post slug
+			$event_url = explode( '/', untrailingslashit( $post['url'] ) );
+			$post_slug = array_pop( $event_url );
+
+			// regenerate the post URL to account for group permalink
+			$post['url'] = trailingslashit( bpeo_get_group_permalink( $group_id ) . $post_slug );
 
 			// --<
 			return $post;
