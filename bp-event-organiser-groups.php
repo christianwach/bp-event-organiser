@@ -27,62 +27,62 @@ Class Name
 */
 
 class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
-	
-	
-	
+
+
+
 	/*
 	============================================================================
 	Properties
 	============================================================================
 	*/
-	
+
 	/*
 	// 'public' will show our extension to non-group members
 	// 'private' means only members of the group can view our extension
 	public $visibility = 'public';
-	
+
 	// if our extension does not need a navigation item, set this to false
 	public $enable_nav_item = true;
-	
+
 	// if our extension does not need an edit screen, set this to false
 	public $enable_edit_item = true;
-	
+
 	// if our extension does not need an admin metabox, set this to false
 	public $enable_admin_item = true;
-	
+
 	// the context of our admin metabox. See add_meta_box()
 	public $admin_metabox_context = 'core';
-	
+
 	// the priority of our admin metabox. See add_meta_box()
 	public $admin_metabox_priority = 'normal';
 	*/
 
 	// no need for a creation step
 	public $enable_create_step = false;
-	
+
 	// if our extension does not need an edit screen, set this to false
 	public $enable_edit_item = false;
-	
+
 	// if our extension does not need an admin metabox, set this to false
 	public $enable_admin_item = false;
-	
-	
-	
-	/** 
+
+
+
+	/**
 	 * @description: initialises this object
 	 * @return nothing
 	 */
 	function __construct() {
-		
+
 		// init vars with filters applied
 		$name = apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) );
 		$slug = apply_filters( 'bpeo_extension_slug', bpeo_get_events_slug() );
 		$pos = apply_filters( 'bpeo_extension_pos', 31 );
-		
+
 		// test for BP 1.8+
 		// could also use 'bp_esc_sql_order' (the other core addition)
 		if ( function_exists( 'bp_core_get_upload_dir' ) ) {
-			
+
 			// init array
 			$args = array(
 				'name' => $name,
@@ -90,26 +90,26 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 				'nav_item_position' => $pos,
 				'enable_create_step' => false,
 			);
-			
+
 			// init
 			parent::init( $args );
-	 
+
 	 	} else {
-		
+
 			// name our tab
 			$this->name = $name;
 			$this->slug = $slug;
-		
+
 			// set position in navigation
 			$this->nav_item_position = $pos;
-		
+
 			// disable create step
 			$this->enable_create_step = false;
-		
+
 		}
-		
+
 	}
-	
+
 	/**
 	 * Override parent _display_hook() method to add logic for single events.
 	 */
@@ -126,14 +126,14 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 
 		bp_core_load_template( apply_filters( 'bp_core_template_plugin', $this->template_file ) );
 	}
-	
+
 	/**
 	 * @description display our content when the nav item is selected
 	 */
 	function display( $group_id = null ) {
 		// show header
 		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
-		
+
 		// delete the calendar transient cache depending on user cap
 		// @todo EO's calendar transient cache needs overhauling
 		if( current_user_can( 'read_private_events' ) ){
@@ -141,12 +141,12 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		} else {
 			delete_transient( 'eo_full_calendar_public' );
 		}
-	
+
 		// show events calendar, filtered by meta value in eo->intercept_calendar()
 		echo eo_get_event_fullcalendar( array(
 			'headerright' => 'prev,next today,month,agendaWeek',
 		) );
-	
+
 	}
 
 	/**
@@ -226,8 +226,8 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			$post = $_post;
 		}
 	}
-	
-	
+
+
 } // class ends
 
 
