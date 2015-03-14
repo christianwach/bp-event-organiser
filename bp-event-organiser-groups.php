@@ -72,7 +72,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	 * @description: initialises this object
 	 * @return nothing
 	 */
-	function __construct() {
+	public function __construct() {
 
 		// init vars with filters applied
 		$name = apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) );
@@ -130,7 +130,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	/**
 	 * @description display our content when the nav item is selected
 	 */
-	function display( $group_id = null ) {
+	public function display( $group_id = null ) {
 		// show header
 		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
 
@@ -190,7 +190,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	 *
 	 * @todo Move part of this functionality into a template part so theme devs can customize.
 	 */
-	function display_single_event() {
+	protected function display_single_event() {
 		if ( empty( $this->queried_event ) ) {
 			return;
 		}
