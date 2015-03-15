@@ -269,12 +269,19 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		echo '<h4>' . __( 'Event Description', 'bp-event-organizer' ) . '</h4>';
 
 		// Make this better... have to juggle the_content filters...
+		// @todo using get_template_part() messes with the $post global probably something to do
+		//       with BP resetting some global properties...
 		echo wpautop( $post->post_content );
 		eo_get_template_part( 'event-meta-event-single' );
 
 		// Action links
-		// @todo Add 'Edit' link
+		// @todo Make this a template function
 		echo '<a href="' . bpeo_get_group_permalink() . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
+
+		// @todo add function for proper edit access, make 'edit' slug changeable
+		if ( true === buddypress()->groups->current_group->user_has_access ) {
+			echo ' | <a href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
+		}
 
 		// revert $post global
 		if ( ! empty( $_post ) ) {
