@@ -279,7 +279,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		echo '<a href="' . bpeo_get_group_permalink() . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
 
 		// @todo add function for proper edit access, make 'edit' slug changeable
-		if ( true === buddypress()->groups->current_group->user_has_access ) {
+		if ( is_user_logged_in() && true === buddypress()->groups->current_group->user_has_access ) {
 			echo ' | <a href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
 		}
 
