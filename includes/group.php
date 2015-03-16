@@ -104,6 +104,25 @@ function bpeo_get_group_events( $group_id, $args = array() ) {
 }
 
 /**
+ * Get group IDs associated with an event.
+ *
+ * @param int $event_id ID of the event.
+ * @return array Array of group IDs.
+ */
+function bpeo_get_event_groups( $event_id ) {
+	$group_terms = wp_get_object_terms( $event_id, 'bpeo_event_group' );
+	$group_term_names = wp_list_pluck( $group_terms, 'name' );
+
+	$group_ids = array();
+	foreach ( $group_term_names as $group_term_name ) {
+		// Trim leading 'group_'.
+		$group_ids[] = intval( substr( $group_term_name, 6 ) );
+	}
+
+	return $group_ids;
+}
+
+/**
  * Modify `WP_Query` requests for the 'bp_group' param.
  *
  * @param WP_Query Query object, passed by reference.
