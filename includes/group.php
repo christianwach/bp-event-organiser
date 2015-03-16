@@ -103,6 +103,53 @@ function bpeo_get_group_events( $group_id, $args = array() ) {
 	return $q->posts;
 }
 
+/**
+ * Modify `WP_Query` requests for the 'bp_group' param.
+ *
+ * @param WP_Query Query object, passed by reference.
+ */
+function bpeo_filter_query_for_bp_group( $query ) {
+	// Only modify 'event' queries.
+	$post_types = $query->get( 'post_type' );
+	if ( ! in_array( 'event', (array) $post_types ) ) {
+		return;
+	}
+
+	$bp_group = $query->get( 'bp_group', null );
+	if ( null === $bp_group ) {
+		return;
+	}
+
+	if ( ! is_array( $bp_group ) ) {
+		$group_ids = array( $bp_group );
+	} else {
+		$group_ids = $bp_group;
+	}
+
+	// Empty array will always return no results.
+	if ( empty( $group_ids ) ) {
+		$query->set( 'post__in', array( 0 ) );
+		return;
+	}
+
+	// Convert group IDs to a tax query.
+	$tq = $query->get( 'tax_query' );
+	$group_terms = array();
+	foreach ( $group_ids as $group_id ) {
+		$group_terms[] = 'group_' . $group_id;
+	}
+
+	$tq[] = array(
+		'taxonomy' => 'bpeo_event_group',
+		'terms' => $group_terms,
+		'field' => 'name',
+		'operator' => 'IN',
+	);
+
+	$query->set( 'tax_query', $tq );
+}
+add_action( 'pre_get_posts', 'bpeo_filter_query_for_bp_group' );
+
 /** TEMPLATE ************************************************************/
 
 /**
