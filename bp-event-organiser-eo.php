@@ -83,7 +83,6 @@ class BuddyPress_Event_Organiser_EO {
 	 * @return bool
 	 */
 	public function is_active() {
-
 		// only check once
 		static $eo_active = false;
 		if ( $eo_active ) { return true; }
@@ -472,45 +471,16 @@ class BuddyPress_Event_Organiser_EO {
 		// init
 		$group_id = 0;
 
-		// get group ID from $_GET
-		if ( isset( $_GET['bp_group_id'] ) AND is_numeric( $_GET['bp_group_id'] ) ) {
-
-			// set variable
+		// Get group ID from $_GET for AJAX requests.
+		if ( isset( $_GET['bp_group_id'] ) && is_numeric( $_GET['bp_group_id'] ) ) {
 			$group_id = absint( $_GET['bp_group_id'] );
-
 		}
-
-		/*
-		throw new Exception( print_r( array(
-			'group_id' => $group_id,
-			'GET' => $_GET,
-		), true ) );
-		*/
 
 		// pass if not in group
 		if ( 0 == $group_id ) return $post;
 
-		/*
-		global $bp, $_POST, $_GET, $_SERVER;
-		throw new Exception( print_r( array(
-			//'post' => $post,
-			//'bp' => $bp->groups,
-			//'referrer' => $_SERVER['HTTP_REFERER'],
-			//'query' => $_SERVER['REQUEST_URI'],
-			//'GET' => $_GET,
-		), true ) );
-		*/
-
 		// get groups for this post
 		$groups = $this->get_calendar_groups( $post_id );
-
-		/*
-		throw new Exception( print_r( array(
-			'group_id' => $group_id,
-			'groups' => $groups,
-			'post' => $post,
-		), true ) );
-		*/
 
 		// do we show this post?
 		if ( in_array( $group_id, $groups ) ) {
@@ -523,7 +493,6 @@ class BuddyPress_Event_Organiser_EO {
 
 			// --<
 			return $post;
-
 		}
 
 		// --<
