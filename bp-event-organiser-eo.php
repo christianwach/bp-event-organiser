@@ -148,16 +148,14 @@ class BuddyPress_Event_Organiser_EO {
 	 * @return nothing
 	 */
 	public function intercept_save_event( $post_id ) {
+		check_admin_referer( 'bp_event_organiser_meta_save', 'bp_event_organiser_nonce_field' );
 
-		// check that we trust the source of the data (EO does this for us)
-		//check_admin_referer( 'bp_event_organiser_meta_save', 'bp_event_organiser_nonce_field' );
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
 
-		// get post data
-		$post = get_post( $post_id );
-
-		// save BP groups for this EO event
+		// Save BP groups for this EO event.
 		$this->update_event_groups( $post_id );
-
 	}
 
 
@@ -292,8 +290,6 @@ class BuddyPress_Event_Organiser_EO {
 			return;
 
 		}
-
-		//print_r( $groups_list ); die();
 
 		// get array of checked IDs for this event
 		$this->group_ids = bpeo_get_event_groups( $event->ID );
