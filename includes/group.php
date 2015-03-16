@@ -34,7 +34,7 @@ function bpeo_connect_event_to_group( $event_id, $group_id ) {
 		return new WP_Error( 'event_not_found', __( 'No event found by that ID.', 'bp-event-organiser' ) );
 	}
 
-	$set = wp_set_object_terms( $event_id, array( 'group_' . $group_id ), 'bpeo_event_group' );
+	$set = wp_set_object_terms( $event_id, array( 'group_' . $group_id ), 'bpeo_event_group', true );
 
 	if ( is_wp_error( $set ) || empty( $set ) ) {
 		return $set;

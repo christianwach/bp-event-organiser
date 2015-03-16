@@ -344,42 +344,34 @@ class BuddyPress_Event_Organiser_EO {
 	 * @return nothing
 	 */
 	public function update_event_groups( $event_id ) {
+		$group_ids = array();
 
-		// init as off
-		$value = array();
-
-		// kick out if not set
-		if ( isset( $_POST['bp_group_organizer_groups'] ) ) {
-
-			// retrieve meta value
-			$value = is_array( $_POST['bp_group_organizer_groups'] ) ? $_POST['bp_group_organizer_groups'] : array();
-
+		// If this $_POST item is empty, group associations are being unset.
+		if ( isset( $_POST['bp_group_organizer_groups'] ) && is_array( $_POST['bp_group_organizer_groups'] ) ) {
+			$group_ids = array_map( 'intval', $_POST['bp_group_organizer_groups'] );
 		}
 
-		// save
-		$this->set_event_groups( $event_id, $value );
-
+		$this->set_event_groups( $event_id, $group_ids );
 	}
-
-
 
 	/**
 	 * @description: update event groups array
-	 * @param int $event_id the numeric ID of the event
+	 * @param int   $event_id  The numeric ID of the event.
+	 * @param array $group_ids IDs of the groups being set. Will overwrite existing connected groups.
 	 * @return nothing
 	 */
-	public function set_event_groups( $event_id, $value = array() ) {
+	protected function set_event_groups( $event_id, $group_ids ) {
+		$existing_group_ids = bpeo_get_event_groups( $event_id );
 
-		// convert to string to be safe
-		$string = implode( ',', $value );
+		$groups_to_add = array_diff( $group_ids, $existing_group_ids );
+		foreach ( $groups_to_add as $group_to_add ) {
+			bpeo_connect_event_to_group( $event_id, $group_to_add );
+		}
 
-		// trace
-		//print_r( $string ); die();
-		//print_r( $value ); die();
-
-		// update event meta
-		update_post_meta( $event_id,  '_bpeo_event_groups', $string );
-
+		$groups_to_remove = array_diff( $existing_group_ids, $group_ids );
+		foreach ( $groups_to_remove as $group_to_remove ) {
+			bpeo_disconnect_event_from_group( $event_id, $group_to_remove );
+		}
 	}
 
 	/**
