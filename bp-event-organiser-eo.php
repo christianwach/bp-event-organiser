@@ -211,7 +211,7 @@ class BuddyPress_Event_Organiser_EO {
 		return;
 
 		// get existing event groups
-		$existing = $this->get_event_groups( $post_id );
+		$existing = bpeo_get_event_groups( $post_id );
 
 		// transfer to new event
 		$this->set_event_groups( $new_event_id, $existing );
@@ -248,8 +248,6 @@ class BuddyPress_Event_Organiser_EO {
 
 		// add nonce
 		wp_nonce_field( 'bp_event_organiser_meta_save', 'bp_event_organiser_nonce_field' );
-
-		//print_r( $event ); die();
 
 		// is group hierarchy present?
 		if( $this->is_group_hierarchy_active() ) {
@@ -298,7 +296,7 @@ class BuddyPress_Event_Organiser_EO {
 		//print_r( $groups_list ); die();
 
 		// get array of checked IDs for this event
-		$this->group_ids = $this->get_event_groups( $event->ID );
+		$this->group_ids = bpeo_get_event_groups( $event->ID );
 
 		// define walker
 		$walker = new Walker_BPEO_Group;
@@ -383,31 +381,6 @@ class BuddyPress_Event_Organiser_EO {
 		update_post_meta( $event_id,  '_bpeo_event_groups', $string );
 
 	}
-
-
-
-	/**
-	 * @description: get all event groups
-	 * @param int $post_id the numeric ID of the WP post
-	 * @return bool $event_groups_array the event groups event
-	 */
-	public function get_event_groups( $post_id ) {
-
-		// get the meta value
-		$event_groups = get_post_meta( $post_id, '_bpeo_event_groups', true );
-
-		// if it's not yet set it will be an empty string, so cast as array
-		if ( $event_groups === '' ) return array();
-
-		// convert to array
-		$event_groups_array = explode( ',', $event_groups );
-
-		// --<
-		return $event_groups_array;
-
-	}
-
-
 
 	/**
 	 * @description: delete event groups
@@ -560,23 +533,6 @@ class BuddyPress_Event_Organiser_EO {
 
 
 } // class ends
-
-
-
-/**
- * @description: get list of groups for an event
- * @return array $groups comma-delimited
- */
-function bp_event_organiser_get_groups( $post_id ) {
-
-	// access plugin global
-	global $buddypress_event_organiser;
-
-	// --<
-	return $buddypress_event_organiser->eo->get_event_groups( $post_id );
-
-}
-
 
 /**
  * @description: get list of group IDs for an event's metabox
