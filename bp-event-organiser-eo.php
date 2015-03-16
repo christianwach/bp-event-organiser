@@ -504,23 +504,11 @@ class BuddyPress_Event_Organiser_EO {
 
 	/**
 	 * @description: get all event groups
-	 * @param int $post_id the numeric ID of the WP post
+	 * @param int $event_id the numeric ID of the WP post
 	 * @return bool $event_groups_array the event groups event
 	 */
-	public function get_calendar_groups( $post_id ) {
-
-		// get the meta value
-		$event_groups = get_post_meta( $post_id, '_bpeo_event_groups', true );
-
-		// if it's not yet set it will be an empty string, so cast as array
-		if ( $event_groups === '' ) return array();
-
-		// convert to array
-		$event_groups_array = explode( ',', $event_groups );
-
-		// --<
-		return $event_groups_array;
-
+	public function get_calendar_groups( $event_id ) {
+		return bpeo_get_event_groups( $event_id );
 	}
 
 
