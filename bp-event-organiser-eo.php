@@ -22,7 +22,11 @@ class BuddyPress_Event_Organiser_EO {
 	 * @description: initialises this object
 	 * @return object
 	 */
-	function __construct() {
+	public function __construct() {
+		if ( ! $this->is_active() ) {
+			add_action( 'admin_notices', array( $this, 'eo_active_notice' ) );
+			return;
+		}
 
 		// register hooks
 		$this->register_hooks();
@@ -32,7 +36,20 @@ class BuddyPress_Event_Organiser_EO {
 
 	}
 
+	/**
+	 * Throw an admin notice about the Event Organiser requirement.
+	 */
+	public function eo_active_notice() {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return;
+		}
 
+		?>
+		<div class="error">
+			<p><?php _e( 'BP Event Organiser requires version 2+ of Event Organiser.', 'bp-event-organiser' ) ?></p>
+		</div>
+		<?php
+	}
 
 	/**
 	 * @description: set references to other objects
@@ -90,22 +107,12 @@ class BuddyPress_Event_Organiser_EO {
 		// access Event Organiser option
 		$installed_version = get_option( 'eventorganiser_version' );
 
-		// this plugin will not work without EO
-		if ( $installed_version === false ) {
-			wp_die( '<p>Event Organiser plugin is required</p>' );
+		// this plugin will not work without EO version 2+.
+		if ( $installed_version !== false && $installed_version >= '2' ) {
+			$eo_active = true;
 		}
 
-		// we need version 2 at least
-		if ( $installed_version < '2' ) {
-			wp_die( '<p>Event Organiser version 2 or higher is required</p>' );
-		}
-
-		// set flag
-		$eo_active = true;
-
-		// --<
 		return $eo_active;
-
 	}
 
 
