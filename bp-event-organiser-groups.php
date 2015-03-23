@@ -108,6 +108,31 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 
 		}
 
+		$this->register_additional_nav_items();
+
+	}
+
+	/**
+	 * Registers additional subnav items.  Mainly the "New Event" subnav item.
+	 */
+	protected function register_additional_nav_items() {
+		if ( ! bp_is_group() ) {
+			return;
+		}
+
+		bp_core_new_subnav_item( array(
+			'name'            => __( 'New Event', 'bp-event-organizer' ),
+			'slug'            => bpeo_get_events_new_slug(),
+			'parent_url'      => bp_get_group_permalink( groups_get_current_group() ),
+			'parent_slug'     => bp_get_current_group_slug(),
+			'screen_function' => array( $this, '_display_hook' ),
+			'position'        => 9999,
+			'item_css_id'     => 'nav-' . bpeo_get_events_new_slug(),
+
+			// this basically hides the nav item until the user is actually on the slug
+			// the user_can_visit() check might need to be switched out later on
+			'user_has_access' => $this->user_can_visit() && bp_is_current_action( bpeo_get_events_new_slug() )
+		) );
 	}
 
 	/**
@@ -118,6 +143,26 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		if ( ! empty( buddypress()->action_variables ) ) {
 			$this->single_event_screen();
 			add_action( 'bp_template_content', array( $this, 'display_single_event' ) );
+
+		// create event
+		} elseif ( bp_is_current_action( bpeo_get_events_new_slug() ) ) {
+			// check if user has access
+			// @todo currently all group members have access to edit events... restrict to mods?
+			if ( false === is_user_logged_in() || false === buddypress()->groups->current_group->user_has_access ) {
+				bp_core_add_message( __( 'You do not have access to edit this event.', 'bp-event-organiser' ), 'error' );
+				bp_core_redirect( bpeo_get_group_permalink() );
+				die();
+			}
+
+			// magic admin screen code!
+			require BPEO_PATH . '/includes/class.bpeo_frontend_admin_screen.php';
+
+			$this->create_event = new BPEO_Frontend_Admin_Screen( array(
+				'type'           => 'new',
+				'redirect_root'  => bpeo_get_group_permalink()
+			) );
+
+			add_action( 'bp_template_content', array( $this->create_event, 'display' ) );
 
 		// default behavior
 		} else{
