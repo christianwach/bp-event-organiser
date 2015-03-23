@@ -169,6 +169,50 @@ function bpeo_filter_query_for_bp_group( $query ) {
 }
 add_action( 'pre_get_posts', 'bpeo_filter_query_for_bp_group' );
 
+/**
+ * Modify EO capabilities for group membership.
+ *
+ * @param array  $caps    Capability array.
+ * @param string $cap     Capability to check.
+ * @param int    $user_id ID of the user being checked.
+ * @param array  $args    Miscellaneous args.
+ * @return array Caps whitelist.
+ */
+function bpeo_event_meta_cap( $caps, $cap, $user_id, $args ) {
+	// @todo Need real caching in BP for this.
+	static $user_groups = null;
+
+	if ( ! in_array( $cap, array( 'read_event' ) ) ) {
+		return $caps;
+	}
+
+	$event = get_post( $args[0] );
+	if ( 'event' !== $event->post_type ) {
+		return $caps;
+	}
+
+	$event_groups = bpeo_get_event_groups( $event->ID );
+
+	if ( is_null( $user_groups ) ) {
+		$user_groups = groups_get_user_groups( $user_id );
+	}
+
+	switch ( $cap ) {
+		case 'read_event' :
+			if ( 'private' !== $event->post_status ) {
+				// EO uses 'read', which doesn't include non-logged-in users.
+				$caps = array( 'exist' );
+			} elseif ( array_intersect( $user_groups['groups'], $event_groups ) ) {
+				$caps = array( 'read' );
+			}
+
+			break;
+	}
+
+	return $caps;
+}
+add_filter( 'map_meta_cap', 'bpeo_event_meta_cap', 20, 4 );
+
 /** TEMPLATE ************************************************************/
 
 /**
