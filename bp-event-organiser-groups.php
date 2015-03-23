@@ -109,7 +109,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		}
 
 		$this->register_additional_nav_items();
-
+		$this->register_buttons();
 	}
 
 	/**
@@ -133,6 +133,13 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			// the user_can_visit() check might need to be switched out later on
 			'user_has_access' => $this->user_can_visit() && bp_is_current_action( bpeo_get_events_new_slug() )
 		) );
+	}
+
+	/**
+	 * Registers buttons to be shown in the group header.
+	 */
+	protected function register_buttons() {
+		add_action( 'bp_group_header_actions', array( $this, 'new_event_button' ) );
 	}
 
 	/**
@@ -332,6 +339,29 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		if ( ! empty( $_post ) ) {
 			$post = $_post;
 		}
+	}
+
+	/**
+	 * Renders the 'New Event' button in the group header.
+	 */
+	public function new_event_button() {
+		// do not show button if on 'new-event' page or if not on a group event page
+		if ( false === $this->user_can_see_nav_item() || bp_is_current_action( bpeo_get_events_new_slug() ) || ! bp_is_current_action( bpeo_get_events_slug() ) ) {
+			return;
+		}
+
+		// don't show if user is not a member of the group
+		if ( false === buddypress()->groups->current_group->is_user_member ) {
+			return;
+		}
+
+		bp_button( array(
+			'component'         => 'groups',
+			'id'                => 'new_event',
+			'must_be_logged_in' => true,
+			'link_text'         => __( 'New Event', 'bp-event-organizer' ),
+			'link_href'         => trailingslashit( bp_get_group_permalink() . bpeo_get_events_new_slug() )
+		) );
 	}
 
 	/**
