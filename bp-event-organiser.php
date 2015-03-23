@@ -39,6 +39,11 @@ if ( ! defined( 'BPEO_EVENTS_SLUG' ) ) {
 	define( 'BPEO_EVENTS_SLUG', 'events' );
 }
 
+// new events slug
+if ( ! defined( 'BPEO_EVENTS_NEW_SLUG' ) ) {
+	define( 'BPEO_EVENTS_NEW_SLUG', 'new-event' );
+}
+
 /**
  * Include BuddyPress-specific functionality.
  */
