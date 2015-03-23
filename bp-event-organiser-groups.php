@@ -129,9 +129,10 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			'position'        => 9999,
 			'item_css_id'     => 'nav-' . bpeo_get_events_new_slug(),
 
-			// this basically hides the nav item until the user is actually on the slug
-			// the user_can_visit() check might need to be switched out later on
-			'user_has_access' => $this->user_can_visit() && bp_is_current_action( bpeo_get_events_new_slug() )
+			// check if user has access
+			// @todo currently all group members have access to edit events... restrict to mods?
+			// also, this tab can only be seen on the 'new-event' page
+			'user_has_access' => buddypress()->groups->current_group->is_user_member && bp_is_current_action( bpeo_get_events_new_slug() )
 		) );
 	}
 
@@ -155,7 +156,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		} elseif ( bp_is_current_action( bpeo_get_events_new_slug() ) ) {
 			// check if user has access
 			// @todo currently all group members have access to edit events... restrict to mods?
-			if ( false === is_user_logged_in() || false === buddypress()->groups->current_group->user_has_access ) {
+			if ( false === is_user_logged_in() || false === buddypress()->groups->current_group->is_user_member ) {
 				bp_core_add_message( __( 'You do not have access to edit this event.', 'bp-event-organiser' ), 'error' );
 				bp_core_redirect( bpeo_get_group_permalink() );
 				die();
@@ -240,7 +241,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		if ( bp_is_action_variable( 'edit', 1 ) ) {
 			// check if user has access
 			// @todo currently all group members have access to edit events... restrict to mods?
-			if ( false === is_user_logged_in() || false === buddypress()->groups->current_group->user_has_access ) {
+			if ( false === buddypress()->groups->current_group->is_user_member ) {
 				bp_core_add_message( __( 'You do not have access to edit this event.', 'bp-event-organiser' ), 'error' );
 				bp_core_redirect( bpeo_get_group_permalink() . "{$this->queried_event->post_name}/" );
 				die();
@@ -331,7 +332,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		echo '<a href="' . bpeo_get_group_permalink() . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
 
 		// @todo add function for proper edit access, make 'edit' slug changeable
-		if ( is_user_logged_in() && true === buddypress()->groups->current_group->user_has_access ) {
+		if ( true === buddypress()->groups->current_group->is_user_member ) {
 			echo ' | <a href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
 		}
 
