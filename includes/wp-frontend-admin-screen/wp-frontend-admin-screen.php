@@ -180,8 +180,8 @@ class WP_Frontend_Admin_Screen {
 
 		// update
 		if ( $_POST ) {
-			// require admin post abstraction functions
-			require dirname( __FILE__ ) . '/abstraction-admin-post.php';
+			// require admin post functions
+			require ABSPATH . 'wp-admin/includes/post.php';
 
 			// verify!
 			check_admin_referer( 'update-post_' . $_POST['post_ID'] );
