@@ -187,6 +187,12 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// show header
 		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
 
+		// show secondary title if filter is in use
+		$filter_title = bpeo_get_the_filter_title();
+		if ( ! empty( $filter_title ) ) {
+			echo "<h4>{$filter_title}</h4>";
+		}
+
 		// delete the calendar transient cache depending on user cap
 		// @todo EO's calendar transient cache needs overhauling
 		if( current_user_can( 'read_private_events' ) ){

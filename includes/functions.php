@@ -17,6 +17,44 @@ function bpeo_get_events_new_slug() {
 	return sanitize_title( constant( 'BPEO_EVENTS_NEW_SLUG' ) );
 }
 
+/**
+ * Output the filter title depending on URL querystring.
+ *
+ * @see bpeo_get_the_filter_title()
+ */
+function bpeo_the_filter_title() {
+	echo bpeo_get_the_filter_title();
+}
+	/**
+	 * Return the filter title depending on URL querystring.
+	 *
+	 * If the 'cat' or 'tag' URL parameter is in use, this function will output
+	 * a title based on these parameters.
+	 *
+	 * @return string
+	 */
+	function bpeo_get_the_filter_title() {
+		$cat = $tag = '';
+
+		if ( ! empty( $_GET['cat'] ) ) {
+			$cat = str_replace( ',', ', ', esc_attr( $_GET['cat'] ) );
+		}
+
+		if ( ! empty( $_GET['tag'] ) ) {
+			$tag = str_replace( ',', ', ', esc_attr( $_GET['tag'] ) );
+		}
+
+		if ( ! empty( $cat ) && ! empty( $tag ) ) {
+			return sprintf( __( "Filtered by category '%1$s' and tag '%2$s'", 'bp-event-organizer' ), $cat, $tag );
+		} elseif ( ! empty( $cat ) ) {
+			return sprintf( __( "Filtered by category '%s'", 'bp-event-organizer' ), $cat );
+		} elseif ( ! empty( $tag ) ) {
+			return sprintf( __( "Filtered by tag '%s'", 'bp-event-organizer' ), $tag );
+		} else {
+			return '';
+		}
+	}
+
 /** HOOKS ***************************************************************/
 
 /**
