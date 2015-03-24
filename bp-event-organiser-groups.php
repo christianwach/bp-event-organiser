@@ -195,10 +195,23 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			delete_transient( 'eo_full_calendar_public' );
 		}
 
-		// show events calendar, filtered by meta value in eo->intercept_calendar()
-		echo eo_get_event_fullcalendar( array(
+		$cat = ! empty( $_GET['cat'] ) ? esc_attr( $_GET['cat'] ) : '';
+		$tag = ! empty( $_GET['tag'] ) ? esc_attr( $_GET['tag'] ) : '';
+
+		$args = array(
 			'headerright' => 'prev,next today,month,agendaWeek',
-		) );
+		);
+
+		if ( ! empty( $cat ) ) {
+			$args['event-category'] = $cat;
+		}
+
+		if ( ! empty( $tag ) ) {
+			$args['event-tag'] = $tag;
+		}
+
+		// show events calendar, filtered by meta value in eo->intercept_calendar()
+		echo eo_get_event_fullcalendar( $args );
 
 	}
 
