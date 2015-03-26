@@ -45,6 +45,7 @@ class BPEO_Component extends BP_Component {
 			'slug' => 'calendar', // @todo better l10n
 			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
 			'parent_slug' => $this->slug,
+			'user_has_access' => bp_core_can_edit_settings(),
 			'screen_function' => array( $this, 'template_loader' ),
 		);
 
