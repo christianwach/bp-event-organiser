@@ -40,21 +40,43 @@ class BPEO_Component extends BP_Component {
 			'default_subnav_slug' => 'calendar',
 		);
 
-		$sub_nav = array(
-			array(
-				'name' => __( 'Calendar', 'bp-event-organiser' ),
-				'slug' => 'calendar', // @todo better l10n
-				'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
-				'parent_slug' => $this->slug,
-				'screen_function' => array( $this, 'template_loader' ),
-			),
+		$sub_nav[] = array(
+			'name' => __( 'Calendar', 'bp-event-organiser' ),
+			'slug' => 'calendar', // @todo better l10n
+			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
+			'parent_slug' => $this->slug,
+			'screen_function' => array( $this, 'template_loader' ),
+		);
+
+		$sub_nav[] = array(
+			'name' => __( 'New Event', 'bp-event-organizer' ),
+			'slug' => bpeo_get_events_new_slug(),
+			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
+			'parent_slug' => $this->slug,
+			'user_has_access' => bp_core_can_edit_settings(),
+			'screen_function' => array( $this, 'template_loader' ),
 		);
 
 		parent::setup_nav( $main_nav, $sub_nav );
 	}
 
 	public function template_loader() {
-		add_action( 'bp_template_content', array( $this, 'select_template' ) );
+		// new event
+		if ( bp_is_current_action( bpeo_get_events_new_slug() ) ) {
+			// magic admin screen code!
+			require BPEO_PATH . '/includes/class.bpeo_frontend_admin_screen.php';
+
+			$this->create_event = new BPEO_Frontend_Admin_Screen( array(
+				'type' => 'new',
+			) );
+
+			add_action( 'bp_template_content', array( $this->create_event, 'display' ) );
+
+		// user calendar
+		} else {
+			add_action( 'bp_template_content', array( $this, 'select_template' ) );
+		}
+
 		bp_core_load_template( 'members/single/plugins' );
 	}
 
