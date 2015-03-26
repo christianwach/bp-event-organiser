@@ -179,9 +179,7 @@ add_action( 'pre_get_posts', 'bpeo_filter_query_for_bp_group' );
  * @return array Caps whitelist.
  */
 function bpeo_event_meta_cap( $caps, $cap, $user_id, $args ) {
-	// @todo Need real caching in BP for this.
-	static $user_groups = null;
-
+	// @todo Need real caching in BP for group memberships.
 	if ( ! in_array( $cap, array( 'read_event' ) ) ) {
 		return $caps;
 	}
@@ -192,10 +190,7 @@ function bpeo_event_meta_cap( $caps, $cap, $user_id, $args ) {
 	}
 
 	$event_groups = bpeo_get_event_groups( $event->ID );
-
-	if ( is_null( $user_groups ) ) {
-		$user_groups = groups_get_user_groups( $user_id );
-	}
+	$user_groups = groups_get_user_groups( $user_id );
 
 	switch ( $cap ) {
 		case 'read_event' :
