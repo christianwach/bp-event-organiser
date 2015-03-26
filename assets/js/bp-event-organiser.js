@@ -1,11 +1,13 @@
 // init var
-var bp_event_organiser_group_id = 0;
+var bp_event_organiser_group_id = 0,
+    bp_event_organiser_displayed_user_id = 0;
 
 // test for our localisation object
 if ( 'undefined' !== typeof BpEventOrganiserSettings ) {
 
 	// get our var
 	bp_event_organiser_group_id = BpEventOrganiserSettings.group_id;
+	bp_event_organiser_displayed_user_id = BpEventOrganiserSettings.displayed_user_id;
 	
 }
 
@@ -24,8 +26,8 @@ jQuery(document).ready( function($) {
 	
 			'eventorganiser.fullcalendar_request', 
 			function( request, a, b, c, d ) {
-			
 				// add our variable to the request
+				request['bp_displayed_user_id'] = bp_event_organiser_displayed_user_id;
 				request['bp_group_id'] = bp_event_organiser_group_id;
 			
 				/*

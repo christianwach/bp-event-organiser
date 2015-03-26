@@ -48,10 +48,12 @@ if ( ! defined( 'BPEO_EVENTS_NEW_SLUG' ) ) {
  * Include BuddyPress-specific functionality.
  */
 function bpeo_include() {
-	require( BPEO_PATH . '/includes/functions.php' );
+	require( BPEO_PATH . 'includes/functions.php' );
+	require( BPEO_PATH . 'includes/component.php' );
+	require( BPEO_PATH . 'includes/user.php' );
 
 	if ( bp_is_active( 'groups' ) ) {
-		require( BPEO_PATH . '/includes/group.php' );
+		require( BPEO_PATH . 'includes/group.php' );
 	}
 }
 add_action( 'bp_include', 'bpeo_include' );
@@ -197,9 +199,9 @@ class BuddyPress_Event_Organiser {
 
 		// get vars
 		$vars = array(
-			'group_id' => bp_get_current_group_id()
+			'group_id' => bp_get_current_group_id(),
+			'displayed_user_id' => bp_displayed_user_id(),
 		);
-		//print_r( $vars ); die();
 
 		// localise with wp function
 		wp_localize_script( 'bp_event_organiser_js', 'BpEventOrganiserSettings', $vars );

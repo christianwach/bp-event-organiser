@@ -100,3 +100,33 @@ function bpeo_filter_term_list( $retval = '' ) {
 }
 add_filter( 'term_links-event-tag',      'bpeo_filter_term_list' );
 add_filter( 'term_links-event-category', 'bpeo_filter_term_list' );
+
+/**
+ * Whitelist BPEO shortcode attributes.
+ *
+ * @param array $out Output array of shortcode attributes.
+ * @param array $pairs Default attributes as defined by EO.
+ * @param array $atts Attributes passed to the shortcode.
+ * @return array
+ */
+function bpeo_filter_eo_fullcalendar_shortcode_attributes( $out, $pairs, $atts ) {
+	$whitelisted_atts = array(
+		'bp_group',
+		'bp_displayed_user_id',
+	);
+
+	foreach ( $atts as $att_name => $att_value ) {
+		if ( isset( $out[ $att_name ] ) ) {
+			continue;
+		}
+
+		if ( ! in_array( $att_name, $whitelisted_atts ) ) {
+			continue;
+		}
+
+		$out[ $att_name ] = $att_value;
+	}
+
+	return $out;
+}
+add_filter( 'shortcode_atts_eo_fullcalendar', 'bpeo_filter_eo_fullcalendar_shortcode_attributes', 10, 3 );
