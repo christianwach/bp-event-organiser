@@ -85,9 +85,6 @@ class BuddyPress_Event_Organiser_EO {
 		// intercept after break occurrence, because a new post is created
 		//add_action( 'eventorganiser_occurrence_broken', array( $this, 'occurrence_broken' ), 10, 3 );
 
-		// intercept calendar display
-		add_filter( 'eventorganiser_fullcalendar_event', array( $this, 'intercept_calendar' ), 10, 3 );
-
 		// intercept post content - try to catch calendar shortcodes
 		add_filter( 'the_content', array( $this, 'intercept_content' ), 10, 1 );
 
@@ -417,58 +414,6 @@ class BuddyPress_Event_Organiser_EO {
 
 
 	//##########################################################################
-
-
-
-	/**
-	 * @description: intercept display of group calendar
-	 * @param object $post the WP post object
-	 * @param int $post_id the numeric ID of the WP post
-	 * @param int $occurrence_id the numeric ID of the EO occurrence
-	 * @return nothing
-	 */
-	public function intercept_calendar( $post, $post_id, $occurrence_id ) {
-
-		/*
-		bp_get_current_group_id() reports incorrect IDs for BP Group Hierarchy
-		sub groups - it only reports the top level group's ID presumably because
-		BuddyPress is parsing the URL to get the group ID. As a result, we need to
-		parse $_GET, which has our injected value.
-		*/
-
-		// init
-		$group_id = 0;
-
-		// Get group ID from $_GET for AJAX requests.
-		if ( isset( $_GET['bp_group_id'] ) && is_numeric( $_GET['bp_group_id'] ) ) {
-			$group_id = absint( $_GET['bp_group_id'] );
-		}
-
-		// pass if not in group
-		if ( 0 == $group_id ) return $post;
-
-		// get groups for this post
-		$groups = $this->get_calendar_groups( $post_id );
-
-		// do we show this post?
-		if ( in_array( $group_id, $groups ) ) {
-			// this is to avoid requerying the event just for the post slug
-			$event_url = explode( '/', untrailingslashit( $post['url'] ) );
-			$post_slug = array_pop( $event_url );
-
-			// regenerate the post URL to account for group permalink
-			$post['url'] = trailingslashit( bpeo_get_group_permalink( $group_id ) . $post_slug );
-
-			// --<
-			return $post;
-		}
-
-		// --<
-		return null;
-
-	}
-
-
 
 	/**
 	 * @description: get all event groups

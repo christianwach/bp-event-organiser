@@ -170,6 +170,26 @@ function bpeo_filter_query_for_bp_group( $query ) {
 add_action( 'pre_get_posts', 'bpeo_filter_query_for_bp_group' );
 
 /**
+ * Catch "fullcalendar" AJAX requests and process 'bp_group' information.
+ *
+ * @param array $query Query vars as set up by EO.
+ */
+function bpeo_add_bp_group_id_to_ajax_query( $query ) {
+	if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) {
+		return $query;
+	}
+
+	if ( ! isset( $_REQUEST['bp_group_id'] ) ) {
+		return $query;
+	}
+
+	$query['bp_group'] = intval( $_REQUEST['bp_group_id'] );
+
+	return $query;
+}
+add_filter( 'eventorganiser_fullcalendar_query', 'bpeo_add_bp_group_id_to_ajax_query' );
+
+/**
  * Modify EO capabilities for group membership.
  *
  * @param array  $caps    Capability array.
