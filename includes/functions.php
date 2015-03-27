@@ -130,3 +130,9 @@ function bpeo_filter_eo_fullcalendar_shortcode_attributes( $out, $pairs, $atts )
 	return $out;
 }
 add_filter( 'shortcode_atts_eo_fullcalendar', 'bpeo_filter_eo_fullcalendar_shortcode_attributes', 10, 3 );
+
+/**
+ * Disable EO's transient cache for calendar queries.
+ */
+add_filter( 'pre_transient_eo_full_calendar_public', '__return_empty_array' );
+add_filter( 'pre_transient_eo_full_calendar_public_priv', '__return_empty_array' );
