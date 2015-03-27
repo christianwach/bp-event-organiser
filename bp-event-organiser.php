@@ -200,8 +200,6 @@ class BuddyPress_Event_Organiser {
 
 		// get vars
 		$vars = array(
-			'group_id' => bp_get_current_group_id(),
-			'displayed_user_id' => bp_displayed_user_id(),
 			'calendar_filter_title' => __( 'Filters', 'bp-event-calendar' ),
 			'calendar_author_filter_title' => __( 'By Author', 'bp-event-calendar' ),
 			'calendar_group_filter_title' => __( 'By Group', 'bp-event-calendar' ),

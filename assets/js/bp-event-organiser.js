@@ -15,24 +15,6 @@
 		// test if we have wp.hooks
 		if ( 'undefined' !== typeof wp && 'undefined' !== typeof wp.hooks ) {
 
-			// Add filter for AJAX request so that the group ID and displayed user ID are passed.
-			wp.hooks.addFilter(
-				'eventorganiser.fullcalendar_request',
-				function( request, a, b, c, d ) {
-					// add our variable to the request
-					if ( l10n.displayed_user_id > 0 ) {
-						request['bp_displayed_user_id'] = l10n.displayed_user_id;
-					}
-
-					if ( l10n.group_id > 0 ) {
-						request['bp_group_id'] = l10n.group_id;
-					}
-
-					// --<
-					return request;
-				}
-			);
-
 			// Add filter for event rendering.
 			wp.hooks.addFilter(
 				'eventorganiser.fullcalendar_render_event',
