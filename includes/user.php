@@ -108,6 +108,7 @@ function bpeo_add_author_info_to_calendar_event( $event, $event_id, $occurrence_
 		'id' => $event_obj->post_author,
 		'url' => bp_core_get_user_domain( $event_obj->post_author ),
 		'name' => bp_core_get_user_displayname( $event_obj->post_author ),
+		'color' => bpeo_get_item_calendar_color( $event_obj->post_author, 'author' ),
 	);
 
 	return $event;

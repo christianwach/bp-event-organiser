@@ -228,6 +228,7 @@ function bpeo_add_group_info_to_calendar_event( $event, $event_id, $occurrence_i
 				'name' => $group->name,
 				'url' => bp_get_group_permalink( $group ),
 				'id' => $group_id,
+				'color' => bpeo_get_item_calendar_color( $group_id, 'group' ),
 			);
 		}
 	}

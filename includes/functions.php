@@ -136,3 +136,70 @@ add_filter( 'shortcode_atts_eo_fullcalendar', 'bpeo_filter_eo_fullcalendar_short
  */
 add_filter( 'pre_transient_eo_full_calendar_public', '__return_empty_array' );
 add_filter( 'pre_transient_eo_full_calendar_public_priv', '__return_empty_array' );
+
+/**
+ * Get an item's calendar color.
+ *
+ * Will select one randomly from a whitelist if not found.
+ *
+ * @param int    $item_id   ID of the item.
+ * @param string $item_type Type of the item. 'author' or 'group'.
+ * @return string Hex code for the item color.
+ */
+function bpeo_get_item_calendar_color( $item_id, $item_type ) {
+	$color = '';
+	switch ( $item_type ) {
+		case 'group' :
+			$color = groups_get_groupmeta( $item_id, 'bpeo_calendar_color' );
+			break;
+
+		case 'author' :
+		default :
+			$color = bp_get_user_meta( $item_id, 'bpeo_calendar_color', true );
+			break;
+	}
+
+	if ( ! $color ) {
+		// http://stackoverflow.com/a/4382138
+		$colors = array(
+			'FFB300', // Vivid Yellow
+			'803E75', // Strong Purple
+			'FF6800', // Vivid Orange
+			'A6BDD7', // Very Light Blue
+			'C10020', // Vivid Red
+			'CEA262', // Grayish Yellow
+			'817066', // Medium Gray
+
+			// The following don't work well for people with defective color vision
+			'007D34', // Vivid Green
+			'F6768E', // Strong Purplish Pink
+			'00538A', // Strong Blue
+			'FF7A5C', // Strong Yellowish Pink
+			'53377A', // Strong Violet
+			'FF8E00', // Vivid Orange Yellow
+			'B32851', // Strong Purplish Red
+			'F4C800', // Vivid Greenish Yellow
+			'7F180D', // Strong Reddish Brown
+			'93AA00', // Vivid Yellowish Green
+			'593315', // Deep Yellowish Brown
+			'F13A13', // Vivid Reddish Orange
+			'232C16', // Dark Olive Green
+		);
+
+		$index = array_rand( $colors );
+		$color = $colors[ $index ];
+
+		switch ( $item_type ) {
+			case 'group' :
+				groups_update_groupmeta( $item_id, 'bpeo_calendar_color', $color );
+				break;
+
+			case 'author' :
+			default :
+				bp_update_user_meta( $item_id, 'bpeo_calendar_color', $color );
+				break;
+		}
+	}
+
+	return $color;
+}

@@ -1,5 +1,6 @@
 ( function( $ ) {
-	var calendars = [],
+	var added_icons = false,
+		calendars = [],
 		l10n;
 
 	/**
@@ -21,6 +22,18 @@
 				function( retval, eo_event, eo_event_link, monthview ) {
 					prerender_event( eo_event, eo_event_link.closest( '.eo-fullcalendar' ).attr( 'id' ) );
 					return retval;
+				}
+			);
+
+			// Register eventAfterRender callback.
+			wp.hooks.addFilter(
+				'eventorganiser.fullcalendar_options',
+				function( args, calendar ) {
+					args.eventAfterRender = function( eo_event, eo_event_link, calendar ) {
+						afterrender_event( eo_event, eo_event_link, calendar );
+					}
+
+					return args;
 				}
 			);
 
@@ -97,6 +110,7 @@
 
 		// Create the checkbox.
 		checkbox  = '<input type="checkbox" id="bpeo-group-filter-' + group_id + '" value="1" name="bpeo-group-filter-' + calendar_id + '" data-group-id="' + group_id + '" checked="checked" />';
+		checkbox += '<span class="bpeo-calendar-icon bpeo-calendar-icon-group" style="background-color:#' + group_data.color + '"></span>';
 		checkbox += '<label for="bpeo-group-filter-' + group_id + '">' + group_data.name + '</label>';
 
 		if ( 'undefined' === typeof calendars.calendar_id.filter_groups ) {
@@ -130,6 +144,7 @@
 
 		// Create the checkbox.
 		checkbox  = '<input type="checkbox" id="bpeo-author-filter-' + author_id + '" value="1" name="bpeo-author-filter-' + calendar_id + '" data-author-id="' + author_id + '" checked="checked" />';
+		checkbox += '<span class="bpeo-calendar-icon bpeo-calendar-icon-author" style="border-bottom-color:#' + author_data.color + '"></span>';
 		checkbox += '<label for="bpeo-author-filter-' + author_id + '">' + author_data.name + '</label>';
 		
 		// Append to filter list.
@@ -236,7 +251,52 @@
 				$( e ).addClass( 'bpeo-event-hidden' );
 			}
 		} );
-	}
+	};
+
+	/**
+	 * Add author and group calendar icons to event.
+	 */
+	afterrender_event = function( eo_event, eo_event_link, calendar ) {
+		var author_icon,
+			group_icons = [],
+			icon_div;
+
+		author_icon = '<span class="bpeo-calendar-icon bpeo-calendar-icon-author" title="' + eo_event.author.name + '" style="border-bottom-color:#' + eo_event.author.color + '"></span>';
+
+		if ( 'undefined' !== typeof eo_event.groups ) {
+			$.each( eo_event.groups, function( group_id, group_data ) {
+				group_icons.push( '<span class="bpeo-calendar-icon bpeo-calendar-icon-group" title="' + group_data.name + '" style="background-color:#' + group_data.color + '"></span>' );
+			} );
+		}
+
+		icon_div = '<div class="bpeo-event-icons">' + author_icon + group_icons.join( '' ) + '</div>';
+		
+		eo_event_link.append( icon_div );
+
+		reset_week_height( eo_event, eo_event_link, calendar );
+	};
+
+	/**
+	 * Reset week height.
+	 */
+	reset_week_height = function( eo_event, eo_event_link, calendar ) {
+		var event_cell = calendar.dateToCell( eo_event._start );
+		var event_height = eo_event_link.height();
+		var weeks = calendar.element.find( '.fc-week' );
+		var $week = $( weeks[ event_cell.row ] );
+		var $week_content_div = $week.find( '.fc-day-content > div' );
+
+		var event_delta = event_height - $week_content_div.height();
+		if ( event_delta <= 0 ) {
+			return;
+		}
+
+		// Adjust the week height.
+		$week_content_div.height( event_height );
+
+		// Align the event with the top of the content cell.
+		eo_event_link.css( 'top', $week_content_div.position().top );
+	};
 
 	$( document ).ready( function() {
 		init();
