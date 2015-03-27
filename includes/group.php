@@ -200,6 +200,19 @@ add_filter( 'eventorganiser_fullcalendar_query', 'bpeo_add_bp_group_id_to_ajax_q
 function bpeo_add_group_info_to_calendar_event( $event, $event_id, $occurrence_id ) {
 	foreach ( bpeo_get_event_groups( $event_id ) as $group_id ) {
 		$event['className'][] = 'eo-event-bp-group-' . intval( $group_id );
+
+		if ( ! isset( $event['groups'] ) ) {
+			$event['groups'] = array();
+		}
+
+		if ( ! isset( $event['groups'][ $group_id ] ) ) {
+			$group = groups_get_group( array( 'group_id' => $group_id ) );
+			$event['groups'][ $group_id ] = array(
+				'name' => $group->name,
+				'url' => bp_get_group_permalink( $group ),
+				'id' => $group_id,
+			);
+		}
 	}
 
 	return $event;

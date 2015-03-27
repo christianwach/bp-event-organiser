@@ -107,6 +107,14 @@ function bpeo_add_author_info_to_calendar_event( $event, $event_id, $occurrence_
 	$event_obj = get_post( $event_id );
 	$event['className'][] = 'eo-event-author-' . intval( $event_obj->post_author );
 
+	$event['author'] = array(
+		'id' => $event_obj->post_author,
+		'url' => bp_core_get_user_domain( $event_obj->post_author ),
+		'name' => bp_core_get_user_displayname( $event_obj->post_author ),
+	);
+
 	return $event;
 }
 add_filter( 'eventorganiser_fullcalendar_event', 'bpeo_add_author_info_to_calendar_event', 10, 3 );
+
+/** Template functions *******************************************************/

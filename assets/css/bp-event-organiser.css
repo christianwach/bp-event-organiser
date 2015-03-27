@@ -1,0 +1,25 @@
+.bpeo-calendar-filter-type {
+	float: left;
+	width: 40%;
+	margin-right: 5%;
+}
+
+.bpeo-calendar-filter-type ul {
+	list-style-type: none;
+}
+
+.bpeo-calendar-filter-type ul li {
+	margin-left: 0;
+}
+
+.bpeo-calendar-filter-type ul li input[type="checkbox"] {
+	margin-right: 10px;
+}
+
+.bpeo-calendar-filter-empty {
+	display: none;
+}
+
+.bpeo-event-hidden {
+	display: none;
+}

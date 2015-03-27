@@ -92,8 +92,9 @@ class BuddyPress_Event_Organiser {
 		// use translation files
 		$this->enable_translation();
 
-		// register any public scripts
+		// Register public assets. @todo Only load when needed.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'wp_print_styles', array( $this, 'enqueue_styles' ) );
 
 		// add action for CBOX theme compatibility
 		add_action( 'wp_head', array( $this, 'cbox_theme_compatibility' ) );
@@ -201,14 +202,24 @@ class BuddyPress_Event_Organiser {
 		$vars = array(
 			'group_id' => bp_get_current_group_id(),
 			'displayed_user_id' => bp_displayed_user_id(),
+			'calendar_filter_title' => __( 'Filters', 'bp-event-calendar' ),
+			'calendar_author_filter_title' => __( 'By Author', 'bp-event-calendar' ),
+			'calendar_group_filter_title' => __( 'By Group', 'bp-event-calendar' ),
 		);
 
 		// localise with wp function
 		wp_localize_script( 'bp_event_organiser_js', 'BpEventOrganiserSettings', $vars );
-
 	}
 
-
+	/**
+	 * Enqueue styles.
+	 */
+	public function enqueue_styles() {
+		wp_enqueue_style(
+			'bp_event_organiser_css',
+			BUDDYPRESS_EVENT_ORGANISER_URL . 'assets/css/bp-event-organiser.css'
+		);
+	}
 
 	/**
 	 * @description: adds icon to menu in CBOX theme
