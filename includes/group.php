@@ -190,6 +190,26 @@ function bpeo_add_bp_group_id_to_ajax_query( $query ) {
 add_filter( 'eventorganiser_fullcalendar_query', 'bpeo_add_bp_group_id_to_ajax_query' );
 
 /**
+ * Filter event links on a group events page to use the group event permalink.
+ *
+ * @param string $retval Current event permalink
+ * @return string
+ */
+function bpeo_calendar_filter_event_link_for_bp_group( $retval ) {
+	if ( ! bp_is_group() ) {
+		return $retval;
+	}
+
+	// this is to avoid requerying the event just for the post slug
+	$event_url = explode( '/', untrailingslashit( $retval ) );
+	$post_slug = array_pop( $event_url );
+
+	// regenerate the post URL to account for group permalink
+	return trailingslashit( bpeo_get_group_permalink() . $post_slug );
+}
+add_filter( 'eventorganiser_calendar_event_link', 'bpeo_calendar_filter_event_link_for_bp_group' );
+
+/**
  * Add group information to calendar event markup.
  *
  * @param array $event         Array of data about the event.
