@@ -190,6 +190,23 @@ function bpeo_add_bp_group_id_to_ajax_query( $query ) {
 add_filter( 'eventorganiser_fullcalendar_query', 'bpeo_add_bp_group_id_to_ajax_query' );
 
 /**
+ * Add group information to calendar event markup.
+ *
+ * @param array $event         Array of data about the event.
+ * @param int   $event_id      ID of the event.
+ * @param int   $occurrence_id ID of the occurrence.
+ * @return array
+ */
+function bpeo_add_group_info_to_calendar_event( $event, $event_id, $occurrence_id ) {
+	foreach ( bpeo_get_event_groups( $event_id ) as $group_id ) {
+		$event['className'][] = 'eo-event-bp-group-' . intval( $group_id );
+	}
+
+	return $event;
+}
+add_filter( 'eventorganiser_fullcalendar_event', 'bpeo_add_group_info_to_calendar_event', 10, 3 );
+
+/**
  * Modify EO capabilities for group membership.
  *
  * @param array  $caps    Capability array.

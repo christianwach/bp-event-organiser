@@ -94,3 +94,19 @@ function bpeo_add_bp_displayed_user_id_to_ajax_query( $query ) {
 	return $query;
 }
 add_filter( 'eventorganiser_fullcalendar_query', 'bpeo_add_bp_displayed_user_id_to_ajax_query' );
+
+/**
+ * Add author information to calendar event markup.
+ *
+ * @param array $event         Array of data about the event.
+ * @param int   $event_id      ID of the event.
+ * @param int   $occurrence_id ID of the occurrence.
+ * @return array
+ */
+function bpeo_add_author_info_to_calendar_event( $event, $event_id, $occurrence_id ) {
+	$event_obj = get_post( $event_id );
+	$event['className'][] = 'eo-event-author-' . intval( $event_obj->post_author );
+
+	return $event;
+}
+add_filter( 'eventorganiser_fullcalendar_event', 'bpeo_add_author_info_to_calendar_event', 10, 3 );
