@@ -224,6 +224,7 @@
 			event_groups = [];
 			event_classes = e.className.split( ' ' );
 			$.each( event_classes, function( eck, event_class ) {
+				// Cast to ints so $.inArray strict check passes later on.
 				if ( 'eo-event-author-' === event_class.substr( 0, 16 ) ) {
 					event_author = +event_class.substr( 16 );
 				} else if( 'eo-event-bp-group-' === event_class.substr( 0, 18 ) ) {
