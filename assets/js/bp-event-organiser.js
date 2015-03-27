@@ -1,6 +1,3 @@
-// Ensure the global `wp` object exists.
-window.wp = window.wp || {};
-
 ( function( $ ) {
 	/**
 	 * Bindings etc that happen on $(document).ready.
