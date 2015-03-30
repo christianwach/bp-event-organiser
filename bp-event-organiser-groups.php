@@ -259,8 +259,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// edit single event logic
 		if ( bp_is_action_variable( 'edit', 1 ) ) {
 			// check if user has access
-			// @todo currently all group members have access to edit events... restrict to mods?
-			if ( false === buddypress()->groups->current_group->is_user_member ) {
+			if ( false === current_user_can( 'edit_event', $this->queried_event->ID ) ) {
 				bp_core_add_message( __( 'You do not have access to edit this event.', 'bp-event-organiser' ), 'error' );
 				bp_core_redirect( bpeo_get_group_permalink() . "{$this->queried_event->post_name}/" );
 				die();
@@ -325,8 +324,8 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// @todo Make this a template function
 		echo '<a href="' . bpeo_get_group_permalink() . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
 
-		// @todo add function for proper edit access, make 'edit' slug changeable
-		if ( true === buddypress()->groups->current_group->is_user_member ) {
+		// @todo make 'edit' slug changeable
+		if ( current_user_can( 'edit_event', $this->queried_event->ID ) ) {
 			echo ' | <a href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
 		}
 
