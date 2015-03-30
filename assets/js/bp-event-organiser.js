@@ -16,29 +16,32 @@
 		// test if we have wp.hooks
 		if ( 'undefined' !== typeof wp && 'undefined' !== typeof wp.hooks ) {
 
-			// Add filter for event rendering.
-			wp.hooks.addFilter(
-				'eventorganiser.fullcalendar_render_event',
-				function( retval, eo_event, eo_event_link, monthview ) {
-					prerender_event( eo_event, eo_event_link.closest( '.eo-fullcalendar' ).attr( 'id' ) );
-					return retval;
-				}
-			);
-
-			// Register eventAfterRender callback.
-			wp.hooks.addFilter(
-				'eventorganiser.fullcalendar_options',
-				function( args, calendar ) {
-					args.eventAfterRender = function( eo_event, eo_event_link, calendar ) {
-						afterrender_event( eo_event, eo_event_link, calendar );
+			// Filter interface only appears on My Events.
+			if ( $( 'body' ).hasClass( 'bp-user' ) ) {
+				// Add filter for event rendering.
+				wp.hooks.addFilter(
+					'eventorganiser.fullcalendar_render_event',
+					function( retval, eo_event, eo_event_link, monthview ) {
+						prerender_event( eo_event, eo_event_link.closest( '.eo-fullcalendar' ).attr( 'id' ) );
+						return retval;
 					}
+				);
 
-					return args;
-				}
-			);
+				// Register eventAfterRender callback.
+				wp.hooks.addFilter(
+					'eventorganiser.fullcalendar_options',
+					function( args, calendar ) {
+						args.eventAfterRender = function( eo_event, eo_event_link, calendar ) {
+							afterrender_event( eo_event, eo_event_link, calendar );
+						}
 
-			// Set up the calendar div.
-			create_calendar_filter();
+						return args;
+					}
+				);
+
+				// Set up the calendar div.
+				create_calendar_filter();
+			}
 		}
 	};
 

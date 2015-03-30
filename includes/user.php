@@ -101,6 +101,11 @@ add_filter( 'eventorganiser_fullcalendar_query', 'bpeo_filter_calendar_query_for
  * @return array
  */
 function bpeo_add_author_info_to_calendar_event( $event, $event_id, $occurrence_id ) {
+	// Only show author info when on a user's My Events page.
+	if ( ! bp_is_user() ) {
+		return $event;
+	}
+
 	$event_obj = get_post( $event_id );
 	$event['className'][] = 'eo-event-author-' . intval( $event_obj->post_author );
 
@@ -114,5 +119,3 @@ function bpeo_add_author_info_to_calendar_event( $event, $event_id, $occurrence_
 	return $event;
 }
 add_filter( 'eventorganiser_fullcalendar_event', 'bpeo_add_author_info_to_calendar_event', 10, 3 );
-
-/** Template functions *******************************************************/
