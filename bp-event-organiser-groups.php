@@ -358,7 +358,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 
 		// @todo make 'delete' slug changeable
 		if ( current_user_can( 'delete_event', $this->queried_event->ID ) ) {
-			echo ' | <a href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$this->queried_event->ID}" ). '/">' . __( 'Delete', 'bp-events-organizer' ). '</a>';
+			echo ' | <a class="confirm" href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$this->queried_event->ID}" ). '/">' . __( 'Delete', 'bp-events-organizer' ). '</a>';
 		}
 
 		// revert $post global
