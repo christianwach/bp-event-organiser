@@ -273,6 +273,33 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 				'queried_post'   => $this->queried_event,
 				'redirect_root'  => bpeo_get_group_permalink()
 			) );
+
+		// delete single event logic
+		} elseif ( bp_is_action_variable( 'delete', 1 ) ) {
+			// check if user has access
+			if ( false === current_user_can( 'delete_event', $this->queried_event->ID ) ) {
+				bp_core_add_message( __( 'You do not have permission to delete this event.', 'bp-event-organiser' ), 'error' );
+				bp_core_redirect( bpeo_get_group_permalink() . "{$this->queried_event->post_name}/" );
+				die();
+			}
+
+			// verify nonce
+			if ( false === bp_action_variable( 2 ) || ! wp_verify_nonce( bp_action_variable( 2 ), "bpeo_delete_event_{$this->queried_event->ID}" ) ) {
+				bp_core_add_message( __( 'You do not have permission to delete this event.', 'bp-event-organiser' ), 'error' );
+				bp_core_redirect( bpeo_get_group_permalink() . "{$this->queried_event->post_name}/" );
+				die();
+			}
+
+			// delete event
+			$delete = wp_delete_post( $this->queried_event->ID, true );
+			if ( false === $delete ) {
+				bp_core_add_message( __( 'There was a problem deleting the event.', 'bp-event-organiser' ), 'error' );
+			} else {
+				bp_core_add_message( __( 'Event deleted.', 'bp-event-organiser' ) );
+			}
+
+			bp_core_redirect( bpeo_get_group_permalink() );
+			die();
 		}
 	}
 
@@ -327,6 +354,11 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// @todo make 'edit' slug changeable
 		if ( current_user_can( 'edit_event', $this->queried_event->ID ) ) {
 			echo ' | <a href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
+		}
+
+		// @todo make 'delete' slug changeable
+		if ( current_user_can( 'delete_event', $this->queried_event->ID ) ) {
+			echo ' | <a href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$this->queried_event->ID}" ). '/">' . __( 'Delete', 'bp-events-organizer' ). '</a>';
 		}
 
 		// revert $post global
