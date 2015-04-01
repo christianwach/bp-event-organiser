@@ -76,6 +76,9 @@ class BuddyPress_Event_Organiser_EO {
 		// add our event meta box
 		add_action( 'add_meta_boxes', array( $this, 'event_meta_box' ) );
 
+		// ajax handler for meta box autocomplete
+		add_action( 'wp_ajax_bpeo_get_groups', array( $this, 'ajax_get_groups' ) );
+
 		// intercept save event
 		add_action( 'eventorganiser_save_event', array( $this, 'intercept_save_event' ), 10, 1 );
 
@@ -87,7 +90,6 @@ class BuddyPress_Event_Organiser_EO {
 
 		// intercept post content - try to catch calendar shortcodes
 		add_filter( 'the_content', array( $this, 'intercept_content' ), 10, 1 );
-
 	}
 
 
@@ -251,87 +253,125 @@ class BuddyPress_Event_Organiser_EO {
 		// add nonce
 		wp_nonce_field( 'bp_event_organiser_meta_save', 'bp_event_organiser_nonce_field' );
 
-		// is group hierarchy present?
-		if( $this->is_group_hierarchy_active() ) {
-
-			// get tree
-			$groups_list = array(
-				'groups' => BP_Groups_Hierarchy::get_tree()
-			);
-
-			// add total
-			$groups_list['total'] = count( $groups_list['groups'] );
-
-		} else {
-
-			// init params
-			$params = array(
-				'type' => 'alphabetical',
-				'per_page' => 1000, // avoid pagination cutoff
-				//'show_hidden' => true, // removed this since events always show up
-			);
-
-			// if not super admin (or admin in single site install)
-			if ( ! is_super_admin() ) {
-
-				// restrict groups to those the user is a member of
-				$params['user_id'] = bp_loggedin_user_id();
-
-			}
-
-			// get flat list
-			$groups_list = BP_Groups_Group::get( $params );
-
-		}
-
-		// kick out if we don't have any
-		if ( $groups_list['total'] === 0 ) {
-
-			// show message
-			echo '<p class="bp_event_organiser_desc">' . __( 'No groups were found.', 'bp-group-organizer' ) . '</p>';
-
-			// kick
-			return;
-
-		}
 
 		// get array of checked IDs for this event
-		$this->group_ids = bpeo_get_event_groups( $event->ID );
+		$this->group_ids = (array) bpeo_get_event_groups( $event->ID );
 
-		// define walker
-		$walker = new Walker_BPEO_Group;
+		if ( bp_is_group() ) {
+			$this->group_ids = array_unique( array_merge( $this->group_ids, (array) bp_get_current_group_id() ) );
+		}
+	?>
 
-		// open html
-		$result = '';
+		<!-- todo properly enqueue these -->
+		<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css" rel="stylesheet" />
+		<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js"></script>
 
-		// open scroller
-		$result .= '<div class="bp_event_organiser_scroller" style="height: 200px; overflow-y: scroll; border: 1px solid #ccc; background: #fff; padding: 0 6px;">'."\n";
+		<p class="bp_event_organiser_desc"><?php _e( 'Enter the names of each group this event should belong to.', 'bp-event-organizer' ); ?></p>
 
-		// open list
-		$result .= '<ul class="bp_event_organiser_groups_list">'."\n";
+		<select name="bp_group_organizer_groups[]" multiple="multiple" style="width:100%;">
+			<?php
+				foreach( $this->group_ids as $gid ) {
+					$group = groups_get_group( array( 'group_id' => $gid ) );
+					echo "<option value='{$gid}' selected='selected'>{$group->name}</option>";
+				}
+			?>
+		</select>
 
-		// call walker
-		$result .= bp_event_organiser_walk_group_tree(
-			$groups_list['groups'],
-			0,
-			(object) array( 'walker' => $walker )
-		);
+		<?php if ( ! empty( $this->group_ids ) ) : ?>
+			<p class="howto"><?php _e( 'To remove a group, click on the "x" link.', 'bp-event-organizer' ); ?></p>
+		<?php endif; ?>
 
-		// close list
-		$result .= '</ul>'."\n\n\n";
+		<script type="text/javascript">
+			bpeoFormatResponse = function(data) {
+				return data.name || data.text;
+			}
 
-		// close scroller
-		$result .= '</div>'."\n\n\n";
+			bpeoFormatResult = function(data) {
+				if (data.loading) return data.name;
 
-		// show meta box
-		echo '
+				var markup = '<div style="clear:both;">' +
+				'<div style="float:left;margin-right:8px;">' + data.avatar + '</div>' +
+				'<div><span style="font-weight:600;">' + data.name + '</span> <em>(' + data.type + ')</em></div>';
 
-		<p class="bp_event_organiser_desc">Choose the groups this event should be assigned to.</p>
+				if (data.description) {
+					markup += '<div style="font-size:.9em;line-height:1.9;">' + data.description + '</div>';
+				}
 
-		'.$result;
+				markup += '</div>';
 
+				return markup;
+			}
+
+			jQuery('#bp_event_organiser_metabox select').select2({
+				ajax: {
+					method: 'POST',
+					url: ajaxurl,
+					dataType: 'json',
+					delay: 500,
+					data: function (params) {
+						return {
+							s: params.term, // search term
+							action: 'bpeo_get_groups',
+							nonce: jQuery('#bp_event_organiser_nonce_field').val(),
+							page: params.page
+						};
+					},
+					cache: true,
+					processResults: function (data, page) {
+						// parse the results into the format expected by Select2.
+						// since we are using custom formatting functions we do not need to
+						// alter the remote JSON data
+						return {
+							results: data
+						};
+					},
+				},
+				escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+				minimumInputLength: 3,
+				templateResult: bpeoFormatResult,
+				templateSelection: bpeoFormatResponse
+			});
+		</script>
+	<?php
 	}
 
+	/**
+	 * AJAX handler for meta box autocomplete using the Select2 JS library.
+	 *
+	 * @see BuddyPress_Event_Organiser_EO::event_meta_box_render()
+	 */
+	public function ajax_get_groups() {
+		global $groups_template;
+
+		check_ajax_referer( 'bp_event_organiser_meta_save', 'nonce' );
+
+		$groups = groups_get_groups( array(
+			'user_id' => is_super_admin() ? 0 : bp_loggedin_user_id(),
+			'search_terms' => $_POST['s']
+		) );
+
+		$json = array();
+		$groups_template = new stdClass;
+		$groups_template->group = new stdClass;
+
+		foreach ( $groups['groups'] as $group ) {
+			$groups_template->group = $group;
+			$json[] = array(
+				'id'          => $group->id,
+				'name'        => $group->name,
+				'type'        => bp_get_group_type(),
+				'description' => bp_create_excerpt( strip_tags( stripslashes( $group->description ) ), 90, array(
+					'ending' => '&hellip;',
+					'filter_shortcodes' => false
+				) ),
+				'avatar' => bp_get_group_avatar_mini(),
+				'total_member_count' => $group->total_member_count,
+			);
+		}
+
+		echo json_encode( $json );
+		exit();
+	}
 
 
 	//##########################################################################
