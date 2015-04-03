@@ -25,8 +25,30 @@ function bpeo_create_activity_on_event_save( $event_id ) {
 		$type = 'bpeo_edit_event';
 	}
 
-	// @todo edit throttle
-	// @todo update existing item on edit rather than create new
+	// Prevent edit floods.
+	if ( 'bpeo_edit_event' === $type ) {
+		$activities = bpeo_get_activity_by_event_id( $event_id );
+
+		if ( $activities ) {
+
+			// Just in case.
+			$activities = bp_sort_by_key( $activities, 'date_recorded' );
+			$last_activity = end( $activities );
+
+			/**
+			 * Filters the number of seconds in the event edit throttle.
+			 *
+			 * This prevents activity stream flooding by multiple edits of the same event.
+			 *
+			 * @param int $throttle_period Defaults to 6 hours.
+			 */
+			$throttle_period = apply_filters( 'bpeo_event_edit_throttle_period', 6 * HOUR_IN_SECONDS );
+			if ( ( time() - strtotime( $last_activity->date_recorded ) ) < $throttle_period ) {
+				return;
+			}
+
+		}
+	}
 
 	$activity_args = array(
 		'component' => 'events',
@@ -34,6 +56,7 @@ function bpeo_create_activity_on_event_save( $event_id ) {
 		'user_id' => $event->post_author, // @todo Event edited by non-author?
 		'primary_link' => get_permalink( $event ),
 		'secondary_item_id' => $event_id, // Leave 'item_id' blank for groups.
+		'recorded_time' => $event->post_modified,
 	);
 
 	bp_activity_add( $activity_args );
@@ -59,7 +82,7 @@ function bpeo_get_activity_by_event_id( $event_id ) {
 			),
 			array(
 				'column' => 'type',
-				'value' => array( 'bpeo_create_event' ),
+				'value' => array( 'bpeo_create_event', 'bpeo_edit_event' ),
 				'compare' => 'IN',
 			),
 			array(
