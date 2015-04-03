@@ -276,6 +276,25 @@ function bpeo_event_meta_cap( $caps, $cap, $user_id, $args ) {
 }
 add_filter( 'map_meta_cap', 'bpeo_event_meta_cap', 20, 4 );
 
+/**
+ * Create activity items for connected groups.
+ *
+ * @param array   $activity_args Arguments used to create the 'events' activity item.
+ * @param WP_Post $event         Event post object.
+ */
+function bpeo_create_group_activity_items( $activity_args, $event ) {
+	$group_ids = bpeo_get_event_groups( $event->ID );
+
+	foreach ( $group_ids as $group_id ) {
+		$_activity_args = $activity_args;
+		$_activity_args['component'] = buddypress()->groups->id;
+		$_activity_args['item_id'] = $group_id;
+		$_activity_args['hide_sitewide'] = true;
+		bp_activity_add( $_activity_args );
+	}
+}
+add_action( 'bpeo_create_event_activity', 'bpeo_create_group_activity_items', 10, 2 );
+
 /** TEMPLATE ************************************************************/
 
 /**

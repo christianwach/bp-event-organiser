@@ -52,6 +52,10 @@ function bpeo_include() {
 	require( BPEO_PATH . 'includes/component.php' );
 	require( BPEO_PATH . 'includes/user.php' );
 
+	if ( bp_is_active( 'activity' ) ) {
+		require( BPEO_PATH . 'includes/activity.php' );
+	}
+
 	if ( bp_is_active( 'groups' ) ) {
 		require( BPEO_PATH . 'includes/group.php' );
 	}
