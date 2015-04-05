@@ -246,7 +246,7 @@ add_filter( 'eventorganiser_fullcalendar_event', 'bpeo_add_group_info_to_calenda
  * @param array  $args    Miscellaneous args.
  * @return array Caps whitelist.
  */
-function bpeo_event_meta_cap( $caps, $cap, $user_id, $args ) {
+function bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 	// @todo Need real caching in BP for group memberships.
 	if ( ! in_array( $cap, array( 'read_event' ) ) ) {
 		return $caps;
@@ -274,7 +274,7 @@ function bpeo_event_meta_cap( $caps, $cap, $user_id, $args ) {
 
 	return $caps;
 }
-add_filter( 'map_meta_cap', 'bpeo_event_meta_cap', 20, 4 );
+add_filter( 'map_meta_cap', 'bpeo_group_event_meta_cap', 20, 4 );
 
 /**
  * Create activity items for connected groups.
