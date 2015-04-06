@@ -54,7 +54,7 @@ class BPEO_Component extends BP_Component {
 			'slug' => bpeo_get_events_new_slug(),
 			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
 			'parent_slug' => $this->slug,
-			'user_has_access' => bp_core_can_edit_settings(),
+			'user_has_access' => bp_core_can_edit_settings() && current_user_can( 'publish_events' ),
 			'screen_function' => array( $this, 'template_loader' ),
 		);
 
