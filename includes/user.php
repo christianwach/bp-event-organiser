@@ -43,6 +43,33 @@ function bpeo_get_my_calendar_event_ids( $user_id ) {
 }
 
 /**
+ * Add EO capabilities for subscribers and contributors.
+ *
+ * By default, subscribers and contributors do not have caps to post, edit or
+ * delete events. This function injects these caps for users with these roles.
+ *
+ * @param array   $allcaps An array of all the user's capabilities.
+ * @param array   $caps    Actual capabilities for meta capability.
+ * @param array   $args    Optional parameters passed to has_cap(), typically object ID.
+ * @param WP_User $user    The user object.
+ */
+function bpeo_user_has_cap( $allcaps, $caps, $args, $user ) {
+	// check if current user has the 'subscriber' or 'contributor' role
+	$is_role = array_intersect_key( array( 'subscriber' => 1, 'contributor' => 1 ), $user->caps );
+	if ( empty( $is_role ) ) {
+		return $allcaps;
+	}
+
+	// add our basic event caps
+	$allcaps['publish_events'] = 1;
+	$allcaps['edit_events']    = 1;
+	$allcaps['delete_events']  = 1;
+
+	return $allcaps;
+}
+add_filter( 'user_has_cap', 'bpeo_user_has_cap', 20, 4 );
+
+/**
  * Modify `WP_Query` requests for the 'bp_displayed_user_id' param.
  *
  * @param WP_Query Query object, passed by reference.
