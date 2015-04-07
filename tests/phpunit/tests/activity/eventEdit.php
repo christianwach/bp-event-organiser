@@ -171,6 +171,38 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 		$this->assertEquals( $modified_event->post_modified, $a[0]->date_recorded );
 	}
 
+	public function test_action_string_for_edit_event_not_connected_to_groups() {
+		$u = $this->factory->user->create();
+
+		$now = time();
+		$e = eo_insert_event( array(
+			'post_date' => date( 'Y-m-d H:i:s', $now - 60*60*24 ),
+			'post_author' => $u,
+			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
+			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+		) );
+
+		eo_update_event( $e, array(
+			'post_author' => $u,
+			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
+			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'description' => 'foo',
+		) );
+
+		$a = bpeo_get_activity_by_event_id( $e );
+		$found = end( $a );
+
+		$event = get_post( $e );
+
+		$expected = sprintf(
+			'%s edited the event %s',
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $u ) ), esc_html( bp_core_get_user_displayname( $u ) ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) )
+		);
+
+		$this->assertSame( $expected, $a[0]->action );
+	}
+
 	public function connect_events( $e ) {
 		bpeo_connect_event_to_group( $e, $this->groups[0] );
 		bpeo_connect_event_to_group( $e, $this->groups[2] );

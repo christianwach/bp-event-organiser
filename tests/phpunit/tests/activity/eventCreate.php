@@ -65,6 +65,29 @@ class BPEO_Tests_Activity_EventCreate extends BPEO_UnitTestCase {
 		$this->assertEquals( 1, $a[2]->hide_sitewide );
 	}
 
+	public function test_action_string_for_new_event_not_connected_to_groups() {
+		$u = $this->factory->user->create();
+
+		$now = time();
+		$e = eo_insert_event( array(
+			'post_author' => $u,
+			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
+			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+		) );
+
+		$a = bpeo_get_activity_by_event_id( $e );
+
+		$event = get_post( $e );
+
+		$expected = sprintf(
+			'%s created the event %s',
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $u ) ), esc_html( bp_core_get_user_displayname( $u ) ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) )
+		);
+
+		$this->assertSame( $expected, $a[0]->action );
+	}
+
 	public function connect_events( $e ) {
 		bpeo_connect_event_to_group( $e, $this->groups[0] );
 		bpeo_connect_event_to_group( $e, $this->groups[2] );
