@@ -277,6 +277,30 @@ function bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 add_filter( 'map_meta_cap', 'bpeo_group_event_meta_cap', 20, 4 );
 
 /**
+ * Register activity actions and format callbacks for 'groups' component.
+ */
+function bpeo_register_activity_actions_for_groups() {
+	bp_activity_set_action(
+		buddypress()->groups->id,
+		'bpeo_create_event',
+		__( 'Events created', 'bp-event-organiser' ),
+		'bpeo_activity_action_format',
+		__( 'Events created', 'buddypress' ),
+		array( 'activity', 'member', 'group', 'member_groups' )
+	);
+
+	bp_activity_set_action(
+		buddypress()->groups->id,
+		'bpeo_edit_event',
+		__( 'Events edited', 'bp-event-organiser' ),
+		'bpeo_activity_action_format',
+		__( 'Events edited', 'buddypress' ),
+		array( 'activity', 'member', 'group', 'member_groups' )
+	);
+}
+add_action( 'bp_register_activity_actions', 'bpeo_register_activity_actions_for_groups' );
+
+/**
  * Create activity items for connected groups.
  *
  * @param array   $activity_args Arguments used to create the 'events' activity item.
@@ -294,6 +318,82 @@ function bpeo_create_group_activity_items( $activity_args, $event ) {
 	}
 }
 add_action( 'bpeo_create_event_activity', 'bpeo_create_group_activity_items', 10, 2 );
+
+function bpeo_activity_action_format_for_groups( $action, $activity ) {
+	$groups = bpeo_get_event_groups( $activity->secondary_item_id );
+
+	$_groups = groups_get_groups( array(
+		'include' => $groups,
+		'populate_extras' => false,
+		'per_page' => false,
+		'type' => 'alphabetical',
+		'show_hidden' => true,
+	) );
+	$groups = $_groups['groups'];
+
+	// Remove groups the current user doesn't have access to.
+	foreach ( $groups as $group_index => $group ) {
+		if ( 'public' === $group->status ) {
+			continue;
+		}
+
+		if ( ! is_user_logged_in() || ! groups_is_user_member( bp_loggedin_user_id(), $group->id ) ) {
+			unset( $groups[ $group_index ] );
+			continue;
+		}
+	}
+
+	$groups = array_values( array_filter( $groups ) );
+	if ( empty( $groups ) ) {
+		return $action;
+	}
+
+	$group_count = count( $groups );
+	switch ( $activity->type ) {
+		case 'bpeo_create_event' :
+			/* translators: 1: link to user, 2: link to event, 3: comma-separated list of group links */
+			$base = _n( '%1$s created the event %2$s in the group %3$s.', '%1$s created the event %2$s in the groups %3$s.', $group_count, 'bp-event-organiser' );
+			break;
+		case 'bpeo_edit_event' :
+			/* translators: 1: link to user, 2: link to event, 3: comma-separated list of group links */
+			$base = _n( '%1$s edited the event %2$s in the group %3$s.', '%1$s edited the event %2$s in the groups %3$s.', $group_count, 'bp-event-organiser' );
+			break;
+	}
+
+	// If this is a user activity item, keeps groups in alphabetical order. Otherwise put primary group first.
+	if ( buddypress()->groups->id === $activity->component ) {
+		foreach ( $groups as $group_index => $group ) {
+			if ( $activity->item_id == $group->id ) {
+				$this_group = $group;
+				unset( $groups[ $group_index ] );
+				array_unshift( $groups, $this_group );
+			}
+		}
+	}
+
+	$groups = array_values( array_filter( $groups ) );
+
+	$group_links = array();
+	foreach ( $groups as $group ) {
+		$group_links[] = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( trailingslashit( bp_get_group_permalink( $group ) . bpeo_get_events_slug() ) ),
+			esc_html( $group->name )
+		);
+	}
+
+	$event = get_post( $activity->secondary_item_id );
+
+	$action = sprintf(
+		$base,
+		sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $activity->user_id ) ), esc_html( bp_core_get_user_displayname( $activity->user_id ) ) ),
+		sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) ),
+		implode( ', ', $group_links )
+	);
+
+	return $action;
+}
+add_filter( 'bpeo_activity_action', 'bpeo_activity_action_format_for_groups', 10, 2 );
 
 /** TEMPLATE ************************************************************/
 

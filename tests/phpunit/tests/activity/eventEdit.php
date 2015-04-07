@@ -203,6 +203,91 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 		$this->assertSame( $expected, $a[0]->action );
 	}
 
+	public function test_action_string_for_edit_event_connected_to_groups_where_groups_are_public() {
+		$u = $this->factory->user->create();
+		$this->groups = array();
+		$this->groups[] = $this->factory->group->create( array(
+			'name' => 'aaa',
+		) );
+		$this->groups[] = $this->factory->group->create( array(
+			'name' => 'bbb',
+		) );
+		$this->groups[] = $this->factory->group->create( array(
+			'name' => 'ccc',
+		) );
+
+		// Group connections happen on 'eventorganiser_save_event'. Whee!
+		add_action( 'eventorganiser_save_event', array( $this, 'connect_events' ) );
+
+		$now = time();
+		$e = eo_insert_event( array(
+			'post_author' => $u,
+			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
+			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+		) );
+
+		remove_action( 'eventorganiser_save_event', array( $this, 'connect_events' ) );
+
+		// Remove throttle temporarily.
+		add_filter( 'bpeo_event_edit_throttle_period', '__return_zero' );
+		eo_update_event( $e, array(), array( 'post_content' => 'foo' ) );
+		remove_filter( 'bpeo_event_edit_throttle_period', '__return_zero' );
+
+		$a = bpeo_get_activity_by_event_id( $e );
+
+		$ua = $ga0 = $ga2 = false;
+		foreach ( $a as $_a ) {
+			if ( 'bpeo_edit_event' != $_a->type ) {
+				continue;
+			}
+
+			if ( $this->groups[0] == $_a->item_id ) {
+				$ga0 = $_a;
+			} elseif ( $this->groups[2] == $_a->item_id ) {
+				$ga2 = $_a;
+			} else {
+				$ua = $_a;
+			}
+		}
+
+		$this->assertNotEmpty( $ua );
+		$this->assertNotEmpty( $ga0 );
+		$this->assertNotEmpty( $ga2 );
+
+		$g0 = groups_get_group( array( 'group_id' => $this->groups[0] ) );
+		$g2 = groups_get_group( array( 'group_id' => $this->groups[2] ) );
+
+		$event = get_post( $e );
+
+		// User string takes the groups in alphabetical order.
+		$ua_expected = sprintf(
+			'%s edited the event %s in the groups %s, %s.',
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $u ) ), esc_html( bp_core_get_user_displayname( $u ) ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_get_group_permalink( $g0 ) . 'events/' ), esc_html( $g0->name ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_get_group_permalink( $g2 ) . 'events/' ), esc_html( $g2->name ) )
+		);
+		$this->assertSame( $ua_expected, $ua->action );
+
+		$g0_expected = sprintf(
+			'%s edited the event %s in the groups %s, %s.',
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $u ) ), esc_html( bp_core_get_user_displayname( $u ) ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_get_group_permalink( $g0 ) . 'events/' ), esc_html( $g0->name ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_get_group_permalink( $g2 ) . 'events/' ), esc_html( $g2->name ) )
+		);
+		$this->assertSame( $g0_expected, $ga0->action );
+
+		$g2_expected = sprintf(
+			'%s edited the event %s in the groups %s, %s.',
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $u ) ), esc_html( bp_core_get_user_displayname( $u ) ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_get_group_permalink( $g2 ) . 'events/' ), esc_html( $g2->name ) ),
+			sprintf( '<a href="%s">%s</a>', esc_url( bp_get_group_permalink( $g0 ) . 'events/' ), esc_html( $g0->name ) )
+		);
+		$this->assertSame( $g2_expected, $ga2->action );
+	}
+
 	public function connect_events( $e ) {
 		bpeo_connect_event_to_group( $e, $this->groups[0] );
 		bpeo_connect_event_to_group( $e, $this->groups[2] );

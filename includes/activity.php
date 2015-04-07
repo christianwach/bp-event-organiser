@@ -140,11 +140,22 @@ function bpeo_activity_action_format( $action, $activity ) {
 			break;
 	}
 
+	$original_action = $action;
+
 	$action = sprintf(
 		$base,
 		sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $activity->user_id ) ), esc_html( bp_core_get_user_displayname( $activity->user_id ) ) ),
 		sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) )
 	);
 
-	return $action;
+	/**
+	 * Filters the activity action for an event.
+	 *
+	 * The groups component uses this hook to add group-specific information to the action.
+	 *
+	 * @param string $action          Action string.
+	 * @param object $activity        Activity object.
+	 * @param string $original_action Action string as originally passed to the object.
+	 */
+	return apply_filters( 'bpeo_activity_action', $action, $activity, $original_action );
 }
