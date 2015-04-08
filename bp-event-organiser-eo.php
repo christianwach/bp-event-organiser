@@ -358,7 +358,7 @@ class BuddyPress_Event_Organiser_EO {
 			$groups_template->group = $group;
 			$json[] = array(
 				'id'          => $group->id,
-				'name'        => $group->name,
+				'name'        => stripslashes( $group->name ),
 				'type'        => bp_get_group_type(),
 				'description' => bp_create_excerpt( strip_tags( stripslashes( $group->description ) ), 90, array(
 					'ending' => '&hellip;',
