@@ -164,7 +164,7 @@ function bpeo_activity_action_format( $action, $activity ) {
  * Remove event-related duplicates from activity streams.
  *
  */
-function bpeo_remove_duplicates_from_activity_stream( $activity, $r ) {
+function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $do_backfill = true ) {
 	// Get a list of queried activity IDs before we start removing.
 	$queried_activity_ids = wp_list_pluck( $activity['activities'], 'id' );
 
@@ -216,7 +216,7 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r ) {
 		}
 	}
 
-	if ( $removed ) {
+	if ( $removed && $do_backfill ) {
 		// Backfill to correct per_page.
 		$deduped_activity_count  = count( $activity['activities'] );
 		$original_activity_count = count( $queried_activity_ids );
@@ -246,7 +246,7 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r ) {
 			$activity['total'] += $backfill['total'];
 
 			// Backfill may duplicate existing items, so we run the whole works through this function again.
-			$activity = bpeo_remove_duplicates_from_activity_stream( $activity, $r );
+			$activity = bpeo_remove_duplicates_from_activity_stream( $activity, $r, ! $break_early );
 
 			// If we're left with more activity than we need, trim it down.
 			if ( count( $activity['activities'] > $original_activity_count ) ) {
@@ -264,4 +264,21 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r ) {
 
 	return $activity;
 }
-add_filter( 'bp_activity_get', 'bpeo_remove_duplicates_from_activity_stream', 10, 2 );
+
+/**
+ * Hook the duplicate-removing logic.
+ */
+function bpeo_hook_duplicate_removing_for_activity_template( $args ) {
+	add_filter( 'bp_activity_get', 'bpeo_remove_duplicates_from_activity_stream', 10, 2 );
+	return $args;
+}
+add_filter( 'bp_before_has_activities_parse_args', 'bpeo_hook_duplicate_removing_for_activity_template' );
+
+/**
+ * Unhook the duplicate-removing logic.
+ */
+function bpeo_unhook_duplicate_removing_for_activity_template( $retval ) {
+	remove_filter( 'bp_activity_get', 'bpeo_remove_duplicates_from_activity_stream', 10, 2 );
+	return $retval;
+}
+add_filter( 'bp_has_activities', 'bpeo_unhook_duplicate_removing_for_activity_template' );

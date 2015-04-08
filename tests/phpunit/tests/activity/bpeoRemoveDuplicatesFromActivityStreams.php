@@ -27,8 +27,11 @@ class BPEO_Tests_Activity_BpeoRemoveDuplicatesFromActivityStream extends BPEO_Un
 			) );
 		}
 
-		self::$users = $bpf->user->create_many( 2 );
-		self::$groups = $bpf->group->create_many( 3 );
+		self::$users[] = $bpf->user->create();
+		self::$users[] = $bpf->user->create();
+		self::$groups = $bpf->group->create_many( 3, array(
+			'creator_id' => self::$users[1],
+		) );
 
 		// $events[0] is connected only to $groups[0].
 		add_action( 'eventorganiser_save_event', array( __CLASS__, 'connect_events_to_group_0' ) );
@@ -118,65 +121,72 @@ class BPEO_Tests_Activity_BpeoRemoveDuplicatesFromActivityStream extends BPEO_Un
 	}
 
 	public function test_duplicate_activity_should_be_removed_from_user_stream() {
-		$found = bp_activity_get( array(
+		bp_has_activities( array(
 			'page' => 1,
 			'per_page' => 5,
-			'filter' => array(
-				'user_id' => self::$users[0],
-			),
-		) );
-
-		foreach ( $found['activities'] as $f ) {
-			$this->assertSame( 'events', $f->component );
-		}
-
-		$this->assertEquals( self::$events, wp_list_pluck( $found['activities'], 'secondary_item_id' ) );
-	}
-
-	public function test_duplicate_activity_should_be_removed_from_group_stream() {
-		$found = bp_activity_get( array(
-			'page' => 1,
-			'per_page' => 5,
-			'filter' => array(
-				'object' => buddypress()->groups->id,
-				'primary_id' => self::$groups[0],
-			),
+			'user_id' => self::$users[0],
 			'show_hidden' => true,
 		) );
 
+		$found = $GLOBALS['activities_template'];
+		unset( $GLOBALS['activities_template'] );
+
+		foreach ( $found->activities as $f ) {
+			$this->assertSame( 'events', $f->component );
+		}
+
+		$this->assertEquals( self::$events, wp_list_pluck( $found->activities, 'secondary_item_id' ) );
+	}
+
+	public function test_duplicate_activity_should_be_removed_from_group_stream() {
+		bp_has_activities( array(
+			'page' => 1,
+			'per_page' => 5,
+			'object' => buddypress()->groups->id,
+			'primary_id' => self::$groups[0],
+			'show_hidden' => true,
+		) );
+
+		$found = $GLOBALS['activities_template'];
+		unset( $GLOBALS['activities_template'] );
+
 		$expected = array( self::$events[0], self::$events[2] );
-		$this->assertEquals( $expected, wp_list_pluck( $found['activities'], 'secondary_item_id' ) );
+		$this->assertEquals( $expected, wp_list_pluck( $found->activities, 'secondary_item_id' ) );
 	}
 
 	/**
 	 * This will happen rarely?
 	 */
 	public function test_duplicate_activity_should_be_removed_from_my_groups_feed() {
-		$found = bp_activity_get( array(
+		bp_has_activities( array(
 			'page' => 1,
 			'per_page' => 6,
-			'filter' => array(
-				'action' => 'bpeo_create_event',
-			),
+			'action' => 'bpeo_create_event',
 			'show_hidden' => true,
 		) );
 
-		$this->assertSame( 3, count( $found['activities'] ) );
-		$this->assertEquals( self::$events, wp_list_pluck( $found['activities'], 'secondary_item_id' ) );
+		$found = $GLOBALS['activities_template'];
+		unset( $GLOBALS['activities_template'] );
+
+		$this->assertSame( 3, count( $found->activities ) );
+		$this->assertEquals( self::$events, wp_list_pluck( $found->activities, 'secondary_item_id' ) );
 	}
 
 	public function test_slots_left_by_removed_duplicates_should_be_backfilled() {
-		$found = bp_activity_get( array(
+		bp_has_activities( array(
 			'page' => 1,
 			'per_page' => 13,
 			'show_hidden' => true,
 		) );
 
-		$this->assertSame( 13, count( $found['activities'] ) );
+		$found = $GLOBALS['activities_template'];
+		unset( $GLOBALS['activities_template'] );
+
+		$this->assertSame( 13, count( $found->activities ) );
 
 		// Make sure we've backfilled the correct ones.
 		$expected_last = array( self::$activities[7], self::$activities[8], self::$activities[9] );
-		$found_last = array_slice( $found['activities'], -3 );
+		$found_last = array_slice( $found->activities, -3 );
 		$this->assertEquals( $expected_last, wp_list_pluck( $found_last, 'id' ) );
 	}
 	// What activity is posted when an event is added to a group after it's been created? Just 'edited'?
