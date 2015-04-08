@@ -417,3 +417,43 @@ function bpeo_get_group_permalink( $group = 0 ) {
 
 	return trailingslashit( bp_get_group_permalink( $group ) . bpeo_get_events_slug() );
 }
+
+/**
+ * Display a list of connected groups on single event pages.
+ */
+function bpeo_list_connected_groups() {
+	$event_group_ids = bpeo_get_event_groups( get_queried_object_id() );
+
+	if ( empty( $event_group_ids ) ) {
+		return;
+	}
+
+	$event_groups = groups_get_groups( array(
+		'include' => $event_group_ids,
+		'show_hidden' => true, // We roll our own.
+	) );
+
+	$markup = array();
+	foreach ( $event_groups['groups'] as $eg ) {
+		// Remove groups that the current user should not have access to.
+		if ( 'public' !== $eg->status && ! current_user_can( 'bp_moderate' ) && ! groups_is_user_member( bp_current_user_id(), $eg->id ) ) {
+			continue;
+		}
+
+		$markup[] = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( bpeo_get_group_permalink( $eg ) ),
+			esc_html( stripslashes( $eg->name ) )
+		);
+	}
+
+	if ( empty( $markup ) ) {
+		return;
+	}
+
+	$count = count( $markup );
+	$base = _n( 'Connected group: %s', 'Connected groups: %s', $count, 'bp-event-organiser' );
+
+	echo sprintf( '<li>' . $base . '</li>', implode( ', ', $markup ) );
+}
+add_action( 'eventorganiser_additional_event_meta', 'bpeo_list_connected_groups' );
