@@ -159,3 +159,109 @@ function bpeo_activity_action_format( $action, $activity ) {
 	 */
 	return apply_filters( 'bpeo_activity_action', $action, $activity, $original_action );
 }
+
+/**
+ * Remove event-related duplicates from activity streams.
+ *
+ */
+function bpeo_remove_duplicates_from_activity_stream( $activity, $r ) {
+	// Get a list of queried activity IDs before we start removing.
+	$queried_activity_ids = wp_list_pluck( $activity['activities'], 'id' );
+
+	// Make a list of all 'bpeo_' results, sorted by type and event ID.
+	$eas = array();
+	foreach ( $activity['activities'] as $a_index => $a ) {
+		if ( 0 === strpos( $a->type, 'bpeo_' ) ) {
+			if ( ! isset( $eas[ $a->type ] ) ) {
+				$eas[ $a->type ] = array();
+			}
+
+			if ( ! isset( $eas[ $a->type ][ $a->secondary_item_id ] ) ) {
+				$eas[ $a->type ][ $a->secondary_item_id ] = array();
+			}
+
+			$eas[ $a->type ][ $a->secondary_item_id ][] = $a_index;
+		}
+	}
+
+	// Find cases of duplicates.
+	$removed = 0;
+	foreach ( $eas as $type => $events ) {
+		foreach ( $events as $event_id => $a_indexes ) {
+			// No dupes for this event.
+			if ( count( $a_indexes ) <= 1 ) {
+				continue;
+			}
+
+			/*
+			 * Identify the "primary" activity:
+			 * - Prefer the "canonical" activity if available (component=events)
+			 * - Otherwise just pick the first one
+			 */
+			$primary_a_index = reset( $a_indexes );
+			foreach ( $a_indexes as $a_index ) {
+				if ( 'events' === $activity['activities'][ $a_index ]->component ) {
+					$primary_a_index = $a_index;
+					break;
+				}
+			}
+
+			// Remove all items but the primary.
+			foreach ( $a_indexes as $a_index ) {
+				if ( $a_index !== $primary_a_index ) {
+					unset( $activity['activities'][ $a_index ] );
+					$removed++;
+				}
+			}
+		}
+	}
+
+	if ( $removed ) {
+		// Backfill to correct per_page.
+		$deduped_activity_count  = count( $activity['activities'] );
+		$original_activity_count = count( $queried_activity_ids );
+		while ( $deduped_activity_count < $original_activity_count ) {
+			$backfill_args = $r;
+
+			// Offset for the originally queried activities.
+			$exclude = (array) $r['exclude'];
+			$backfill_args['exclude'] = array_merge( $exclude, $queried_activity_ids );
+
+			// In case of more reduction due to further duplication, fetch a generous number.
+			$backfill_args['per_page'] += $removed;
+
+			$backfill = bp_activity_get( $backfill_args );
+
+			/*
+			 * If the number of backfill items returned is less than the number requested, it means there
+			 * are no more activity items to query after this. Set a flag so that we override the count
+			 * logic and break out of the loop.
+			 */
+			$break_early = false;
+			if ( count( $backfill['activities'] ) < $backfill_args['per_page'] ) {
+				$break_early = true;
+			}
+
+			$activity['activities'] = array_merge( $activity['activities'], $backfill['activities'] );
+			$activity['total'] += $backfill['total'];
+
+			// Backfill may duplicate existing items, so we run the whole works through this function again.
+			$activity = bpeo_remove_duplicates_from_activity_stream( $activity, $r );
+
+			// If we're left with more activity than we need, trim it down.
+			if ( count( $activity['activities'] > $original_activity_count ) ) {
+				$activity['activities'] = array_slice( $activity['activities'], 0, $original_activity_count );
+			}
+
+			// Break early if we're out of activity to backfill.
+			if ( $break_early ) {
+				break;
+			}
+
+			$deduped_activity_count = count( $activity['activities'] );
+		}
+	}
+
+	return $activity;
+}
+add_filter( 'bp_activity_get', 'bpeo_remove_duplicates_from_activity_stream', 10, 2 );
