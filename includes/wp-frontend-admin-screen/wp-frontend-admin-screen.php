@@ -375,7 +375,7 @@ class WP_Frontend_Admin_Screen {
 				$tax_meta_box_id = $tax_name . 'div';
 			}
 
-			add_meta_box( $tax_meta_box_id, $label, $taxonomy->meta_box_cb, null, 'side', 'core', array( 'taxonomy' => $tax_name ) );
+			add_meta_box( $tax_meta_box_id, $label, $taxonomy->meta_box_cb, self::$post_type, 'side', 'core', array( 'taxonomy' => $tax_name ) );
 		}
 
 		// plugin metabox registration
