@@ -116,9 +116,6 @@ class BuddyPress_Event_Organiser {
 	 */
 	public function initialise() {
 
-		// load our Walker class
-		require( BUDDYPRESS_EVENT_ORGANISER_PATH . 'bp-event-organiser-walker.php' );
-
 		// load our BuddyPress Group class
 		require( BUDDYPRESS_EVENT_ORGANISER_PATH . 'bp-event-organiser-groups.php' );
 
