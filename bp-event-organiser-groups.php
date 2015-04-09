@@ -342,10 +342,11 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		echo '<h4>' . __( 'Event Description', 'bp-event-organizer' ) . '</h4>';
 
 		// Make this better... have to juggle the_content filters...
-		// @todo using get_template_part() messes with the $post global probably something to do
-		//       with BP resetting some global properties...
 		echo wpautop( $post->post_content );
+
+		add_action( 'loop_end', array( $this, 'catch_reset_postdata' ) );
 		eo_get_template_part( 'event-meta-event-single' );
+		remove_action( 'loop_end', array( $this, 'catch_reset_postdata' ) );
 
 		// Action links
 		// @todo Make this a template function
@@ -390,6 +391,27 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		) );
 	}
 
+	/**
+	 * Ensure that wp_reset_postdata() doesn't reset the post back to page ID 0.
+	 *
+	 * The event meta template provided by EO uses {@link wp_reset_postdata()} when
+	 * an event is recurring.  This interferes with BuddyPress when using EO's
+	 * 'eventorganiser_additional_event_meta' hook and wanting to fetch EO's WP
+	 * post for further data output.
+	 *
+	 * This method catches the end of the reoccurence event loop and wipes out the
+	 * post so wp_reset_postdata() doesn't reset the post back to page ID 0.
+	 */
+	public function catch_reset_postdata( $q ) {
+		// check if a reoccurence loop occurred; if not, bail
+		if ( empty( $q->query['post_type'] ) ) {
+			return;
+		}
+
+		// wipe out the post property in $wp_query to prevent our page from resetting
+		// when wp_reset_postdata() is used
+		$GLOBALS['wp_query']->post = null;
+	}
 } // class ends
 
 

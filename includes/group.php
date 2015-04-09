@@ -422,7 +422,7 @@ function bpeo_get_group_permalink( $group = 0 ) {
  * Display a list of connected groups on single event pages.
  */
 function bpeo_list_connected_groups() {
-	$event_group_ids = bpeo_get_event_groups( get_queried_object_id() );
+	$event_group_ids = bpeo_get_event_groups( get_the_ID() );
 
 	if ( empty( $event_group_ids ) ) {
 		return;
