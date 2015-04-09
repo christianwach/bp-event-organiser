@@ -160,6 +160,9 @@ class WP_Frontend_Admin_Screen {
 				// require admin post abstraction functions
 				require dirname( __FILE__ ) . '/abstraction-admin-post.php';
 
+				// do something before the draft is inserted
+				$this->before_insert( 'draft' );
+
 				$this->queried_post = get_default_post_to_edit( self::$post_type, true );
 
 				// Schedule purging of auto-draft posts
@@ -169,6 +172,24 @@ class WP_Frontend_Admin_Screen {
 			}
 		}
 
+	}
+
+	/**
+	 * Do something before a post is inserted or saved into the DB.
+	 *
+	 * @param string $context The type of insert. Either 'draft' or ''. Default: ''.
+	 */
+	final protected function before_insert( $context = '' ) {
+		// WPMU Sitewide Tags interferes with our library due to it including the
+		// entire WP admin files causing redeclare fatal errors
+		if ( function_exists( 'sitewide_tags_post' ) ) {
+			remove_action( 'save_post', 'sitewide_tags_post', 10, 2 );
+		}
+
+		// regular save; use class method, handy for extended classes
+		if ( 'draft' !== $context ) {
+			$this->before_save();
+		}
 	}
 
 	/**
@@ -186,8 +207,9 @@ class WP_Frontend_Admin_Screen {
 			// verify!
 			check_admin_referer( 'update-post_' . $_POST['post_ID'] );
 
-			// for extended classes
-			$this->before_save();
+			// do something before saving
+			// extended classes should extend the before_save() method to do stuff
+			$this->before_insert();
 
 			// rejig content for saving function
 			// this is due to us changing the editor ID to avoid conflicts with themes
