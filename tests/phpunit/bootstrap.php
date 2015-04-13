@@ -18,6 +18,10 @@ if ( file_exists( BP_TESTS_DIR . '/bootstrap.php' ) ) :
 			$GLOBALS['wp_rewrite'] = new WP_Rewrite();
 		}
 
+		if ( ! isset( $GLOBALS['wp_roles'] ) || ! ( $GLOBALS['wp_roles'] instanceof WP_Roles ) ) {
+			$GLOBALS['wp_roles'] = new WP_Roles();
+		}
+
 		// Bootstrap EO.
 		require dirname( __FILE__ ) . '/../../../event-organiser/event-organiser.php';
 		eventorganiser_install();
