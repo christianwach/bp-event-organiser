@@ -49,14 +49,14 @@
 	 * Create the calendar filter interface.
 	 */
 	create_calendar_filter = function() {
-		$( '.eo-fullcalendar' ).append( 
-			'<div class="bpeo-calendar-filter bpeo-calendar-filter-empty">' + "\n" + 
-				'<h3>' + l10n.calendar_filter_title + '</h3>' + "\n" + 
+		$( '.eo-fullcalendar' ).append(
+			'<div class="bpeo-calendar-filter bpeo-calendar-filter-empty">' + "\n" +
+				'<h3>' + l10n.calendar_filter_title + '</h3>' + "\n" +
 
 				'<div class="bpeo-calendar-filter-type bpeo-calendar-filter-type-author bpeo-calendar-filter-empty">' + "\n" +
 					'<h4>' + l10n.calendar_author_filter_title + '</h4>' + "\n" +
-					'<ul></ul>' + "\n" + 
-				'</div>' + "\n" +	
+					'<ul></ul>' + "\n" +
+				'</div>' + "\n" +
 
 				'<div class="bpeo-calendar-filter-type bpeo-calendar-filter-type-group bpeo-calendar-filter-empty">' + "\n" +
 					'<h4>' + l10n.calendar_group_filter_title + '</h4>' + "\n" +
@@ -78,11 +78,11 @@
 	 * groups. If not, we add them.
 	 *
 	 * @param {object} eo_event Event data object.
-	 * @param {string} calendar_id ID of the parent calendar. 
+	 * @param {string} calendar_id ID of the parent calendar.
 	 */
 	prerender_event = function( eo_event, calendar_id ) {
 		if ( 'undefined' === typeof calendars.calendar_id ) {
-			calendars.calendar_id = { 'groups': {}, 'authors': {}, 'checked_groups': [], 'checked_authors': [] };	
+			calendars.calendar_id = { 'groups': {}, 'authors': {}, 'checked_groups': [], 'checked_authors': [] };
 		}
 
 		if ( 'undefined' !== typeof eo_event.groups ) {
@@ -119,7 +119,7 @@
 		if ( 'undefined' === typeof calendars.calendar_id.filter_groups ) {
 			calendars.calendar_id.filter_groups = $( '#' + calendar_id ).find( '.bpeo-calendar-filter-type-group ul' );
 		}
-		
+
 		// Append to filter list.
 		calendars.calendar_id.filter_groups.append( '<li>' + checkbox + '</li>' );
 
@@ -140,7 +140,7 @@
 		if ( 'undefined' === typeof calendars.calendar_id.filter_authors ) {
 			calendars.calendar_id.filter_authors = $( '#' + calendar_id ).find( '.bpeo-calendar-filter-type-author ul' );
 		}
-		
+
 		// Stash data about the author with the calendar.
 		calendars.calendar_id.authors[ author_id ] = author_data;
 		calendars.calendar_id.checked_authors.push( author_id );
@@ -149,7 +149,7 @@
 		checkbox  = '<input type="checkbox" id="bpeo-author-filter-' + author_id + '" value="1" name="bpeo-author-filter-' + calendar_id + '" data-author-id="' + author_id + '" checked="checked" />';
 		checkbox += '<span class="bpeo-calendar-icon bpeo-calendar-icon-author" style="border-bottom-color:#' + author_data.color + '"></span>';
 		checkbox += '<label for="bpeo-author-filter-' + author_id + '">' + author_data.name + '</label>';
-		
+
 		// Append to filter list.
 		calendars.calendar_id.filter_authors.append( '<li>' + checkbox + '</li>' );
 
@@ -169,7 +169,7 @@
 		items.sort( function( a, b ) {
 			var aname = $( a ).find( 'label' ).text();
 			var bname = $( b ).find( 'label' ).text();
-			
+
 			if ( aname < bname ) return -1;
 			if ( aname > bname ) return 1;
 			return 0;
@@ -273,7 +273,7 @@
 		}
 
 		icon_div = '<div class="bpeo-event-icons">' + author_icon + group_icons.join( '' ) + '</div>';
-		
+
 		eo_event_link.append( icon_div );
 
 		reset_week_height( eo_event, eo_event_link, calendar );
