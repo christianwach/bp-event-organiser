@@ -429,7 +429,7 @@ class WP_Frontend_Admin_Screen {
 	 */
 	public function enqueue_editor_scripts() {
 		// save $post global temporarily
-		global $post;
+		global $post, $wp_version;
 		$_post = false;
 		if ( ! empty( $post ) ) {
 			$_post = $post;
@@ -442,11 +442,16 @@ class WP_Frontend_Admin_Screen {
 		// @see wp_default_scripts()
 		$suffix = SCRIPT_DEBUG ? '' : '.min';
 		wp_enqueue_script( 'word-count', admin_url( "js/word-count$suffix.js" ), array( 'jquery' ), false, 1 );
-		wp_enqueue_script( 'tags-box', admin_url( "js/tags-box$suffix.js" ), array( 'jquery', 'suggest' ), false, 1 );
 		wp_enqueue_script( 'postbox', admin_url( "js/postbox$suffix.js" ), array('jquery-ui-sortable'), false, 1 );
-		wp_enqueue_script( 'post', admin_url( "js/post$suffix.js" ), array( 'suggest', 'wp-lists', 'postbox', 'tags-box' ), false, 1 );
+		wp_enqueue_script( 'post', admin_url( "js/post$suffix.js" ), array( 'suggest', 'wp-lists', 'postbox' ), false, 1 );
 		wp_enqueue_script( 'link', admin_url( "js/link$suffix.js" ), array( 'wp-lists', 'postbox' ), false, 1 );
 		//wp_enqueue_script( 'autosave' );
+
+		// yay, different WP versions!
+		if ( version_compare( $wp_version, '4.1.999') >= 0 ) {
+			wp_enqueue_script( 'tags-box', $this->url . "/tags-box$suffix.js", array( 'jquery', 'suggest' ), false, 1 );
+		}
+
 		if ( wp_is_mobile() ) {
 			wp_enqueue_script( 'jquery-touch-punch' );
 		}
@@ -482,6 +487,7 @@ class WP_Frontend_Admin_Screen {
 			'published' => __('Published'),
 			'saveAlert' => __('The changes you made will be lost if you navigate away from this page.'),
 			'savingText' => __('Saving Draft&#8230;'),
+			'comma' => $this->strings['tag_delimiter'],
 		) );
 
 		// editor-specific styles
