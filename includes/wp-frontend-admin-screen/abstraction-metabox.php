@@ -21,6 +21,8 @@ if ( ! function_exists( 'get_current_screen' ) ) :
  * Pluggable version of get_current_screen().
  *
  * You should change 'id' to your custom post type.
+ *
+ * @return object
  */
 function get_current_screen() {
 	$object = new stdClass;
@@ -34,12 +36,18 @@ if ( ! function_exists( 'convert_to_screen' ) ) :
 /**
  * Pluggable version of get_current_screen().
  *
- * This is used by WP admin in some spots to convert admin pages to
- * the appropriate admin screen.  This isn't relevant for us, so we just
- * return our customized version of get_current_screen().
+ * This is used by WP admin in some spots to convert admin pages to the
+ * appropriate admin screen.  We return a simplified version of what WP
+ * admin is expecting.
+ *
+ * @param  string $hook_name The hook name.  Usually this is a custom post type.
+ * @return object
  */
-function convert_to_screen() {
-	return get_current_screen();
+function convert_to_screen( $hook_name ) {
+	$object = new stdClass;
+	$object->id   = $hook_name;
+	$object->base = '';
+	return $object;
 }
 endif;
 
