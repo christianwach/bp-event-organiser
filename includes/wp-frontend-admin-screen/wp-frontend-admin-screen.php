@@ -449,7 +449,7 @@ class WP_Frontend_Admin_Screen {
 
 		// yay, different WP versions!
 		if ( version_compare( $wp_version, '4.1.999') >= 0 ) {
-			wp_enqueue_script( 'tags-box', $this->url . "/tags-box$suffix.js", array( 'jquery', 'suggest' ), false, 1 );
+			wp_enqueue_script( 'tags-box', admin_url( "js/tags-box$suffix.js" ), array( 'jquery', 'suggest' ), false, 1 );
 		}
 
 		if ( wp_is_mobile() ) {
