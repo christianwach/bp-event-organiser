@@ -105,7 +105,7 @@
 	 */
 	add_group_filter = function( group_data, calendar_id ) {
 		var checkbox,
-			group_id = group_data.id;
+			group_id = parseInt( group_data.id );
 
 		// Stash data about the group with the calendar.
 		calendars.calendar_id.groups[ group_id ] = group_data;
@@ -135,7 +135,7 @@
 	 */
 	add_author_filter = function( author_data, calendar_id ) {
 		var checkbox,
-			author_id = author_data.id;
+			author_id = parseInt( author_data.id );
 
 		if ( 'undefined' === typeof calendars.calendar_id.filter_authors ) {
 			calendars.calendar_id.filter_authors = $( '#' + calendar_id ).find( '.bpeo-calendar-filter-type-author ul' );
@@ -193,7 +193,7 @@
 			calendars.calendar_id.filter_groups.find( 'li input' ).each( function( k, v ) {
 				$current = $( v );
 				if ( $current.is( ':checked' ) ) {
-					calendars.calendar_id.checked_groups.push( $current.data( 'group-id' ) );
+					calendars.calendar_id.checked_groups.push( parseInt( $current.data( 'group-id' ) ) );
 				}
 			} );
 		} else if ( author_id ) {
@@ -201,7 +201,7 @@
 			calendars.calendar_id.filter_authors.find( 'li input' ).each( function( k, v ) {
 				$current = $( v );
 				if ( $current.is( ':checked' ) ) {
-					calendars.calendar_id.checked_authors.push( $current.data( 'author-id' ) );
+					calendars.calendar_id.checked_authors.push( parseInt( $current.data( 'author-id' ) ) );
 				}
 			} );
 		}
