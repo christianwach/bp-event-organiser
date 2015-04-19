@@ -23,6 +23,8 @@ class BPEO_Component extends BP_Component {
 			'slug' => bpeo_get_events_slug(),
 			'has_directory' => false,
 		) );
+
+		$this->setup_single_event_screen();
 	}
 
 	/**
@@ -61,6 +63,41 @@ class BPEO_Component extends BP_Component {
 		parent::setup_nav( $main_nav, $sub_nav );
 	}
 
+	/**
+	 * Set up single event screen.
+	 */
+	protected function setup_single_event_screen() {
+		if ( ! bp_is_user() ) {
+			return;
+		}
+
+		if ( ! bp_is_current_component( bpeo_get_events_slug() ) ) {
+			return;
+		}
+
+		if ( bp_is_current_action( bpeo_get_events_new_slug() ) ) {
+			return;
+		}
+
+		// query for the event
+		$event = eo_get_events( array(
+			'name' => bp_current_action()
+		) );
+
+		// check if event exists
+		if ( empty( $event ) ) {
+			bp_core_add_message( __( 'Event does not exist.', 'bp-event-organiser' ), 'error' );
+			bp_core_redirect( trailingslashit( bp_displayed_user_domain() . bpeo_get_events_slug() ) );
+			die();
+		}
+
+		// save queried event as property
+		$this->queried_event = $event[0];
+
+		// add our screen hook
+		add_action( 'bp_screens', array( $this, 'template_loader' ) );
+	}
+
 	public function template_loader() {
 		// new event
 		if ( bp_is_current_action( bpeo_get_events_new_slug() ) ) {
@@ -72,6 +109,11 @@ class BPEO_Component extends BP_Component {
 			) );
 
 			add_action( 'bp_template_content', array( $this->create_event, 'display' ) );
+
+		// single event
+		} elseif ( false === bp_is_current_action( 'calendar' ) ) {
+			$this->single_event_screen();
+			add_action( 'bp_template_content', array( $this, 'display_single_event' ) );
 
 		// user calendar
 		} else {
@@ -91,6 +133,152 @@ class BPEO_Component extends BP_Component {
 		);
 
 		echo eo_get_event_fullcalendar( $args );
+	}
+
+	/**
+	 * Single event screen handler.
+	 */
+	protected function single_event_screen() {
+		if ( empty( $this->queried_event ) ) {
+			return;
+		}
+
+		// edit single event logic
+		if ( bp_is_action_variable( 'edit' ) ) {
+			// check if user has access
+			if ( false === current_user_can( 'edit_event', $this->queried_event->ID ) ) {
+				bp_core_add_message( __( 'You do not have access to edit this event.', 'bp-event-organiser' ), 'error' );
+				bp_core_redirect( trailingslashit( bp_displayed_user_domain() . $this->slug ) . "{$this->queried_event->post_name}/" );
+				die();
+			}
+
+
+			// magic admin screen code!
+			require BPEO_PATH . '/includes/class.bpeo_frontend_admin_screen.php';
+
+			$this->edit_event = new BPEO_Frontend_Admin_Screen( array(
+				'queried_post'   => $this->queried_event,
+				'redirect_root'  => trailingslashit( bp_displayed_user_domain() . $this->slug )
+			) );
+
+		// delete single event logic
+		} elseif ( bp_is_action_variable( 'delete' ) ) {
+			// check if user has access
+			if ( false === current_user_can( 'delete_event', $this->queried_event->ID ) ) {
+				bp_core_add_message( __( 'You do not have permission to delete this event.', 'bp-event-organiser' ), 'error' );
+				bp_core_redirect( trailingslashit( bp_displayed_user_domain() . $this->slug ) . "{$this->queried_event->post_name}/" );
+				die();
+			}
+
+			// verify nonce
+			if ( false === bp_action_variable( 1 ) || ! wp_verify_nonce( bp_action_variable( 1 ), "bpeo_delete_event_{$this->queried_event->ID}" ) ) {
+				bp_core_add_message( __( 'You do not have permission to delete this event.', 'bp-event-organiser' ), 'error' );
+				bp_core_redirect( trailingslashit( bp_displayed_user_domain() . $this->slug ) . "{$this->queried_event->post_name}/" );
+				die();
+			}
+
+			// delete event
+			$delete = wp_delete_post( $this->queried_event->ID, true );
+			if ( false === $delete ) {
+				bp_core_add_message( __( 'There was a problem deleting the event.', 'bp-event-organiser' ), 'error' );
+			} else {
+				bp_core_add_message( __( 'Event deleted.', 'bp-event-organiser' ) );
+			}
+
+			bp_core_redirect( trailingslashit( bp_displayed_user_domain() . $this->slug ) );
+			die();
+		}
+	}
+
+	/**
+	 * Display a single event within a user's profile.
+	 *
+	 * @todo Move part of this functionality into a template part so theme devs can customize.
+	 * @todo Merge single event display logic for users and groups
+	 */
+	public function display_single_event() {
+		if ( empty( $this->queried_event ) ) {
+			return;
+		}
+
+		// save $post global temporarily
+		global $post;
+		$_post = false;
+		if ( ! empty( $post ) ) {
+			$_post = $post;
+		}
+
+		// override the $post global so EO can use its functions
+		$post = $this->queried_event;
+
+		// edit screen has its own display method
+		if ( bp_is_action_variable( 'edit' ) ) {
+			$this->edit_event->display();
+
+			// revert $post global
+			if ( ! empty( $_post ) ) {
+				$post = $_post;
+			}
+			return;
+		}
+
+		/**
+		 * Move this logic into a template part
+		 */
+		echo '<h2> ' . get_the_title() . '</h2>';
+
+		echo '<h4>' . __( 'Event Description', 'bp-event-organizer' ) . '</h4>';
+
+		// Make this better... have to juggle the_content filters...
+		echo wpautop( $post->post_content );
+
+		// post thumbnail - hardcoded to medium size at the moment.
+		the_post_thumbnail( 'medium' );
+
+		add_action( 'loop_end', array( $this, 'catch_reset_postdata' ) );
+		eo_get_template_part( 'event-meta-event-single' );
+		remove_action( 'loop_end', array( $this, 'catch_reset_postdata' ) );
+
+		// Action links
+		// @todo Make this a template function
+		echo '<a href="' . trailingslashit( bp_displayed_user_domain() . $this->slug ) . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
+
+		// @todo make 'edit' slug changeable
+		if ( current_user_can( 'edit_event', $this->queried_event->ID ) ) {
+			echo ' | <a href="' . trailingslashit( bp_displayed_user_domain() . $this->slug ) . $this->queried_event->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
+		}
+
+		// @todo make 'delete' slug changeable
+		if ( current_user_can( 'delete_event', $this->queried_event->ID ) ) {
+			echo ' | <a class="confirm" href="' . trailingslashit( bp_displayed_user_domain() . $this->slug ) . $this->queried_event->post_name . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$this->queried_event->ID}" ). '/">' . __( 'Delete', 'bp-events-organizer' ). '</a>';
+		}
+
+		// revert $post global
+		if ( ! empty( $_post ) ) {
+			$post = $_post;
+		}
+	}
+
+	/**
+	 * Ensure that wp_reset_postdata() doesn't reset the post back to page ID 0.
+	 *
+	 * The event meta template provided by EO uses {@link wp_reset_postdata()} when
+	 * an event is recurring.  This interferes with BuddyPress when using EO's
+	 * 'eventorganiser_additional_event_meta' hook and wanting to fetch EO's WP
+	 * post for further data output.
+	 *
+	 * This method catches the end of the reoccurence event loop and wipes out the
+	 * post so wp_reset_postdata() doesn't reset the post back to page ID 0.
+	 */
+	public function catch_reset_postdata( $q ) {
+		// check if a reoccurence loop occurred; if not, bail
+		if ( empty( $q->query['post_type'] ) ) {
+			return;
+		}
+
+		// wipe out the post property in $wp_query to prevent our page from resetting
+		// when wp_reset_postdata() is used
+		$GLOBALS['wp_query']->post = null;
 	}
 }
 
