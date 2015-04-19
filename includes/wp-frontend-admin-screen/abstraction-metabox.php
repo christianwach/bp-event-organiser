@@ -844,6 +844,344 @@ function _wp_post_thumbnail_html( $thumbnail_id = null, $post = null ) {
 }
 endif;
 
+/** DUPLICATES - POST SUBMIT META BOX ***********************************/
+
+if ( ! function_exists( 'post_submit_meta_box' ) ) :
+/**
+ * Display post submit form fields.
+ *
+ * WFAS Mod: Removed "Preview Changes" button.
+ *
+ * @since 2.7.0
+ *
+ * @param object $post
+ */
+function post_submit_meta_box($post, $args = array() ) {
+	global $action;
+
+	$post_type = $post->post_type;
+	$post_type_object = get_post_type_object($post_type);
+	$can_publish = current_user_can($post_type_object->cap->publish_posts);
+?>
+<div class="submitbox" id="submitpost">
+
+<div id="minor-publishing">
+
+<?php // Hidden submit button early on so that the browser chooses the right button when form is submitted with Return key ?>
+<div style="display:none;">
+<?php submit_button( __( 'Save' ), 'button', 'save' ); ?>
+</div>
+
+<div id="minor-publishing-actions">
+<div id="save-action">
+<?php if ( 'publish' != $post->post_status && 'future' != $post->post_status && 'pending' != $post->post_status ) { ?>
+<input <?php if ( 'private' == $post->post_status ) { ?>style="display:none"<?php } ?> type="submit" name="save" id="save-post" value="<?php esc_attr_e('Save Draft'); ?>" class="button" />
+<?php } elseif ( 'pending' == $post->post_status && $can_publish ) { ?>
+<input type="submit" name="save" id="save-post" value="<?php esc_attr_e('Save as Pending'); ?>" class="button" />
+<?php } ?>
+<span class="spinner"></span>
+</div>
+
+<div class="clear"></div>
+</div><!-- #minor-publishing-actions -->
+
+<div id="misc-publishing-actions">
+
+<div class="misc-pub-section misc-pub-post-status"><label for="post_status"><?php _e('Status:') ?></label>
+<span id="post-status-display">
+<?php
+switch ( $post->post_status ) {
+	case 'private':
+		_e('Privately Published');
+		break;
+	case 'publish':
+		_e('Published');
+		break;
+	case 'future':
+		_e('Scheduled');
+		break;
+	case 'pending':
+		_e('Pending Review');
+		break;
+	case 'draft':
+	case 'auto-draft':
+		_e('Draft');
+		break;
+}
+?>
+</span>
+<?php if ( 'publish' == $post->post_status || 'private' == $post->post_status || $can_publish ) { ?>
+<a href="#post_status" <?php if ( 'private' == $post->post_status ) { ?>style="display:none;" <?php } ?>class="edit-post-status hide-if-no-js"><span aria-hidden="true"><?php _e( 'Edit' ); ?></span> <span class="screen-reader-text"><?php _e( 'Edit status' ); ?></span></a>
+
+<div id="post-status-select" class="hide-if-js">
+<input type="hidden" name="hidden_post_status" id="hidden_post_status" value="<?php echo esc_attr( ('auto-draft' == $post->post_status ) ? 'draft' : $post->post_status); ?>" />
+<select name='post_status' id='post_status'>
+<?php if ( 'publish' == $post->post_status ) : ?>
+<option<?php selected( $post->post_status, 'publish' ); ?> value='publish'><?php _e('Published') ?></option>
+<?php elseif ( 'private' == $post->post_status ) : ?>
+<option<?php selected( $post->post_status, 'private' ); ?> value='publish'><?php _e('Privately Published') ?></option>
+<?php elseif ( 'future' == $post->post_status ) : ?>
+<option<?php selected( $post->post_status, 'future' ); ?> value='future'><?php _e('Scheduled') ?></option>
+<?php endif; ?>
+<option<?php selected( $post->post_status, 'pending' ); ?> value='pending'><?php _e('Pending Review') ?></option>
+<?php if ( 'auto-draft' == $post->post_status ) : ?>
+<option<?php selected( $post->post_status, 'auto-draft' ); ?> value='draft'><?php _e('Draft') ?></option>
+<?php else : ?>
+<option<?php selected( $post->post_status, 'draft' ); ?> value='draft'><?php _e('Draft') ?></option>
+<?php endif; ?>
+</select>
+ <a href="#post_status" class="save-post-status hide-if-no-js button"><?php _e('OK'); ?></a>
+ <a href="#post_status" class="cancel-post-status hide-if-no-js button-cancel"><?php _e('Cancel'); ?></a>
+</div>
+
+<?php } ?>
+</div><!-- .misc-pub-section -->
+
+<div class="misc-pub-section misc-pub-visibility" id="visibility">
+<?php _e('Visibility:'); ?> <span id="post-visibility-display"><?php
+
+if ( 'private' == $post->post_status ) {
+	$post->post_password = '';
+	$visibility = 'private';
+	$visibility_trans = __('Private');
+} elseif ( !empty( $post->post_password ) ) {
+	$visibility = 'password';
+	$visibility_trans = __('Password protected');
+} elseif ( $post_type == 'post' && is_sticky( $post->ID ) ) {
+	$visibility = 'public';
+	$visibility_trans = __('Public, Sticky');
+} else {
+	$visibility = 'public';
+	$visibility_trans = __('Public');
+}
+
+echo esc_html( $visibility_trans ); ?></span>
+<?php if ( $can_publish ) { ?>
+<a href="#visibility" class="edit-visibility hide-if-no-js"><span aria-hidden="true"><?php _e( 'Edit' ); ?></span> <span class="screen-reader-text"><?php _e( 'Edit visibility' ); ?></span></a>
+
+<div id="post-visibility-select" class="hide-if-js">
+<input type="hidden" name="hidden_post_password" id="hidden-post-password" value="<?php echo esc_attr($post->post_password); ?>" />
+<?php if ($post_type == 'post'): ?>
+<input type="checkbox" style="display:none" name="hidden_post_sticky" id="hidden-post-sticky" value="sticky" <?php checked(is_sticky($post->ID)); ?> />
+<?php endif; ?>
+<input type="hidden" name="hidden_post_visibility" id="hidden-post-visibility" value="<?php echo esc_attr( $visibility ); ?>" />
+<input type="radio" name="visibility" id="visibility-radio-public" value="public" <?php checked( $visibility, 'public' ); ?> /> <label for="visibility-radio-public" class="selectit"><?php _e('Public'); ?></label><br />
+<?php if ( $post_type == 'post' && current_user_can( 'edit_others_posts' ) ) : ?>
+<span id="sticky-span"><input id="sticky" name="sticky" type="checkbox" value="sticky" <?php checked( is_sticky( $post->ID ) ); ?> /> <label for="sticky" class="selectit"><?php _e( 'Stick this post to the front page' ); ?></label><br /></span>
+<?php endif; ?>
+<input type="radio" name="visibility" id="visibility-radio-password" value="password" <?php checked( $visibility, 'password' ); ?> /> <label for="visibility-radio-password" class="selectit"><?php _e('Password protected'); ?></label><br />
+<span id="password-span"><label for="post_password"><?php _e('Password:'); ?></label> <input type="text" name="post_password" id="post_password" value="<?php echo esc_attr($post->post_password); ?>"  maxlength="20" /><br /></span>
+<input type="radio" name="visibility" id="visibility-radio-private" value="private" <?php checked( $visibility, 'private' ); ?> /> <label for="visibility-radio-private" class="selectit"><?php _e('Private'); ?></label><br />
+
+<p>
+ <a href="#visibility" class="save-post-visibility hide-if-no-js button"><?php _e('OK'); ?></a>
+ <a href="#visibility" class="cancel-post-visibility hide-if-no-js button-cancel"><?php _e('Cancel'); ?></a>
+</p>
+</div>
+<?php } ?>
+
+</div><!-- .misc-pub-section -->
+
+<?php
+/* translators: Publish box date format, see http://php.net/date */
+$datef = __( 'M j, Y @ H:i' );
+if ( 0 != $post->ID ) {
+	if ( 'future' == $post->post_status ) { // scheduled for publishing at a future date
+		$stamp = __('Scheduled for: <b>%1$s</b>');
+	} elseif ( 'publish' == $post->post_status || 'private' == $post->post_status ) { // already published
+		$stamp = __('Published on: <b>%1$s</b>');
+	} elseif ( '0000-00-00 00:00:00' == $post->post_date_gmt ) { // draft, 1 or more saves, no date specified
+		$stamp = __('Publish <b>immediately</b>');
+	} elseif ( time() < strtotime( $post->post_date_gmt . ' +0000' ) ) { // draft, 1 or more saves, future date specified
+		$stamp = __('Schedule for: <b>%1$s</b>');
+	} else { // draft, 1 or more saves, date specified
+		$stamp = __('Publish on: <b>%1$s</b>');
+	}
+	$date = date_i18n( $datef, strtotime( $post->post_date ) );
+} else { // draft (no saves, and thus no date specified)
+	$stamp = __('Publish <b>immediately</b>');
+	$date = date_i18n( $datef, strtotime( current_time('mysql') ) );
+}
+
+if ( ! empty( $args['args']['revisions_count'] ) ) :
+	$revisions_to_keep = wp_revisions_to_keep( $post );
+?>
+<div class="misc-pub-section misc-pub-revisions">
+<?php
+	if ( $revisions_to_keep > 0 && $revisions_to_keep <= $args['args']['revisions_count'] ) {
+		echo '<span title="' . esc_attr( sprintf( __( 'Your site is configured to keep only the last %s revisions.' ),
+			number_format_i18n( $revisions_to_keep ) ) ) . '">';
+		printf( __( 'Revisions: %s' ), '<b>' . number_format_i18n( $args['args']['revisions_count'] ) . '+</b>' );
+		echo '</span>';
+	} else {
+		printf( __( 'Revisions: %s' ), '<b>' . number_format_i18n( $args['args']['revisions_count'] ) . '</b>' );
+	}
+?>
+	<a class="hide-if-no-js" href="<?php echo esc_url( get_edit_post_link( $args['args']['revision_id'] ) ); ?>"><span aria-hidden="true"><?php _ex( 'Browse', 'revisions' ); ?></span> <span class="screen-reader-text"><?php _e( 'Browse revisions' ); ?></span></a>
+</div>
+<?php endif;
+
+if ( $can_publish ) : // Contributors don't get to choose the date of publish ?>
+<div class="misc-pub-section curtime misc-pub-curtime">
+	<span id="timestamp">
+	<?php printf($stamp, $date); ?></span>
+	<a href="#edit_timestamp" class="edit-timestamp hide-if-no-js"><span aria-hidden="true"><?php _e( 'Edit' ); ?></span> <span class="screen-reader-text"><?php _e( 'Edit date and time' ); ?></span></a>
+	<div id="timestampdiv" class="hide-if-js"><?php touch_time(($action == 'edit'), 1); ?></div>
+</div><?php // /misc-pub-section ?>
+<?php endif; ?>
+
+<?php
+/**
+ * Fires after the post time/date setting in the Publish meta box.
+ *
+ * @since 2.9.0
+ */
+do_action( 'post_submitbox_misc_actions' );
+?>
+</div>
+<div class="clear"></div>
+</div>
+
+<div id="major-publishing-actions">
+<?php
+/**
+ * Fires at the beginning of the publishing actions section of the Publish meta box.
+ *
+ * @since 2.7.0
+ */
+do_action( 'post_submitbox_start' );
+?>
+<div id="delete-action">
+<?php
+if ( current_user_can( "delete_post", $post->ID ) ) {
+	if ( !EMPTY_TRASH_DAYS )
+		$delete_text = __('Delete Permanently');
+	else
+		$delete_text = __('Move to Trash');
+	?>
+<a class="submitdelete deletion" href="<?php echo get_delete_post_link($post->ID); ?>"><?php echo $delete_text; ?></a><?php
+} ?>
+</div>
+
+<div id="publishing-action">
+<span class="spinner"></span>
+<?php
+if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID ) {
+	if ( $can_publish ) :
+		if ( !empty($post->post_date_gmt) && time() < strtotime( $post->post_date_gmt . ' +0000' ) ) : ?>
+		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Schedule') ?>" />
+		<?php submit_button( __( 'Schedule' ), 'primary button-large', 'publish', false ); ?>
+<?php	else : ?>
+		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Publish') ?>" />
+		<?php submit_button( __( 'Publish' ), 'primary button-large', 'publish', false ); ?>
+<?php	endif;
+	else : ?>
+		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Submit for Review') ?>" />
+		<?php submit_button( __( 'Submit for Review' ), 'primary button-large', 'publish', false ); ?>
+<?php
+	endif;
+} else { ?>
+		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Update') ?>" />
+		<input name="save" type="submit" class="button button-primary button-large" id="publish" value="<?php esc_attr_e( 'Update' ) ?>" />
+<?php
+} ?>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+
+<?php
+}
+endif;
+
+if ( ! function_exists( 'touch_time' ) ) :
+/**
+ * Print out HTML form date elements for editing post or comment publish date.
+ *
+ * @since 0.71
+ *
+ * @param int|bool $edit      Accepts 1|true for editing the date, 0|false for adding the date.
+ * @param int|bool $for_post  Accepts 1|true for applying the date to a post, 0|false for a comment.
+ * @param int      $tab_index The tabindex attribute to add. Default 0.
+ * @param int|bool $multi     Optional. Whether the additional fields and buttons should be added.
+ *                            Default 0|false.
+ */
+function touch_time( $edit = 1, $for_post = 1, $tab_index = 0, $multi = 0 ) {
+	global $wp_locale, $comment;
+	$post = get_post();
+
+	if ( $for_post )
+		$edit = ! ( in_array($post->post_status, array('draft', 'pending') ) && (!$post->post_date_gmt || '0000-00-00 00:00:00' == $post->post_date_gmt ) );
+
+	$tab_index_attribute = '';
+	if ( (int) $tab_index > 0 )
+		$tab_index_attribute = " tabindex=\"$tab_index\"";
+
+	// todo: Remove this?
+	// echo '<label for="timestamp" style="display: block;"><input type="checkbox" class="checkbox" name="edit_date" value="1" id="timestamp"'.$tab_index_attribute.' /> '.__( 'Edit timestamp' ).'</label><br />';
+
+	$time_adj = current_time('timestamp');
+	$post_date = ($for_post) ? $post->post_date : $comment->comment_date;
+	$jj = ($edit) ? mysql2date( 'd', $post_date, false ) : gmdate( 'd', $time_adj );
+	$mm = ($edit) ? mysql2date( 'm', $post_date, false ) : gmdate( 'm', $time_adj );
+	$aa = ($edit) ? mysql2date( 'Y', $post_date, false ) : gmdate( 'Y', $time_adj );
+	$hh = ($edit) ? mysql2date( 'H', $post_date, false ) : gmdate( 'H', $time_adj );
+	$mn = ($edit) ? mysql2date( 'i', $post_date, false ) : gmdate( 'i', $time_adj );
+	$ss = ($edit) ? mysql2date( 's', $post_date, false ) : gmdate( 's', $time_adj );
+
+	$cur_jj = gmdate( 'd', $time_adj );
+	$cur_mm = gmdate( 'm', $time_adj );
+	$cur_aa = gmdate( 'Y', $time_adj );
+	$cur_hh = gmdate( 'H', $time_adj );
+	$cur_mn = gmdate( 'i', $time_adj );
+
+	$month = '<label for="mm" class="screen-reader-text">' . __( 'Month' ) . '</label><select ' . ( $multi ? '' : 'id="mm" ' ) . 'name="mm"' . $tab_index_attribute . ">\n";
+	for ( $i = 1; $i < 13; $i = $i +1 ) {
+		$monthnum = zeroise($i, 2);
+		$month .= "\t\t\t" . '<option value="' . $monthnum . '" ' . selected( $monthnum, $mm, false ) . '>';
+		/* translators: 1: month number (01, 02, etc.), 2: month abbreviation */
+		$month .= sprintf( __( '%1$s-%2$s' ), $monthnum, $wp_locale->get_month_abbrev( $wp_locale->get_month( $i ) ) ) . "</option>\n";
+	}
+	$month .= '</select>';
+
+	$day = '<label for="jj" class="screen-reader-text">' . __( 'Day' ) . '</label><input type="text" ' . ( $multi ? '' : 'id="jj" ' ) . 'name="jj" value="' . $jj . '" size="2" maxlength="2"' . $tab_index_attribute . ' autocomplete="off" />';
+	$year = '<label for="aa" class="screen-reader-text">' . __( 'Year' ) . '</label><input type="text" ' . ( $multi ? '' : 'id="aa" ' ) . 'name="aa" value="' . $aa . '" size="4" maxlength="4"' . $tab_index_attribute . ' autocomplete="off" />';
+	$hour = '<label for="hh" class="screen-reader-text">' . __( 'Hour' ) . '</label><input type="text" ' . ( $multi ? '' : 'id="hh" ' ) . 'name="hh" value="' . $hh . '" size="2" maxlength="2"' . $tab_index_attribute . ' autocomplete="off" />';
+	$minute = '<label for="mn" class="screen-reader-text">' . __( 'Minute' ) . '</label><input type="text" ' . ( $multi ? '' : 'id="mn" ' ) . 'name="mn" value="' . $mn . '" size="2" maxlength="2"' . $tab_index_attribute . ' autocomplete="off" />';
+
+	echo '<div class="timestamp-wrap">';
+	/* translators: 1: month, 2: day, 3: year, 4: hour, 5: minute */
+	printf( __( '%1$s %2$s, %3$s @ %4$s : %5$s' ), $month, $day, $year, $hour, $minute );
+
+	echo '</div><input type="hidden" id="ss" name="ss" value="' . $ss . '" />';
+
+	if ( $multi ) return;
+
+	echo "\n\n";
+	$map = array(
+		'mm' => array( $mm, $cur_mm ),
+		'jj' => array( $jj, $cur_jj ),
+		'aa' => array( $aa, $cur_aa ),
+		'hh' => array( $hh, $cur_hh ),
+		'mn' => array( $mn, $cur_mn ),
+	);
+	foreach ( $map as $timeunit => $value ) {
+		list( $unit, $curr ) = $value;
+
+		echo '<input type="hidden" id="hidden_' . $timeunit . '" name="hidden_' . $timeunit . '" value="' . $unit . '" />' . "\n";
+		$cur_timeunit = 'cur_' . $timeunit;
+		echo '<input type="hidden" id="' . $cur_timeunit . '" name="' . $cur_timeunit . '" value="' . $curr . '" />' . "\n";
+	}
+?>
+
+<p>
+<a href="#edit_timestamp" class="save-timestamp hide-if-no-js button"><?php _e('OK'); ?></a>
+<a href="#edit_timestamp" class="cancel-timestamp hide-if-no-js button-cancel"><?php _e('Cancel'); ?></a>
+</p>
+<?php
+}
+endif;
+
 /** DUPLICATES - MISC ***************************************************/
 
 if ( ! function_exists( 'submit_button' ) ) :

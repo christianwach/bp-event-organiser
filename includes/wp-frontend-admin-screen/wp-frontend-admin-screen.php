@@ -101,6 +101,7 @@ class WP_Frontend_Admin_Screen {
 			'button_update'     => __( 'Update' ),
 			'tag_delimiter'     => _x( ',', 'tag delimiter' ),
 			'featured_image'    => __( 'Featured Image' ),
+			'title_publish'     => __( 'Publish' ),
 
 			/* translators: If your word count is based on single characters (East Asian characters),
 			   enter 'characters'. Otherwise, enter 'words'. Do not translate into your own language. */
@@ -297,6 +298,7 @@ class WP_Frontend_Admin_Screen {
 
 		<h2><?php esc_html_e( $title  ); ?></h2>
 
+		<div id="post-body">
 		<form id="post" method="post" action="" name="post">
 			<?php wp_nonce_field( 'update-post_' . $post->ID ); ?>
 			<input type="hidden" id="post_ID" name="post_ID" value="<?php echo esc_attr( $post->ID ); ?>" />
@@ -367,7 +369,10 @@ class WP_Frontend_Admin_Screen {
 			add_meta_box( 'postimagediv', $this->strings['featured_image'], 'post_thumbnail_meta_box', self::$post_type, 'side', 'low');
 		}
 
-		// duplicates taxonomy metabox registration from edit-form-advanced.php
+		// publish metabox
+		add_meta_box( 'submitdiv', $this->strings['title_publish'], 'post_submit_meta_box', self::$post_type, 'side', 'low' );
+
+		// taxonomy metaboxes
 		foreach ( get_object_taxonomies( $post ) as $tax_name ) {
 			$taxonomy = get_taxonomy( $tax_name );
 			if ( ! $taxonomy->show_ui || false === $taxonomy->meta_box_cb ) {
@@ -393,42 +398,17 @@ class WP_Frontend_Admin_Screen {
 		do_meta_boxes( self::$post_type, 'normal', $post );
 		do_meta_boxes( self::$post_type, 'side', $post );
 
-		// output save button
-		// copied from publish metabox
-		// we're not supporting directly changing the post date at the moment
-	?>
-
-			<div id="publishing-action">
-			<span class="spinner"></span>
-			<?php
-			if ( ! in_array( $post->post_status, array( 'publish', 'future', 'private' ) ) || 0 == $post->ID ) {
-				if ( $can_publish ) :
-					if ( ! empty( $post->post_date_gmt ) && time() < strtotime( $post->post_date_gmt . ' +0000' ) ) : ?>
-					<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Schedule') ?>" />
-					<?php submit_button( __( 'Schedule' ), 'primary button-large', 'publish', false ); ?>
-					<?php	else : ?>
-							<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( $this->strings['button_publish'] ) ?>" />
-							<?php submit_button( $this->strings['button_publish'], 'primary button-large', 'publish', false ); ?>
-					<?php	endif;
-				else : ?>
-					<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Submit for Review') ?>" />
-					<?php submit_button( __( 'Submit for Review' ), 'primary button-large', 'publish', false ); ?>
-			<?php
-				endif;
-			} else { ?>
-				<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e( $this->strings['button_update'] ) ?>" />
-				<input name="save" type="submit" class="button button-primary button-large" id="publish" value="<?php esc_attr_e( $this->strings['button_update'] ) ?>" />
-			<?php
-			} ?>
-			</div>
-		</form>
-
-	<?php
 		// revert $post global
 		if ( ! empty( $_post ) ) {
 			$post = $_post;
 		}
 
+	?>
+
+		</form>
+		</div>
+
+	<?php
 	}
 
 	/**

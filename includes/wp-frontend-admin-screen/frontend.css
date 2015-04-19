@@ -88,6 +88,32 @@ div.error {
 	word-spacing: 3px;
 }
 
+#post-status-display,
+#post-visibility-display {
+	font-weight: 600;
+}
+
+.misc-pub-section {
+	padding: 6px 10px 8px;
+}
+
+/* from /wp-admin/css/forms.css */
+
+#misc-publishing-actions label[for="post_status"]:before {
+	content: '\f173';
+	display: inline-block;
+	font: normal 20px/1 'dashicons';
+	speak: none;
+	left: -1px;
+	padding: 0 5px 0 0;
+	position: relative;
+	top: 0;
+	text-decoration: none !important;
+	vertical-align: top;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
 /** overrides ***********************************************************/
 
 .postbox {
@@ -151,3 +177,8 @@ div.error {
 .handlediv {display:none;}
 
 .tagcloud-link {display: block; margin-top: .6em;}
+
+#major-publishing-actions, #misc-publishing-actions p {margin-top: 1em;}
+
+#delete-action {float:right; padding-top:13px;}
+	#delete-action a {color:#a00;}
