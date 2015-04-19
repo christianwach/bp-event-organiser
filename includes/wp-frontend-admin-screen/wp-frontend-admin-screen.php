@@ -363,7 +363,7 @@ class WP_Frontend_Admin_Screen {
 		// metabox time!
 
 		// featured image metabox
-		if ( current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' ) && current_user_can( 'upload_files' ) ) {
+		if ( current_theme_supports( 'post-thumbnails', $post->post_type ) && post_type_supports( $post->post_type, 'thumbnail' ) && current_user_can( 'upload_files' ) ) {
 			add_meta_box( 'postimagediv', $this->strings['featured_image'], 'post_thumbnail_meta_box', self::$post_type, 'side', 'low');
 		}
 
