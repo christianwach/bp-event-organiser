@@ -103,6 +103,26 @@ function bpeo_filter_query_for_bp_displayed_user_id( $query ) {
 add_action( 'pre_get_posts', 'bpeo_filter_query_for_bp_displayed_user_id', 1000 );
 
 /**
+ * Filter event links on a group events page to use the group event permalink.
+ *
+ * @param string $retval Current event permalink
+ * @return string
+ */
+function bpeo_calendar_filter_event_link_for_bp_user( $retval ) {
+	if ( ! bp_is_user() ) {
+		return $retval;
+	}
+
+	// this is to avoid requerying the event just for the post slug
+	$event_url = explode( '/', untrailingslashit( $retval ) );
+	$post_slug = array_pop( $event_url );
+
+	// regenerate the post URL to account for group permalink
+	return trailingslashit( bp_displayed_user_domain() . bpeo_get_events_slug() . '/' . $post_slug );
+}
+add_filter( 'eventorganiser_calendar_event_link', 'bpeo_calendar_filter_event_link_for_bp_user' );
+
+/**
  * Modify the calendar query to include the displayed user ID.
  *
  * @param  array $query Query vars as set up by EO.
