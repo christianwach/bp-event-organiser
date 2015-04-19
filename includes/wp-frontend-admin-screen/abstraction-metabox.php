@@ -784,6 +784,66 @@ function get_terms_to_edit( $post_id, $taxonomy = 'post_tag' ) {
 }
 endif;
 
+/** DUPLICATES - THUMBNAIL META BOX *************************************/
+
+if ( ! function_exists( 'post_thumbnail_meta_box' ) ) :
+/**
+ * Display post thumbnail meta box.
+ *
+ * @since 2.9.0
+ */
+function post_thumbnail_meta_box( $post ) {
+	$thumbnail_id = get_post_meta( $post->ID, '_thumbnail_id', true );
+	echo _wp_post_thumbnail_html( $thumbnail_id, $post->ID );
+}
+endif;
+
+if ( ! function_exists( '_wp_post_thumbnail_html' ) ) :
+/**
+ * Output HTML for the post thumbnail meta-box.
+ *
+ * @since 2.9.0
+ *
+ * @param int $thumbnail_id ID of the attachment used for thumbnail
+ * @param mixed $post The post ID or object associated with the thumbnail, defaults to global $post.
+ * @return string html
+ */
+function _wp_post_thumbnail_html( $thumbnail_id = null, $post = null ) {
+	global $content_width, $_wp_additional_image_sizes;
+
+	$post = get_post( $post );
+
+	$upload_iframe_src = esc_url( get_upload_iframe_src('image', $post->ID ) );
+	$set_thumbnail_link = '<p class="hide-if-no-js"><a title="' . esc_attr__( 'Set featured image' ) . '" href="%s" id="set-post-thumbnail" class="thickbox">%s</a></p>';
+	$content = sprintf( $set_thumbnail_link, $upload_iframe_src, esc_html__( 'Set featured image' ) );
+
+	if ( $thumbnail_id && get_post( $thumbnail_id ) ) {
+		$old_content_width = $content_width;
+		$content_width = 266;
+		if ( !isset( $_wp_additional_image_sizes['post-thumbnail'] ) )
+			$thumbnail_html = wp_get_attachment_image( $thumbnail_id, array( $content_width, $content_width ) );
+		else
+			$thumbnail_html = wp_get_attachment_image( $thumbnail_id, 'post-thumbnail' );
+		if ( !empty( $thumbnail_html ) ) {
+			$ajax_nonce = wp_create_nonce( 'set_post_thumbnail-' . $post->ID );
+			$content = sprintf( $set_thumbnail_link, $upload_iframe_src, $thumbnail_html );
+			$content .= '<p class="hide-if-no-js"><a href="#" id="remove-post-thumbnail" onclick="WPRemoveThumbnail(\'' . $ajax_nonce . '\');return false;">' . esc_html__( 'Remove featured image' ) . '</a></p>';
+		}
+		$content_width = $old_content_width;
+	}
+
+	/**
+	 * Filter the admin post thumbnail HTML markup to return.
+	 *
+	 * @since 2.9.0
+	 *
+	 * @param string $content Admin post thumbnail HTML markup.
+	 * @param int    $post_id Post ID.
+	 */
+	return apply_filters( 'admin_post_thumbnail_html', $content, $post->ID );
+}
+endif;
+
 /** DUPLICATES - MISC ***************************************************/
 
 if ( ! function_exists( 'submit_button' ) ) :

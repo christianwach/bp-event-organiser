@@ -100,6 +100,7 @@ class WP_Frontend_Admin_Screen {
 			'button_publish'    => __( 'Publish' ),
 			'button_update'     => __( 'Update' ),
 			'tag_delimiter'     => _x( ',', 'tag delimiter' ),
+			'featured_image'    => __( 'Featured Image' ),
 
 			/* translators: If your word count is based on single characters (East Asian characters),
 			   enter 'characters'. Otherwise, enter 'words'. Do not translate into your own language. */
@@ -360,6 +361,12 @@ class WP_Frontend_Admin_Screen {
 
 	<?php
 		// metabox time!
+
+		// featured image metabox
+		if ( current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' ) && current_user_can( 'upload_files' ) ) {
+			add_meta_box( 'postimagediv', $this->strings['featured_image'], 'post_thumbnail_meta_box', self::$post_type, 'side', 'low');
+		}
+
 		// duplicates taxonomy metabox registration from edit-form-advanced.php
 		foreach ( get_object_taxonomies( $post ) as $tax_name ) {
 			$taxonomy = get_taxonomy( $tax_name );
@@ -436,7 +443,8 @@ class WP_Frontend_Admin_Screen {
 		}
 
 		// override the $post global so EO can use its functions
-		$post = $this->queried_post;
+		$post      = $this->queried_post;
+		$post_type = $this->queried_post->post_type;
 
 		// frontend requires manually enqueuing some scripts due to is_admin() check
 		// @see wp_default_scripts()
@@ -454,6 +462,12 @@ class WP_Frontend_Admin_Screen {
 
 		if ( wp_is_mobile() ) {
 			wp_enqueue_script( 'jquery-touch-punch' );
+		}
+
+		// post thumbnail requires a few assets
+		if ( current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' ) ) {
+			add_thickbox();
+			wp_enqueue_media( array( 'post' => $post->ID ) );
 		}
 
 		// localization
