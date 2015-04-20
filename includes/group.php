@@ -350,6 +350,10 @@ add_action( 'bpeo_create_event_activity', 'bpeo_create_group_activity_items', 10
 function bpeo_activity_action_format_for_groups( $action, $activity ) {
 	$groups = bpeo_get_event_groups( $activity->secondary_item_id );
 
+	if ( empty( $groups ) ) {
+		return $action;
+	}
+
 	$_groups = groups_get_groups( array(
 		'include' => $groups,
 		'populate_extras' => false,
