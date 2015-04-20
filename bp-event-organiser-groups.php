@@ -108,32 +108,54 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 
 		}
 
-		$this->register_additional_nav_items();
+		$this->register_subnav();
 		$this->register_buttons();
 	}
 
 	/**
-	 * Registers additional subnav items.  Mainly the "New Event" subnav item.
+	 * Registers subnav menu for a group's 'events' nav item.
+	 *
+	 * This is ultra hacky.  According to BP, the 'events' nav item is a subnav.
+	 * So for 'events' to have a subnav, we have to do some weird stuff.  See how
+	 * a group's "Manage" subnav is registered in bp-groups-loader.php for an idea
+	 * of what we're doing here.
 	 */
-	protected function register_additional_nav_items() {
+	protected function register_subnav() {
 		if ( ! bp_is_group() ) {
 			return;
 		}
 
-		bp_core_new_subnav_item( array(
-			'name'            => __( 'New Event', 'bp-event-organizer' ),
-			'slug'            => bpeo_get_events_new_slug(),
-			'parent_url'      => bp_get_group_permalink( groups_get_current_group() ),
-			'parent_slug'     => bp_get_current_group_slug(),
-			'screen_function' => array( $this, '_display_hook' ),
-			'position'        => 9999,
-			'item_css_id'     => 'nav-' . bpeo_get_events_new_slug(),
+		$subnav = array();
 
-			// check if user has access
-			// @todo currently all group members have access to edit events... restrict to mods?
-			// also, this tab can only be seen on the 'new-event' page
-			'user_has_access' => buddypress()->groups->current_group->is_user_member && bp_is_current_action( bpeo_get_events_new_slug() )
-		) );
+		// Common params to all nav items
+		$default_params = array(
+			'parent_url'        => bpeo_get_group_permalink(),
+
+			// this doesn't make sense; this emulates how a group's "Manage" subnav is
+			// registered as well
+			'parent_slug'       => buddypress()->groups->current_group->slug . '_events',
+
+			'screen_function'   => array( $this, '_display_hook' ),
+			'user_has_access'   => buddypress()->groups->current_group->is_user_member,
+			'show_in_admin_bar' => true,
+		);
+
+		$sub_nav[] = array_merge( array(
+			'name'     => __( 'Calendar', 'bp-event-organizer' ),
+			'slug'     => 'calendar',
+			'position' => 0,
+			'link'     => bpeo_get_group_permalink(),
+		), $default_params );
+
+		$sub_nav[] = array_merge( array(
+			'name'     => __( 'New Event', 'bp-event-organizer' ),
+			'slug'     => bpeo_get_events_new_slug(),
+			'position' => 10,
+		), $default_params );
+
+		foreach( (array) $sub_nav as $nav ) {
+			bp_core_new_subnav_item( $nav );
+		}
 	}
 
 	/**
@@ -147,13 +169,11 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	 * Override parent _display_hook() method to add logic for single events.
 	 */
 	public function _display_hook() {
-		// single event
-		if ( ! empty( buddypress()->action_variables ) ) {
-			$this->single_event_screen();
-			add_action( 'bp_template_content', array( $this, 'display_single_event' ) );
+		// add event subnav
+		add_action( 'bp_template_content', array( $this, 'add_subnav' ) );
 
-		// create event
-		} elseif ( bp_is_current_action( bpeo_get_events_new_slug() ) ) {
+		// new event
+		if ( bp_is_action_variable( bpeo_get_events_new_slug() ) ) {
 			// check if user has access
 			// @todo currently all group members have access to edit events... restrict to mods?
 			if ( false === is_user_logged_in() || false === buddypress()->groups->current_group->is_user_member ) {
@@ -172,12 +192,42 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 
 			add_action( 'bp_template_content', array( $this->create_event, 'display' ) );
 
+		// single event
+		} elseif ( ! empty( buddypress()->action_variables ) ) {
+			$this->single_event_screen();
+			add_action( 'bp_template_content', array( $this, 'display_single_event' ) );
+
 		// default behavior
 		} else{
 			add_action( 'bp_template_content', array( $this, 'call_display' ) );
 		}
 
 		bp_core_load_template( apply_filters( 'bp_core_template_plugin', $this->template_file ) );
+	}
+
+	/**
+	 * Output the events subnav menu on group event pages.
+	 *
+	 * See how a group's "Manage" subnav works for an idea of what we're doing.
+	 */
+	public function add_subnav() {
+		$_action_variables = buddypress()->action_variables;
+
+		// highlight the 'calendar' slug when we're on the slug
+		if ( false === bp_action_variable() ) {
+			buddypress()->action_variables[] = 'calendar';
+		}
+
+	?>
+
+		<div class="item-list-tabs no-ajax" id="subnav" role="navigation">
+			<ul>
+				<?php bp_get_options_nav( buddypress()->groups->current_group->slug . '_events' ); ?>
+			</ul>
+		</div><!-- .item-list-tabs -->
+
+	<?php
+		buddypress()->action_variables = $_action_variables;
 	}
 
 	/**
