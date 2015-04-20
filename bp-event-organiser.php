@@ -204,6 +204,7 @@ class BuddyPress_Event_Organiser {
 			'calendar_filter_title' => __( 'Filters', 'bp-event-calendar' ),
 			'calendar_author_filter_title' => __( 'By Author', 'bp-event-calendar' ),
 			'calendar_group_filter_title' => __( 'By Group', 'bp-event-calendar' ),
+			'loggedin_user_id' => bp_loggedin_user_id(),
 		);
 
 		// localise with wp function

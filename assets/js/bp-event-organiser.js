@@ -157,14 +157,18 @@
 		calendars.calendar_id.filter_authors.closest( '.bpeo-calendar-filter' ).removeClass( 'bpeo-calendar-filter-empty' );
 		calendars.calendar_id.filter_authors.closest( '.bpeo-calendar-filter-type' ).removeClass( 'bpeo-calendar-filter-empty' );
 
-		sort_by_label( calendars.calendar_id.filter_authors );
+		sort_by_label( calendars.calendar_id.filter_authors, l10n.loggedin_user_id );
 	};
 
 	/**
 	 * Sort list of filters by label.
 	 */
-	sort_by_label = function( $list ) {
+	sort_by_label = function( $list, author_first ) {
 		var items = $list.children();
+
+		if ( 'undefined' === typeof author_first ) {
+			author_first = null;
+		}
 
 		items.sort( function( a, b ) {
 			var aname = $( a ).find( 'label' ).text();
@@ -174,6 +178,17 @@
 			if ( aname > bname ) return 1;
 			return 0;
 		} );
+
+		// Groan. Keep author at the top.
+		if ( author_first ) {
+			var author_item = '';
+			items.each( function( k, v ) {
+				if ( author_first == $( v ).data( 'author-id' ) ) {
+					items.splice( k, 1 ).splice( 0, 0, v );
+					return false;
+				}
+			} );
+		}
 
 		$list.empty();
 		$list.append( items );
