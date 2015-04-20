@@ -55,6 +55,31 @@ function bpeo_the_filter_title() {
 		}
 	}
 
+/**
+ * Output the iCal link for an event.
+ *
+ * @param int $post_id The post ID.
+ */
+function bpeo_the_ical_link( $post_id ) {
+	echo bpeo_get_the_ical_link( $post_id );
+}
+	/**
+	 * Returns the iCal link for an event.
+	 *
+	 * Only works for the 'event' post type.
+	 *
+	 * @param  int $post_id The post ID.
+	 * @return string
+	 */
+	function bpeo_get_the_ical_link( $post_id ) {
+		if ( 'event' !== get_post( $post_id )->post_type ) {
+			return '';
+		}
+
+		return trailingslashit( get_permalink( $post_id ) . 'feed/eo-events' );
+	}
+
+
 /** HOOKS ***************************************************************/
 
 /**
@@ -100,6 +125,17 @@ function bpeo_filter_term_list( $retval = '' ) {
 }
 add_filter( 'term_links-event-tag',      'bpeo_filter_term_list' );
 add_filter( 'term_links-event-category', 'bpeo_filter_term_list' );
+
+/**
+ * Add iCal link to single event pages.
+ */
+function bpeo_add_ical_link_to_eventmeta() {
+?>
+	<li><a class="bpeo-ical-link" href="<?php bpeo_the_ical_link( get_the_ID() ); ?>"><span class="icon"></span><?php esc_html_e( 'Download iCal file', 'bp-events-organizer' ); ?></a></li>
+
+<?php
+}
+add_action( 'eventorganiser_additional_event_meta', 'bpeo_add_ical_link_to_eventmeta', 50 );
 
 /**
  * Whitelist BPEO shortcode attributes.

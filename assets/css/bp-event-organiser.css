@@ -40,3 +40,18 @@
 .bpeo-event-hidden {
 	display: none;
 }
+
+/* iCal link */
+.bpeo-ical-link {
+	text-decoration: none;
+}
+
+.bpeo-ical-link span.icon:before {
+	content: "\f508";
+	color: #aaa;
+	font-family: dashicons;
+	font-size: 18px;
+	line-height: 1.5;
+	padding-right: 5px;
+	vertical-align: bottom;
+}
