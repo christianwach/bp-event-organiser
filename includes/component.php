@@ -11,7 +11,8 @@ class BPEO_Component extends BP_Component {
 		parent::start(
 			'bpeo',
 			__( 'Event Organiser', 'bp-event-organiser' ),
-			BPEO_PATH
+			BPEO_PATH,
+			array( 'adminbar_myaccount_order' => 36 )
 		);
 	}
 
@@ -61,6 +62,41 @@ class BPEO_Component extends BP_Component {
 		);
 
 		parent::setup_nav( $main_nav, $sub_nav );
+	}
+
+	/**
+	 * Set up admin bar links.
+	 */
+	public function setup_admin_bar( $wp_admin_nav = array() ) {
+		$bp = buddypress();
+
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+
+		// Add the "My Account" sub menus
+		$wp_admin_nav[] = array(
+			'parent' => $bp->my_account_menu_id,
+			'id'     => 'my-account-events',
+			'title'  => __( 'Events', 'bp-event-organiser' ),
+			'href'   => bp_loggedin_user_domain() . bpeo_get_events_slug(),
+		);
+
+		$wp_admin_nav[] = array(
+			'parent' => 'my-account-events',
+			'id'     => 'my-account-events-calendar',
+			'title'  => __( 'Calendar', 'bp-event-organiser' ),
+			'href'   => trailingslashit( bp_loggedin_user_domain() . bpeo_get_events_slug() ),
+		);
+
+		$wp_admin_nav[] = array(
+			'parent' => 'my-account-events',
+			'id'     => 'my-account-events-new',
+			'title'  => __( 'New Event', 'bp-event-organiser' ),
+			'href'   => trailingslashit( bp_loggedin_user_domain() . bpeo_get_events_slug() . '/' . bpeo_get_events_new_slug() ),
+		);
+
+		parent::setup_admin_bar( $wp_admin_nav );
 	}
 
 	/**
