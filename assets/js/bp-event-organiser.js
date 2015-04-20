@@ -146,7 +146,7 @@
 		calendars.calendar_id.checked_authors.push( author_id );
 
 		// Create the checkbox.
-		checkbox  = '<input type="checkbox" id="bpeo-author-filter-' + author_id + '" value="1" name="bpeo-author-filter-' + calendar_id + '" data-author-id="' + author_id + '" checked="checked" />';
+		checkbox  = '<input type="checkbox" id="bpeo-author-filter-' + author_id + '" value="1" name="bpeo-author-filter-' + calendar_id + '" data-author-id="' + author_id + '" />';
 		checkbox += '<span class="bpeo-calendar-icon bpeo-calendar-icon-author" style="border-bottom-color:#' + author_data.color + '"></span>';
 		checkbox += '<label for="bpeo-author-filter-' + author_id + '">' + author_data.name + '</label>';
 
@@ -181,10 +181,18 @@
 
 		// Groan. Keep author at the top.
 		if ( author_first ) {
-			var author_item = '';
 			items.each( function( k, v ) {
-				if ( author_first == $( v ).data( 'author-id' ) ) {
-					items.splice( k, 1 ).splice( 0, 0, v );
+				if ( author_first == $( v ).find( 'input' ).data( 'author-id' ) ) {
+					// Remove the original.
+					items.splice( k, 1 )
+
+					// Put the author at the beginning of the array.
+					items.splice( 0, 0, v );
+
+					// Check the author box.
+					var $author_cb = $( items[0] ).find( 'input' );
+					$author_cb.prop( 'checked', true );
+					process_filter_click( $author_cb );
 					return false;
 				}
 			} );
