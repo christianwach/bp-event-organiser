@@ -238,6 +238,34 @@ function bpeo_add_group_info_to_calendar_event( $event, $event_id, $occurrence_i
 add_filter( 'eventorganiser_fullcalendar_event', 'bpeo_add_group_info_to_calendar_event', 10, 3 );
 
 /**
+ * Unhook BP's rel=canonical and replace with our custom version.
+ */
+function bpeo_rel_canonical_for_group() {
+	if ( ! bp_is_group() ) {
+		return;
+	}
+
+	if ( ! bp_is_current_action( bpeo_get_events_slug() ) ) {
+		return;
+	}
+
+	if ( ! $event_slug = bp_action_variable( 0 ) ) {
+		return;
+	}
+
+	if ( ! $e = get_page_by_path( $event_slug, OBJECT, 'event' ) ) {
+		return;
+	}
+
+	// Don't let BP output its own canonical tag.
+	remove_action( 'bp_head', 'bp_rel_canonical' );
+
+	$canonical_url = get_permalink( $e );
+	echo "<link rel='canonical' href='" . esc_url( $canonical_url ) . "' />\n";
+}
+add_action( 'wp_head', 'bpeo_rel_canonical_for_group', 9 );
+
+/**
  * Modify EO capabilities for group membership.
  *
  * @param array  $caps    Capability array.

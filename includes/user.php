@@ -123,6 +123,34 @@ function bpeo_calendar_filter_event_link_for_bp_user( $retval ) {
 add_filter( 'eventorganiser_calendar_event_link', 'bpeo_calendar_filter_event_link_for_bp_user' );
 
 /**
+ * Unhook BP's rel=canonical and replace with our custom version.
+ */
+function bpeo_rel_canonical_for_member() {
+	if ( ! bp_is_user() ) {
+		return;
+	}
+
+	if ( ! bp_is_current_component( bpeo_get_events_slug() ) ) {
+		return;
+	}
+
+	if ( ! $event_slug = bp_current_action() ) {
+		return;
+	}
+
+	if ( ! $e = get_page_by_path( $event_slug, OBJECT, 'event' ) ) {
+		return;
+	}
+
+	// Don't let BP output its own canonical tag.
+	remove_action( 'bp_head', 'bp_rel_canonical' );
+
+	$canonical_url = get_permalink( $e );
+	echo "<link rel='canonical' href='" . esc_url( $canonical_url ) . "' />\n";
+}
+add_action( 'wp_head', 'bpeo_rel_canonical_for_member', 9 );
+
+/**
  * Modify the calendar query to include the displayed user ID.
  *
  * @param  array $query Query vars as set up by EO.
