@@ -115,6 +115,11 @@ class BPEO_Component extends BP_Component {
 			return;
 		}
 
+		// This is not a single event.
+		if ( ! bp_current_action() ) {
+			return;
+		}
+
 		// query for the event
 		$event = eo_get_events( array(
 			'name' => bp_current_action()
