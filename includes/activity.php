@@ -13,11 +13,19 @@
  *
  * @param int $event_id ID of the event.
  */
-function bpeo_create_activity_on_event_save( $event_id ) {
-	if ( 'eventorganiser_created_event' === current_action() ) {
-		$type = 'bpeo_create_event';
-	} else {
+function bpeo_create_activity_on_event_save( $event_id, $post, $update ) {
+	if ( 'event' !== $post->post_type ) {
+		return;
+	}
+
+	if ( 'publish' !== $post->post_status ) {
+		return;
+	}
+
+	if ( $update ) {
 		$type = 'bpeo_edit_event';
+	} else {
+		$type = 'bpeo_create_event';
 	}
 
 	$event = get_post( $event_id );
@@ -59,8 +67,7 @@ function bpeo_create_activity_on_event_save( $event_id ) {
 
 	do_action( 'bpeo_create_event_activity', $activity_args, $event );
 }
-add_action( 'eventorganiser_created_event', 'bpeo_create_activity_on_event_save' );
-add_action( 'eventorganiser_updated_event', 'bpeo_create_activity_on_event_save' );
+add_action( 'wp_insert_post', 'bpeo_create_activity_on_event_save', 10, 3 );
 
 /**
  * Get activity items associated with an event ID.
