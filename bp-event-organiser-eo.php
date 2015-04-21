@@ -3,7 +3,6 @@
 BuddyPress_Event_Organiser_EO Class
 --------------------------------------------------------------------------------
 */
-
 class BuddyPress_Event_Organiser_EO {
 
 	/**
