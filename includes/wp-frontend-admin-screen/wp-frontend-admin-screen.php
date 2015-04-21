@@ -204,7 +204,9 @@ class WP_Frontend_Admin_Screen {
 		// update
 		if ( $_POST ) {
 			// require admin post functions
-			require ABSPATH . 'wp-admin/includes/post.php';
+			if ( ! function_exists( 'get_default_post_to_edit' ) ) {
+				require ABSPATH . 'wp-admin/includes/post.php';
+			}
 
 			// verify!
 			check_admin_referer( 'update-post_' . $_POST['post_ID'] );
