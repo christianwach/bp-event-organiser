@@ -194,7 +194,6 @@ class BPEO_Component extends BP_Component {
 				die();
 			}
 
-
 			// magic admin screen code!
 			require BPEO_PATH . '/includes/class.bpeo_frontend_admin_screen.php';
 
