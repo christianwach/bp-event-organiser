@@ -13,22 +13,12 @@
  *
  * @param int $event_id ID of the event.
  */
-function bpeo_create_activity_on_event_save( $event_id, $post, $update ) {
-	if ( 'event' !== $post->post_type ) {
-		return;
-	}
-
-	if ( 'publish' !== $post->post_status ) {
-		return;
-	}
-
-	if ( $update ) {
-		$type = 'bpeo_edit_event';
-	} else {
-		$type = 'bpeo_create_event';
-	}
-
+function bpeo_create_activity_for_event( $event_id, $type ) {
 	$event = get_post( $event_id );
+
+	if ( 'event' !== $event->post_type ) {
+		return;
+	}
 
 	// Prevent edit floods.
 	if ( 'bpeo_edit_event' === $type ) {
@@ -67,7 +57,38 @@ function bpeo_create_activity_on_event_save( $event_id, $post, $update ) {
 
 	do_action( 'bpeo_create_event_activity', $activity_args, $event );
 }
-add_action( 'wp_insert_post', 'bpeo_create_activity_on_event_save', 10, 3 );
+
+function bpeo_create_activity_on_event_creation( $new_status, $old_status, $event ) {
+	if ( 'event' !== $event->post_type ) {
+		return;
+	}
+
+	if ( 'publish' !== $new_status ) {
+		return;
+	}
+
+	bpeo_create_activity_for_event( $event->ID, 'bpeo_create_event' );
+}
+add_action( 'transition_post_status', 'bpeo_create_activity_on_event_creation', 10, 3 );
+
+function bpeo_create_activity_on_event_edit( $event_id ) {
+	$event = get_post( $event_id );
+
+	if ( ! $event ) {
+		return;
+	}
+
+	if ( 'event' !== $event->post_type ) {
+		return;
+	}
+
+	if ( 'publish' !== $event->post_status ) {
+		return;
+	}
+
+	bpeo_create_activity_for_event( $event_id, 'bpeo_edit_event' );
+}
+add_action( 'edit_post', 'bpeo_create_activity_on_event_edit' );
 
 /**
  * Get activity items associated with an event ID.
