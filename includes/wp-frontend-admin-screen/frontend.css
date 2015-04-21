@@ -178,7 +178,7 @@ div.error {
 
 .tagcloud-link {display: block; margin-top: .6em;}
 
-#major-publishing-actions, #misc-publishing-actions p {margin-top: 1em;}
+#major-publishing-actions, #minor-publishing-actions, #misc-publishing-actions p {margin-top: 1em;}
 
-#delete-action {float:right; padding-top:13px;}
+#major-publishing-actions {float:right; padding-top:13px;}
 	#delete-action a {color:#a00;}

@@ -850,7 +850,10 @@ if ( ! function_exists( 'post_submit_meta_box' ) ) :
 /**
  * Display post submit form fields.
  *
- * WFAS Mod: Removed "Preview Changes" button.
+ * WFAS Mods:
+ *  - Removed "Preview Changes" button.
+ *  - Moved "Save Draft" / "Save as Pending" button to bottom of metabox.
+ *  - Moved main "Publish" submit button to the core WFAS class.
  *
  * @since 2.7.0
  *
@@ -866,24 +869,6 @@ function post_submit_meta_box($post, $args = array() ) {
 <div class="submitbox" id="submitpost">
 
 <div id="minor-publishing">
-
-<?php // Hidden submit button early on so that the browser chooses the right button when form is submitted with Return key ?>
-<div style="display:none;">
-<?php submit_button( __( 'Save' ), 'button', 'save' ); ?>
-</div>
-
-<div id="minor-publishing-actions">
-<div id="save-action">
-<?php if ( 'publish' != $post->post_status && 'future' != $post->post_status && 'pending' != $post->post_status ) { ?>
-<input <?php if ( 'private' == $post->post_status ) { ?>style="display:none"<?php } ?> type="submit" name="save" id="save-post" value="<?php esc_attr_e('Save Draft'); ?>" class="button" />
-<?php } elseif ( 'pending' == $post->post_status && $can_publish ) { ?>
-<input type="submit" name="save" id="save-post" value="<?php esc_attr_e('Save as Pending'); ?>" class="button" />
-<?php } ?>
-<span class="spinner"></span>
-</div>
-
-<div class="clear"></div>
-</div><!-- #minor-publishing-actions -->
 
 <div id="misc-publishing-actions">
 
@@ -1063,31 +1048,28 @@ if ( current_user_can( "delete_post", $post->ID ) ) {
 } ?>
 </div>
 
-<div id="publishing-action">
-<span class="spinner"></span>
-<?php
-if ( !in_array( $post->post_status, array('publish', 'future', 'private') ) || 0 == $post->ID ) {
-	if ( $can_publish ) :
-		if ( !empty($post->post_date_gmt) && time() < strtotime( $post->post_date_gmt . ' +0000' ) ) : ?>
-		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Schedule') ?>" />
-		<?php submit_button( __( 'Schedule' ), 'primary button-large', 'publish', false ); ?>
-<?php	else : ?>
-		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Publish') ?>" />
-		<?php submit_button( __( 'Publish' ), 'primary button-large', 'publish', false ); ?>
-<?php	endif;
-	else : ?>
-		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Submit for Review') ?>" />
-		<?php submit_button( __( 'Submit for Review' ), 'primary button-large', 'publish', false ); ?>
-<?php
-	endif;
-} else { ?>
-		<input name="original_publish" type="hidden" id="original_publish" value="<?php esc_attr_e('Update') ?>" />
-		<input name="save" type="submit" class="button button-primary button-large" id="publish" value="<?php esc_attr_e( 'Update' ) ?>" />
-<?php
-} ?>
-</div>
 <div class="clear"></div>
 </div>
+
+<?php // Hidden submit button early on so that the browser chooses the right button when form is submitted with Return key ?>
+<div style="display:none;">
+<?php submit_button( __( 'Save' ), 'button', 'save' ); ?>
+</div>
+
+<div id="minor-publishing-actions">
+<div id="save-action">
+<?php if ( 'publish' != $post->post_status && 'future' != $post->post_status && 'pending' != $post->post_status ) { ?>
+<input <?php if ( 'private' == $post->post_status ) { ?>style="display:none"<?php } ?> type="submit" name="save" id="save-post" value="<?php esc_attr_e('Save Draft'); ?>" class="button" />
+<?php } elseif ( 'pending' == $post->post_status && $can_publish ) { ?>
+<input type="submit" name="save" id="save-post" value="<?php esc_attr_e('Save as Pending'); ?>" class="button" />
+<?php } ?>
+<span class="spinner"></span>
+</div>
+
+<div class="clear"></div>
+</div><!-- #minor-publishing-actions -->
+
+
 </div>
 
 <?php
