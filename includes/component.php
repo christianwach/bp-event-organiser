@@ -147,6 +147,7 @@ class BPEO_Component extends BP_Component {
 
 			$this->create_event = new BPEO_Frontend_Admin_Screen( array(
 				'type' => 'new',
+				'redirect_root'  => trailingslashit( bp_displayed_user_domain() . $this->slug )
 			) );
 
 			add_action( 'bp_template_content', array( $this->create_event, 'display' ) );
