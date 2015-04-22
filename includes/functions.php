@@ -131,8 +131,19 @@ function bpeo_the_single_event_action_links( $post ) {
 			$back = $root = trailingslashit( bp_displayed_user_domain() . bpeo_get_events_slug() );
 		} elseif ( bp_is_group() ) {
 			$back = $root = bpeo_get_group_permalink();
+
+		// WP single event page
 		} else {
-			$back = get_home_url( );
+			// see if we have an events page
+			$back = get_page_by_path( bpeo_get_events_slug() );
+			if ( ! empty( $back ) ) {
+				$back = trailingslashit( home_url( bpeo_get_events_slug() ) );
+
+			// no events page, so use EO's main events archive page
+			} else {
+				$back = trailingslashit( home_url( trim( eventorganiser_get_option( 'url_events', 'events/event' ) ) ) );
+			}
+
 			$root = trailingslashit( bp_displayed_user_domain() . bpeo_get_events_slug() );
 		}
 
