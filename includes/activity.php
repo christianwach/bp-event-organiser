@@ -20,9 +20,22 @@ function bpeo_create_activity_for_event( $event_id, $type ) {
 		return;
 	}
 
+	// Existing activity items for this event.
+	$activities = bpeo_get_activity_by_event_id( $event_id );
+
+	// There should never be more than one top-level create item.
+	if ( 'bpeo_create_event' === $type ) {
+		$create_items = array();
+		foreach ( $activities as $activity ) {
+			if ( 'bpeo_create_event' === $activity->type && 'events' === $activity->component ) {
+				return;
+			}
+
+		}
+	}
+
 	// Prevent edit floods.
 	if ( 'bpeo_edit_event' === $type ) {
-		$activities = bpeo_get_activity_by_event_id( $event_id );
 
 		if ( $activities ) {
 
