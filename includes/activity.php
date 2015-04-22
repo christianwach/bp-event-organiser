@@ -13,11 +13,32 @@
  *
  * @param int $event_id ID of the event.
  */
-function bpeo_create_activity_for_event( $event_id, $type ) {
+function bpeo_create_activity_for_event( $event_id ) {
 	$event = get_post( $event_id );
 
-	if ( 'event' !== $event->post_type ) {
-		return;
+	if ( 'eventorganiser_created_event' === current_action() ) {
+		$type = 'bpeo_create_event';
+	} else {
+		$type = 'bpeo_edit_event';
+	}
+
+	/**
+	 * The most terrible thing ever.
+	 *
+	 * EO calls `eo_update_event()` during `eventorganiser_details_save()`. But
+	 * `eventorganiser_details_save()` is called even during the creation of an event. This
+	 * makes in nearly impossible to detect, via hook alone, when a new event is being
+	 * created (vs an existing post being generated). Our sledgehammer workaround is to
+	 * refrain from creating activity items whenever the hook is triggered from
+	 * `eventorganiser_details_save()`.
+	 */
+	if ( 'bpeo_edit_event' === $type ) {
+		$db = debug_backtrace();
+		foreach ( $db as $_db ) {
+			if ( 'eventorganiser_details_save' === $_db['function'] ) {
+				return;
+			}
+		}
 	}
 
 	// Existing activity items for this event.
@@ -30,7 +51,6 @@ function bpeo_create_activity_for_event( $event_id, $type ) {
 			if ( 'bpeo_create_event' === $activity->type && 'events' === $activity->component ) {
 				return;
 			}
-
 		}
 	}
 
@@ -70,56 +90,8 @@ function bpeo_create_activity_for_event( $event_id, $type ) {
 
 	do_action( 'bpeo_create_event_activity', $activity_args, $event );
 }
-
-/**
- * Generate activity event on event creation through the interface.
- *
- * Creating an event through the Dashboard or frontend interface does not trigger the necessary
- * hooks in the necessary order (due to the fact that `eo_insert_event()` is not used there).
- * Hooking to 'transition_post_status' is an oddball workaround.
- */
-function bpeo_create_activity_on_event_creation( $new_status, $old_status, $event ) {
-	if ( 'event' !== $event->post_type ) {
-		return;
-	}
-
-	if ( 'publish' !== $new_status ) {
-		return;
-	}
-
-	bpeo_create_activity_for_event( $event->ID, 'bpeo_create_event' );
-}
-add_action( 'transition_post_status', 'bpeo_create_activity_on_event_creation', 10, 3 );
-
-/**
- * Generate activity event on event creation through `eo_insert_event()`.
- */
-function bpeo_create_event_on_event_creation_through_api( $event_id ) {
-	bpeo_create_activity_for_event( $event_id, 'bpeo_create_event' );
-}
-add_action( 'eventorganiser_created_event', 'bpeo_create_event_on_event_creation_through_api' );
-
-/**
- * Generate activity event on event edit.
- */
-function bpeo_create_activity_on_event_edit( $event_id ) {
-	$event = get_post( $event_id );
-
-	if ( ! $event ) {
-		return;
-	}
-
-	if ( 'event' !== $event->post_type ) {
-		return;
-	}
-
-	if ( 'publish' !== $event->post_status ) {
-		return;
-	}
-
-	bpeo_create_activity_for_event( $event_id, 'bpeo_edit_event' );
-}
-add_action( 'edit_post', 'bpeo_create_activity_on_event_edit' );
+add_action( 'eventorganiser_created_event', 'bpeo_create_activity_for_event' );
+add_action( 'eventorganiser_updated_event', 'bpeo_create_activity_for_event' );
 
 /**
  * Get activity items associated with an event ID.
