@@ -58,6 +58,13 @@ function bpeo_create_activity_for_event( $event_id, $type ) {
 	do_action( 'bpeo_create_event_activity', $activity_args, $event );
 }
 
+/**
+ * Generate activity event on event creation through the interface.
+ *
+ * Creating an event through the Dashboard or frontend interface does not trigger the necessary
+ * hooks in the necessary order (due to the fact that `eo_insert_event()` is not used there).
+ * Hooking to 'transition_post_status' is an oddball workaround.
+ */
 function bpeo_create_activity_on_event_creation( $new_status, $old_status, $event ) {
 	if ( 'event' !== $event->post_type ) {
 		return;
@@ -71,6 +78,17 @@ function bpeo_create_activity_on_event_creation( $new_status, $old_status, $even
 }
 add_action( 'transition_post_status', 'bpeo_create_activity_on_event_creation', 10, 3 );
 
+/**
+ * Generate activity event on event creation through `eo_insert_event()`.
+ */
+function bpeo_create_event_on_event_creation_through_api( $event_id ) {
+	bpeo_create_activity_for_event( $event_id, 'bpeo_create_event' );
+}
+add_action( 'eventorganiser_created_event', 'bpeo_create_event_on_event_creation_through_api' );
+
+/**
+ * Generate activity event on event edit.
+ */
 function bpeo_create_activity_on_event_edit( $event_id ) {
 	$event = get_post( $event_id );
 
