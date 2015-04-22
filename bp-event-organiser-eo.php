@@ -79,7 +79,7 @@ class BuddyPress_Event_Organiser_EO {
 		add_action( 'wp_ajax_bpeo_get_groups', array( $this, 'ajax_get_groups' ) );
 
 		// intercept save event
-		add_action( 'eventorganiser_save_event', array( $this, 'intercept_save_event' ), 10, 1 );
+		add_action( 'save_post', array( $this, 'intercept_save_event' ), 15, 3 );
 
 		// intercept before break occurrence
 		add_action( 'eventorganiser_pre_break_occurrence', array( $this, 'pre_break_occurrence' ), 10, 2 );
@@ -152,10 +152,14 @@ class BuddyPress_Event_Organiser_EO {
 	 * @param int $post_id the numeric ID of the WP post
 	 * @return nothing
 	 */
-	public function intercept_save_event( $post_id ) {
+	public function intercept_save_event( $post_id, $post, $update ) {
 		check_admin_referer( 'bp_event_organiser_meta_save', 'bp_event_organiser_nonce_field' );
 
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		if ( 'event' !== $post->post_type ) {
 			return;
 		}
 

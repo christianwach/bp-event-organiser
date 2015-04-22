@@ -215,15 +215,10 @@ class WP_Frontend_Admin_Screen {
 			// extended classes should extend the before_save() method to do stuff
 			$this->before_insert();
 
-			$existing_post = get_post( $_POST['post_ID'] );
-
 			// rejig content for saving function
 			// this is due to us changing the editor ID to avoid conflicts with themes
 			$_POST['content'] = $_POST[$this->editor_id];
 			$post_id = edit_post();
-
-			$is_update = 'auto-draft' !== $existing_post->post_status;
-			$this->after_save( $post_id, $is_update );
 
 			// add BP message
 			if ( function_exists( 'bp_core_add_message' ) ) {
@@ -592,17 +587,6 @@ class WP_Frontend_Admin_Screen {
 	 * This runs in the display() method.
 	 */
 	protected function before_display() {}
-
-	/**
-	 * Override to do some logic here if needed.
-	 *
-	 * This runs inside the save portion of the screen() method.  Handy if you
-	 * need to register some actions after saving.
-	 *
-	 * @param int  $post_id   ID of the WP post object.
-	 * @param bool $is_update True if this is an update to an existing event.
-	 */
-	protected function after_save( $post_id, $is_update ) {}
 
 	/**
 	 * Override to do some logic here if needed.

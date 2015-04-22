@@ -48,20 +48,6 @@ class BPEO_Frontend_Admin_Screen extends WP_Frontend_Admin_Screen {
 	}
 
 	/**
-	 * Replicate EO's hooks from `eo_insert_event()` and `eo_update_event()`.
-	 *
-	 * @param int  $post_id   ID of the WP post object.
-	 * @param bool $is_update True if this is an update to an existing event.
-	 */
-	protected function after_save( $post_id, $is_update ) {
-		if ( $is_update ) {
-			do_action( 'eventorganiser_updated_event', $post_id );
-		} else {
-			do_action( 'eventorganiser_created_event', $post_id );
-		}
-	}
-
-	/**
 	 * Enqueue additional scripts.
 	 */
 	protected function enqueue_scripts() {

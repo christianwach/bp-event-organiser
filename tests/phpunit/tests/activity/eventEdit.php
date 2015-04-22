@@ -224,18 +224,19 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 			'name' => 'ccc',
 		) );
 
-		// Group connections happen on 'eventorganiser_save_event'. Whee!
-		add_action( 'eventorganiser_save_event', array( $this, 'connect_events' ) );
+		// Group connections happen on 'save_post'. Whee!
+		add_action( 'save_post', array( $this, 'connect_events' ), 15 );
 
 		$now = time();
 		$e = eo_insert_event( array(
 			'post_author' => $u,
+			'post_date' => date( 'Y-m-d H:i:s', $now - 60*60 ),
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
 			'post_status' => 'publish',
 		) );
 
-		remove_action( 'eventorganiser_save_event', array( $this, 'connect_events' ) );
+		remove_action( 'save_post', array( $this, 'connect_events' ), 15 );
 
 		// Remove throttle temporarily.
 		add_filter( 'bpeo_event_edit_throttle_period', '__return_zero' );
