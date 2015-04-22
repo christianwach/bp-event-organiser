@@ -13,11 +13,15 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish',
 		) );
 
 		$before = bpeo_get_activity_by_event_id( $e );
 
+		// Remove throttle temporarily.
+		add_filter( 'bpeo_event_edit_throttle_period', '__return_zero' );
 		eo_update_event( $e, array(), array( 'post_content' => 'foo' ) );
+		remove_filter( 'bpeo_event_edit_throttle_period', '__return_zero' );
 
 		$after = bpeo_get_activity_by_event_id( $e );
 
@@ -53,6 +57,7 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish',
 		) );
 
 		remove_action( 'eventorganiser_save_event', array( $this, 'connect_events' ) );
@@ -103,6 +108,7 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish',
 		) );
 
 		// Manually create edit item, 5:59 ago.
@@ -132,6 +138,7 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish',
 		) );
 
 		// Manually create edit item, 6:01 ago.
@@ -180,6 +187,7 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish',
 		) );
 
 		eo_update_event( $e, array(
@@ -224,6 +232,7 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish',
 		) );
 
 		remove_action( 'eventorganiser_save_event', array( $this, 'connect_events' ) );
