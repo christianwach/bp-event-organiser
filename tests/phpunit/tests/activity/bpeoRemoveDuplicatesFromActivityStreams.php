@@ -34,14 +34,14 @@ class BPEO_Tests_Activity_BpeoRemoveDuplicatesFromActivityStream extends BPEO_Un
 		) );
 
 		// $events[0] is connected only to $groups[0].
-		add_action( 'eventorganiser_save_event', array( __CLASS__, 'connect_events_to_group_0' ) );
+		add_action( 'save_post', array( __CLASS__, 'connect_events_to_group_0' ), 15 );
 		self::$events[] = $eof->event->create( array(
 			'post_date' => date( 'Y-m-d H:i:s', $now - 60*60*5 ),
 			'post_author' => self::$users[0],
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
 		) );
-		remove_action( 'eventorganiser_save_event', array( __CLASS__, 'connect_events_to_group_0' ) );
+		remove_action( 'save_post', array( __CLASS__, 'connect_events_to_group_0' ), 15 );
 
 		self::$events[] = $eof->event->create( array(
 			'post_date' => date( 'Y-m-d H:i:s', $now - 60*60*6 ),
@@ -51,14 +51,14 @@ class BPEO_Tests_Activity_BpeoRemoveDuplicatesFromActivityStream extends BPEO_Un
 		) );
 
 		// $events[2] is connected to $groups[0] and $groups[2].
-		add_action( 'eventorganiser_save_event', array( __CLASS__, 'connect_events_to_groups_0_and_2' ) );
+		add_action( 'save_post', array( __CLASS__, 'connect_events_to_groups_0_and_2' ), 15 );
 		self::$events[] = $eof->event->create( array(
 			'post_date' => date( 'Y-m-d H:i:s', $now - 60*60*7 ),
 			'post_author' => self::$users[0],
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
 		) );
-		remove_action( 'eventorganiser_save_event', array( __CLASS__, 'connect_events_to_groups_0_and_2' ) );
+		remove_action( 'save_post', array( __CLASS__, 'connect_events_to_groups_0_and_2' ), 15 );
 
 		for ( $i = 7; $i <= 11; $i++ ) {
 			self::$activities[] = $bpf->activity->create( array(

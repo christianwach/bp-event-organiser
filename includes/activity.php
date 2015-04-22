@@ -13,32 +13,16 @@
  *
  * @param int $event_id ID of the event.
  */
-function bpeo_create_activity_for_event( $event_id ) {
-	$event = get_post( $event_id );
+function bpeo_create_activity_for_event( $event_id, $event, $update ) {
+	if ( 'event' !== $event->post_type ) {
+		return;
+	}
 
-	if ( 'eventorganiser_created_event' === current_action() ) {
+	// Hack: distinguish 'create' from 'edit' by comparing post_date and post_modified.
+	if ( $event->post_date === $event->post_modified ) {
 		$type = 'bpeo_create_event';
 	} else {
 		$type = 'bpeo_edit_event';
-	}
-
-	/**
-	 * The most terrible thing ever.
-	 *
-	 * EO calls `eo_update_event()` during `eventorganiser_details_save()`. But
-	 * `eventorganiser_details_save()` is called even during the creation of an event. This
-	 * makes in nearly impossible to detect, via hook alone, when a new event is being
-	 * created (vs an existing post being generated). Our sledgehammer workaround is to
-	 * refrain from creating activity items whenever the hook is triggered from
-	 * `eventorganiser_details_save()`.
-	 */
-	if ( 'bpeo_edit_event' === $type ) {
-		$db = debug_backtrace();
-		foreach ( $db as $_db ) {
-			if ( 'eventorganiser_details_save' === $_db['function'] ) {
-				return;
-			}
-		}
 	}
 
 	// Existing activity items for this event.
@@ -77,21 +61,22 @@ function bpeo_create_activity_for_event( $event_id ) {
 		}
 	}
 
+	$recorded_time = 'bpeo_create_event' === $type ? $event->post_date : $event->post_modified;
+
 	$activity_args = array(
 		'component' => 'events',
 		'type' => $type,
 		'user_id' => $event->post_author, // @todo Event edited by non-author?
 		'primary_link' => get_permalink( $event ),
 		'secondary_item_id' => $event_id, // Leave 'item_id' blank for groups.
-		'recorded_time' => $event->post_modified,
+		'recorded_time' => $recorded_time,
 	);
 
 	bp_activity_add( $activity_args );
 
 	do_action( 'bpeo_create_event_activity', $activity_args, $event );
 }
-add_action( 'eventorganiser_created_event', 'bpeo_create_activity_for_event' );
-add_action( 'eventorganiser_updated_event', 'bpeo_create_activity_for_event' );
+add_action( 'save_post', 'bpeo_create_activity_for_event', 20, 3 );
 
 /**
  * Get activity items associated with an event ID.
