@@ -486,6 +486,6 @@ function bpeo_list_connected_groups() {
 	$count = count( $markup );
 	$base = _n( '<strong>Connected group:</strong> %s', '<strong>Connected groups:</strong> %s', $count, 'bp-event-organiser' );
 
-	echo sprintf( '<li>' . wp_kses( $base ) . '</li>', implode( ', ', $markup ) );
+	echo sprintf( '<li>' . wp_filter_kses( $base ) . '</li>', implode( ', ', $markup ) );
 }
 add_action( 'eventorganiser_additional_event_meta', 'bpeo_list_connected_groups' );
