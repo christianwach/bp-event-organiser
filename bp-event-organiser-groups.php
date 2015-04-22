@@ -376,36 +376,8 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			return;
 		}
 
-		/**
-		 * Move this logic into a template part
-		 */
-		echo '<h2> ' . get_the_title() . '</h2>';
-
-		echo '<h4>' . __( 'Event Description', 'bp-event-organizer' ) . '</h4>';
-
-		// Make this better... have to juggle the_content filters...
-		echo wpautop( $post->post_content );
-
-		// post thumbnail - hardcoded to medium size at the moment.
-		the_post_thumbnail( 'medium' );
-
-		add_action( 'loop_end', array( $this, 'catch_reset_postdata' ) );
-		eo_get_template_part( 'event-meta-event-single' );
-		remove_action( 'loop_end', array( $this, 'catch_reset_postdata' ) );
-
-		// Action links
-		// @todo Make this a template function
-		echo '<a href="' . bpeo_get_group_permalink() . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
-
-		// @todo make 'edit' slug changeable
-		if ( current_user_can( 'edit_event', $this->queried_event->ID ) ) {
-			echo ' | <a href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
-		}
-
-		// @todo make 'delete' slug changeable
-		if ( current_user_can( 'delete_event', $this->queried_event->ID ) ) {
-			echo ' | <a class="confirm" href="' . bpeo_get_group_permalink() . $this->queried_event->post_name . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$this->queried_event->ID}" ). '/">' . __( 'Delete', 'bp-events-organizer' ). '</a>';
-		}
+		// output single event content
+		bpeo_the_single_event_content( $post );
 
 		// revert $post global
 		if ( ! empty( $_post ) ) {
@@ -413,27 +385,6 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		}
 	}
 
-	/**
-	 * Ensure that wp_reset_postdata() doesn't reset the post back to page ID 0.
-	 *
-	 * The event meta template provided by EO uses {@link wp_reset_postdata()} when
-	 * an event is recurring.  This interferes with BuddyPress when using EO's
-	 * 'eventorganiser_additional_event_meta' hook and wanting to fetch EO's WP
-	 * post for further data output.
-	 *
-	 * This method catches the end of the reoccurence event loop and wipes out the
-	 * post so wp_reset_postdata() doesn't reset the post back to page ID 0.
-	 */
-	public function catch_reset_postdata( $q ) {
-		// check if a reoccurence loop occurred; if not, bail
-		if ( empty( $q->query['post_type'] ) ) {
-			return;
-		}
-
-		// wipe out the post property in $wp_query to prevent our page from resetting
-		// when wp_reset_postdata() is used
-		$GLOBALS['wp_query']->post = null;
-	}
 } // class ends
 
 

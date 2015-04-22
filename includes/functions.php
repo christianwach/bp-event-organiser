@@ -18,6 +18,35 @@ function bpeo_get_events_new_slug() {
 }
 
 /**
+ * Output the single event content.
+ *
+ * @todo Perhaps make this a template part?
+ *
+ * @param WP_Post $post
+ */
+function bpeo_the_single_event_content( $post ) {
+	global $post;
+?>
+
+	<h2> <?php the_title(); ?></h2>
+
+	<h4><?php _e( 'Event Description', 'bp-event-organizer' ); ?></h4>
+
+	<?php
+	// Make this better... have to juggle the_content filters...
+	echo wpautop( $post->post_content );
+
+	// post thumbnail - hardcoded to medium size at the moment.
+	the_post_thumbnail( 'medium' );
+
+	add_action( 'loop_end', 'bpeo_catch_reset_postdata' );
+	eo_get_template_part( 'event-meta-event-single' );
+	remove_action( 'loop_end', 'bpeo_catch_reset_postdata' );
+
+	bpeo_the_single_event_action_links( $post );
+}
+
+/**
  * Output the filter title depending on URL querystring.
  *
  * @see bpeo_get_the_filter_title()
@@ -79,6 +108,50 @@ function bpeo_the_ical_link( $post_id ) {
 		return trailingslashit( get_permalink( $post_id ) . 'feed/eo-events' );
 	}
 
+/**
+ * Output the single event action links.
+ *
+ * @param WP_Post|int $post The WP Post object or the post ID.
+ */
+function bpeo_the_single_event_action_links( $post ) {
+	echo bpeo_get_the_single_event_action_links( $post );
+}
+	/**
+	 * Return the single event action links.
+	 *
+	 * @param  WP_Post|int $post The WP Post object or the post ID.
+	 * @return string
+	 */
+	function bpeo_get_the_single_event_action_links( $post ) {
+		if ( false === $post instanceof WP_Post ) {
+			$post = get_post( $post );
+		}
+
+		if ( bp_is_user() ) {
+			$back = $root = trailingslashit( bp_displayed_user_domain() . bpeo_get_events_slug() );
+		} elseif ( bp_is_group() ) {
+			$back = $root = bpeo_get_group_permalink();
+		} else {
+			$back = get_home_url( );
+			$root = trailingslashit( bp_displayed_user_domain() . bpeo_get_events_slug() );
+		}
+
+		$links = array();
+
+		$links['back'] = '<a href="' . esc_url( $back ) . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
+
+		// @todo make 'edit' slug changeable
+		if ( current_user_can( 'edit_event', $post->ID ) ) {
+			$links['edit'] = '<a href="' . esc_url( $root ) . $post->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
+		}
+
+		// @todo make 'delete' slug changeable
+		if ( current_user_can( 'delete_event', $post->ID ) ) {
+			$links['delete'] = '<a class="confirm" href="' . esc_url( $root ) . $post->post_name . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$post->ID}" ). '/">' . __( 'Delete', 'bp-events-organizer' ). '</a>';
+		}
+
+		return implode( ' | ', (array) apply_filters( 'bpeo_get_the_single_event_action_links', $links ) );
+	}
 
 /** HOOKS ***************************************************************/
 
@@ -238,4 +311,26 @@ function bpeo_get_item_calendar_color( $item_id, $item_type ) {
 	}
 
 	return $color;
+}
+
+/**
+ * Ensure that wp_reset_postdata() doesn't reset the post back to page ID 0.
+ *
+ * The event meta template provided by EO uses {@link wp_reset_postdata()} when
+ * an event is recurring.  This interferes with BuddyPress when using EO's
+ * 'eventorganiser_additional_event_meta' hook and wanting to fetch EO's WP
+ * post for further data output.
+ *
+ * This method catches the end of the reoccurence event loop and wipes out the
+ * post so wp_reset_postdata() doesn't reset the post back to page ID 0.
+ */
+function bpeo_catch_reset_postdata( $q ) {
+	// check if a reoccurence loop occurred; if not, bail
+	if ( empty( $q->query['post_type'] ) ) {
+		return;
+	}
+
+	// wipe out the post property in $wp_query to prevent our page from resetting
+	// when wp_reset_postdata() is used
+	$GLOBALS['wp_query']->post = null;
 }
