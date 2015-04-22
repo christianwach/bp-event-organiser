@@ -141,7 +141,7 @@ class BPEO_Component extends BP_Component {
 
 	public function template_loader() {
 		// new event
-		if ( bp_is_current_action( bpeo_get_events_new_slug() ) ) {
+		if ( bpeo_is_action( 'new' ) ) {
 			// magic admin screen code!
 			require BPEO_PATH . '/includes/class.bpeo_frontend_admin_screen.php';
 
@@ -186,7 +186,7 @@ class BPEO_Component extends BP_Component {
 		}
 
 		// edit single event logic
-		if ( bp_is_action_variable( 'edit' ) ) {
+		if ( bpeo_is_action( 'edit' ) ) {
 			// check if user has access
 			if ( false === current_user_can( 'edit_event', $this->queried_event->ID ) ) {
 				bp_core_add_message( __( 'You do not have access to edit this event.', 'bp-event-organiser' ), 'error' );
@@ -203,7 +203,7 @@ class BPEO_Component extends BP_Component {
 			) );
 
 		// delete single event logic
-		} elseif ( bp_is_action_variable( 'delete' ) ) {
+		} elseif ( bpeo_is_action( 'delete' ) ) {
 			// check if user has access
 			if ( false === current_user_can( 'delete_event', $this->queried_event->ID ) ) {
 				bp_core_add_message( __( 'You do not have permission to delete this event.', 'bp-event-organiser' ), 'error' );
@@ -253,7 +253,7 @@ class BPEO_Component extends BP_Component {
 		$post = $this->queried_event;
 
 		// edit screen has its own display method
-		if ( bp_is_action_variable( 'edit' ) ) {
+		if ( bpeo_is_action( 'edit' ) ) {
 			$this->edit_event->display();
 
 			// revert $post global

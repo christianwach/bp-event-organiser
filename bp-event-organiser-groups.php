@@ -165,7 +165,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		add_action( 'bp_template_content', array( $this, 'add_subnav' ) );
 
 		// new event
-		if ( bp_is_action_variable( bpeo_get_events_new_slug() ) ) {
+		if ( bpeo_is_action( 'new' ) ) {
 			// check if user has access
 			// @todo currently all group members have access to edit events... restrict to mods?
 			if ( false === is_user_logged_in() || false === buddypress()->groups->current_group->is_user_member ) {
@@ -299,7 +299,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		$this->queried_event = $event[0];
 
 		// edit single event logic
-		if ( bp_is_action_variable( 'edit', 1 ) ) {
+		if ( bpeo_is_action( 'edit' ) ) {
 			// check if user has access
 			if ( false === current_user_can( 'edit_event', $this->queried_event->ID ) ) {
 				bp_core_add_message( __( 'You do not have access to edit this event.', 'bp-event-organiser' ), 'error' );
@@ -317,7 +317,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			) );
 
 		// delete single event logic
-		} elseif ( bp_is_action_variable( 'delete', 1 ) ) {
+		} elseif ( bpeo_is_action( 'delete' ) ) {
 			// check if user has access
 			if ( false === current_user_can( 'delete_event', $this->queried_event->ID ) ) {
 				bp_core_add_message( __( 'You do not have permission to delete this event.', 'bp-event-organiser' ), 'error' );
@@ -366,7 +366,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		$post = $this->queried_event;
 
 		// edit screen has its own display method
-		if ( bp_is_action_variable( 'edit', 1 ) ) {
+		if ( bpeo_is_action( 'edit' ) ) {
 			$this->edit_event->display();
 
 			// revert $post global

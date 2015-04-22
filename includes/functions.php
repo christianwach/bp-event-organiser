@@ -47,6 +47,53 @@ function bpeo_the_single_event_content( $post ) {
 }
 
 /**
+ * Normalize EO action conditional checks across BP components.
+ *
+ * The BP groups component shifts the current path over by 1, which can make
+ * conditional checks a little uneven.  This function normalizes these
+ * conditional checks.
+ *
+ * @param string $action The action to check. eg. 'new', 'edit', or 'delete'.
+ *
+ * @return bool
+ */
+function bpeo_is_action( $action = '' ) {
+	$retval = false;
+
+	if ( bp_is_user() ) {
+		$is_component = 'bp_is_current_component';
+		$is_new = 'bp_is_current_action';
+		$pos = 0;
+	} elseif( bp_is_group() ) {
+		$is_component = 'bp_is_current_action';
+		$is_new = 'bp_is_action_variable';
+		$pos = 1;
+	} else {
+		return $retval;
+	}
+
+	// not on an events page, so stop!
+	if ( false === $is_component( bpeo_get_events_slug() ) ) {
+		return $retval;
+	}
+
+	// alias of 'new'
+	$action = 'new' === $action ? bpeo_get_events_new_slug() : $action;
+
+	// check if we're on a 'new event' page
+	if ( bpeo_get_events_new_slug() === $action ) {
+		return $is_new( $action );
+	}
+
+	// all other actions - 'edit', 'delete'
+	if ( false === bp_is_action_variable( $action, $pos ) ) {
+		return $retval;
+	}
+
+	return true;
+}
+
+/**
  * Output the filter title depending on URL querystring.
  *
  * @see bpeo_get_the_filter_title()
