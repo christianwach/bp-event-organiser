@@ -70,6 +70,35 @@ function bpeo_user_has_cap( $allcaps, $caps, $args, $user ) {
 add_filter( 'user_has_cap', 'bpeo_user_has_cap', 20, 4 );
 
 /**
+ * Give users the 'upload_files' cap, when appropriate.
+ *
+ * @param  array  $caps    The mapped caps
+ * @param  string $cap     The cap being mapped
+ * @param  int    $user_id The user id in question
+ * @return array
+ */
+function bpeo_map_upload_files_meta_cap( $caps, $cap, $user_id ) {
+	// bail if not checking for 'upload_files' cap
+	if ( 'upload_files' !== $cap ) {
+		return $caps;
+	}
+
+	// make sure user is valid
+	$maybe_user = new WP_User( $user_id );
+	if ( ! is_a( $maybe_user, 'WP_User' ) || empty( $maybe_user->ID ) ) {
+		return $caps;
+	}
+
+	// allow 'upload_files' cap on BPEO new and edit pages
+	if ( bpeo_is_action( 'new' ) || bpeo_is_action( 'edit' ) ) {
+		return array( 'exist' );
+	}
+
+	return $caps;
+}
+add_filter( 'map_meta_cap', 'bpeo_map_upload_files_meta_cap', 10, 3 );
+
+/**
  * Modify `WP_Query` requests for the 'bp_displayed_user_id' param.
  *
  * @param WP_Query Query object, passed by reference.
