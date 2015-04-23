@@ -238,6 +238,10 @@ class BPEO_Component extends BP_Component {
 	 * This is for themes using the 'bp_template_title' hook.
 	 */
 	public function display_single_event_title() {
+		if ( bpeo_is_action( 'edit' ) ) {
+			return;
+		}
+
 		if ( empty( $this->queried_event ) ) {
 			return;
 		}
