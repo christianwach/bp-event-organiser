@@ -272,7 +272,7 @@ class BPEO_Component extends BP_Component {
 		}
 
 		// save $post global temporarily
-		global $post;
+		global $post, $pages;
 		$_post = false;
 		if ( ! empty( $post ) ) {
 			$_post = $post;
@@ -296,6 +296,23 @@ class BPEO_Component extends BP_Component {
 		if ( ! did_action( 'bp_template_title' ) ) {
 			the_title( '<h2>', '</h2>' );
 		}
+
+		// BP removes all filters for 'the_content' during theme compat.
+		// bring it back and remove BP's content filter
+		bp_restore_all_filters( 'the_content' );
+		remove_filter( 'the_content', 'bp_replace_the_content' );
+
+		// hey there, mr. hack!
+		//
+		// we're going to use the_content() in our BPEO template part.  so we want to
+		// get the rendered post content for the event without BP theme compat running
+		// its filter.
+		//
+		// get_the_content() is weird and checks the $pages global for the content
+		$pages[-1] = apply_filters( 'the_content', $post->post_content );
+
+		// remove all filters like before
+		bp_remove_all_filters( 'the_content' );
 
 		// output single event content
 		eo_get_template_part( 'content', 'event' );
