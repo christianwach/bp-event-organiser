@@ -187,6 +187,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// single event
 		} elseif ( ! empty( buddypress()->action_variables ) ) {
 			$this->single_event_screen();
+			add_action( 'bp_template_title',   array( $this, 'display_single_event_title' ) );
 			add_action( 'bp_template_content', array( $this, 'display_single_event' ) );
 
 		// default behavior
@@ -346,6 +347,34 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	}
 
 	/**
+	 * Display the single event title within a group.
+	 *
+	 * This is for themes using the 'bp_template_title' hook.
+	 */
+	public function display_single_event_title() {
+		if ( empty( $this->queried_event ) ) {
+			return;
+		}
+
+		// save $post global temporarily
+		global $post;
+		$_post = false;
+		if ( ! empty( $post ) ) {
+			$_post = $post;
+		}
+
+		// override the $post global so EO can use its functions
+		$post = $this->queried_event;
+
+		the_title();
+
+		// revert $post global
+		if ( ! empty( $_post ) ) {
+			$post = $_post;
+		}
+	}
+
+	/**
 	 * Display a single event within a group.
 	 *
 	 * @todo Move part of this functionality into a template part so theme devs can customize.
@@ -374,6 +403,11 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 				$post = $_post;
 			}
 			return;
+		}
+
+		// output title if theme is not using the 'bp_template_title' hook
+		if ( ! did_action( 'bp_template_title' ) ) {
+			the_title( '<h2>', '</h2>' );
 		}
 
 		// output single event content
