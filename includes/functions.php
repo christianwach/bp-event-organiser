@@ -191,7 +191,7 @@ function bpeo_the_single_event_action_links( $post ) {
 				$back = trailingslashit( home_url( trim( eventorganiser_get_option( 'url_events', 'events/event' ) ) ) );
 			}
 
-			$root = trailingslashit( bp_displayed_user_domain() . bpeo_get_events_slug() );
+			$root = trailingslashit( bp_loggedin_user_domain() . bpeo_get_events_slug() );
 		}
 
 		$links = array();
