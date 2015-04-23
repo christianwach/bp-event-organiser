@@ -298,7 +298,7 @@ class BPEO_Component extends BP_Component {
 		}
 
 		// output single event content
-		bpeo_the_single_event_content( $post );
+		eo_get_template_part( 'content', 'event' );
 
 		// revert $post global
 		if ( ! empty( $_post ) ) {

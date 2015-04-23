@@ -18,35 +18,6 @@ function bpeo_get_events_new_slug() {
 }
 
 /**
- * Output the single event content.
- *
- * @todo Perhaps make this a template part?
- *
- * @param WP_Post $post
- */
-function bpeo_the_single_event_content( $post ) {
-	global $post;
-?>
-
-	<h2> <?php the_title(); ?></h2>
-
-	<h4><?php _e( 'Event Description', 'bp-event-organizer' ); ?></h4>
-
-	<?php
-	// Make this better... have to juggle the_content filters...
-	echo wpautop( $post->post_content );
-
-	// post thumbnail - hardcoded to medium size at the moment.
-	the_post_thumbnail( 'medium' );
-
-	add_action( 'loop_end', 'bpeo_catch_reset_postdata' );
-	eo_get_template_part( 'event-meta-event-single' );
-	remove_action( 'loop_end', 'bpeo_catch_reset_postdata' );
-
-	bpeo_the_single_event_action_links( $post );
-}
-
-/**
  * Normalize EO action conditional checks across BP components.
  *
  * The BP groups component shifts the current path over by 1, which can make

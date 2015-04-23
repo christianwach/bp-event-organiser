@@ -411,7 +411,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		}
 
 		// output single event content
-		bpeo_the_single_event_content( $post );
+		eo_get_template_part( 'content', 'event' );
 
 		// revert $post global
 		if ( ! empty( $_post ) ) {
