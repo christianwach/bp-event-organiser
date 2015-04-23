@@ -214,6 +214,91 @@ function bpeo_the_single_event_action_links( $post ) {
 /** HOOKS ***************************************************************/
 
 /**
+ * Replace EO's default content with our own one when on a canonical event page.
+ *
+ * If you want to use EO's original default content, use this snippet:
+ *     add_filter( 'bpeo_enable_replace_canonical_event_content', '__return_false' );
+ *
+ * @param  string $retval Existing canonical event content.
+ * @return string
+ */
+function bpeo_remove_default_canonical_event_content( $retval ) {
+	// bail if we shouldn't replace the existing content
+	if ( false === (bool) apply_filters( 'bpeo_enable_replace_canonical_event_content', true ) ) {
+		return $retval;
+	}
+
+	if( is_singular('event') && false === eventorganiser_is_event_template( '', 'event' ) ) {
+		remove_filter( 'the_content', '_eventorganiser_single_event_content' );
+		add_filter( 'the_content', 'bpeo_canonical_event_content' );
+	}
+
+	return $retval;
+}
+add_filter( 'template_include', 'bpeo_remove_default_canonical_event_content', 20 );
+
+/**
+ * Callback filter to use BPEO's content for the canonical event page.
+ *
+ * @see bpeo_remove_default_canonical_event_content()
+ *
+ * @param  string $content Current content.
+ * @return string
+ */
+function bpeo_canonical_event_content( $content ) {
+	remove_filter( 'the_content', 'bpeo_canonical_event_content' );
+
+	// buffer the template part
+	ob_start();
+	eo_get_template_part( 'content', 'event' );
+	$tpart = ob_get_contents();
+	ob_end_clean();
+
+	remove_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
+
+	return $tpart;
+}
+
+/**
+ * Registers BPEO's template directory with EO's template stack.
+ *
+ * To register the stack, use:
+ *     add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
+ *
+ * @param  array $retval Current template stack.
+ * @return array
+ */
+function bpeo_register_template_stack( $retval ) {
+	// inject our stack between the current theme and EO's template directory
+	array_splice( $retval, 2, 0, constant( 'BPEO_PATH' ) . 'templates/' );
+	return $retval;
+}
+
+/**
+ * Use our template stack only when calling the content-event.php template.
+ *
+ * The content-event.php template is a custom template bundled with BPEO.  We
+ * want EO to use our template directory ahead of their own.
+ *
+ * @param string $slug The template part slug
+ * @param string $name The template part name.
+ */
+function bpeo_add_template_stack_to_content_event_template( $slug, $name ) {
+	// not matching our template name? stop now!
+	if ( 'event' !== $name ) {
+		return;
+	}
+
+	// use our template stack
+	add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
+
+	// this is for cleaning up the post global when using the
+	// event-meta-single-event.php template with recurring events
+	add_action( 'loop_end', 'bpeo_catch_reset_postdata' );
+}
+add_action( 'get_template_part_content', 'bpeo_add_template_stack_to_content_event_template', 10, 2 );
+
+/**
  * Filter event taxonomy term links to match the current BP page.
  *
  * BP event content should be displayed within BP instead of event links
