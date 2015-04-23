@@ -187,6 +187,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// single event
 		} elseif ( ! empty( buddypress()->action_variables ) ) {
 			$this->single_event_screen();
+			add_action( 'bp_template_title',   array( $this, 'display_single_event_title' ) );
 			add_action( 'bp_template_content', array( $this, 'display_single_event' ) );
 
 		// default behavior
