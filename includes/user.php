@@ -3,16 +3,34 @@
 /**
  * Get IDs for events that should appear on a user's "My Calendar".
  *
- * @param int $user_id ID of the user.
+ * By default, grabs a user's events as well as their friends and groups.
+ *
+ * @param int   $user_id ID of the user.
+ * @param array $args {
+ *     Array of arguments.
+ *     @type bool $friends          Should we grab events created by friends? Default: true.
+ *     @type bool $show_unpublished Should we grab unpublished events?  Default: false.
+ * }
  */
-function bpeo_get_my_calendar_event_ids( $user_id ) {
+function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
+	$r = wp_parse_args( $args, array(
+		'friends' => true,
+		'show_unpublished' => false
+	) );
+
 	$event_ids = array();
 
 	// Events created by me, or by friends.
 	$authors = array( $user_id );
 
-	if ( bp_is_active( 'friends' ) ) {
+	if ( bp_is_active( 'friends' ) && true === (bool) $r['friends'] ) {
 		$authors = array_merge( $authors, friends_get_friend_user_ids( $user_id ) );
+	}
+
+	if ( true === $r['show_unpublished'] ) {
+		$post_status = array( 'pending', 'private', 'draft', 'future', 'trash' );
+	} else {
+		$post_status = 'publish';
 	}
 
 	$eids_by_author = get_posts( array(
@@ -20,6 +38,7 @@ function bpeo_get_my_calendar_event_ids( $user_id ) {
 		'fields' => 'ids',
 		'showpastevents' => true,
 		'author__in' => $authors,
+		'post_status' => $post_status
 	) );
 
 	$event_ids = array_merge( $event_ids, $eids_by_author );
@@ -34,6 +53,7 @@ function bpeo_get_my_calendar_event_ids( $user_id ) {
 			'fields' => 'ids',
 			'showpastevents' => true,
 			'bp_group' => $group_ids,
+			'post_status' => $post_status
 		) );
 
 		$event_ids = array_merge( $event_ids, $eids_by_group );
