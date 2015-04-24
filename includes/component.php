@@ -37,7 +37,7 @@ class BPEO_Component extends BP_Component {
 		$main_nav = array(
 			'name' => $name,
 			'slug' => $this->slug,
-			'position' => 62,
+			'position' => 65,
 			'show_for_displayed_user' => false,
 			'screen_function' => array( $this, 'template_loader' ),
 			'default_subnav_slug' => 'calendar',
