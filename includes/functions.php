@@ -56,6 +56,11 @@ function bpeo_is_action( $action = '' ) {
 		return $is_new( $action );
 	}
 
+	// check if we're on a 'manage events' page
+	if ( 'manage' === $action ) {
+		return $is_new( $action );
+	}
+
 	// all other actions - 'edit', 'delete'
 	if ( false === bp_is_action_variable( $action, $pos ) ) {
 		return $retval;
