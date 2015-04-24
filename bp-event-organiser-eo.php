@@ -153,6 +153,10 @@ class BuddyPress_Event_Organiser_EO {
 	 * @return nothing
 	 */
 	public function intercept_save_event( $post_id, $post, $update ) {
+		if ( empty( $_REQUEST['bp_event_organiser_nonce_field'] ) ) {
+			return;
+		}
+
 		check_admin_referer( 'bp_event_organiser_meta_save', 'bp_event_organiser_nonce_field' );
 
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
