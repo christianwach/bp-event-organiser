@@ -365,6 +365,7 @@ class WP_Frontend_Admin_Screen {
 
 	<?php
 		// metabox time!
+		// most of this is duplicated from edit-form-advanced.php
 
 		// featured image metabox
 		if ( current_theme_supports( 'post-thumbnails', $post->post_type ) && post_type_supports( $post->post_type, 'thumbnail' ) && current_user_can( 'upload_files' ) ) {
@@ -395,6 +396,8 @@ class WP_Frontend_Admin_Screen {
 		// plugin metabox registration
 		do_action( 'add_meta_boxes', self::$post_type, $post );
 		do_action( 'add_meta_boxes_' . self::$post_type, $post );
+		do_action( 'do_meta_boxes', self::$post_type, 'normal', $post );
+		do_action( 'do_meta_boxes', self::$post_type, 'side', $post );
 
 		// render metaboxes
 		do_meta_boxes( self::$post_type, 'normal', $post );
@@ -405,6 +408,7 @@ class WP_Frontend_Admin_Screen {
 			$post = $_post;
 		}
 
+		// submit button
 	?>
 
 			<div id="publishing-action">
