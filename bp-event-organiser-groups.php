@@ -432,7 +432,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		bp_remove_all_filters( 'the_content' );
 
 		// output single event content
-		eo_get_template_part( 'content', 'event' );
+		eo_get_template_part( 'content-eo', 'event' );
 
 		// revert $post global
 		if ( ! empty( $_post ) ) {

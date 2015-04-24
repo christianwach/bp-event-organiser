@@ -225,7 +225,7 @@ function bpeo_canonical_event_content( $content ) {
 	global $pages;
 
 	// reset get_the_content() to use already-rendered content so we can use it in
-	// our content-event.php template part
+	// our content-eo-event.php template part
 	//
 	// get_the_content() is weird and checks the $pages global for the content
 	// so let's use the rendered content here and set it in the $pages global
@@ -237,7 +237,7 @@ function bpeo_canonical_event_content( $content ) {
 
 	// buffer the template part
 	ob_start();
-	eo_get_template_part( 'content', 'event' );
+	eo_get_template_part( 'content-eo', 'event' );
 	$tpart = ob_get_contents();
 	ob_end_clean();
 
@@ -265,9 +265,9 @@ function bpeo_register_template_stack( $retval ) {
 }
 
 /**
- * Use our template stack only when calling the content-event.php template.
+ * Use our template stack only when calling the content-eo-event.php template.
  *
- * The content-event.php template is a custom template bundled with BPEO.  We
+ * The content-eo-event.php template is a custom template bundled with BPEO.  We
  * want EO to use our template directory ahead of their own.
  *
  * @param string $slug The template part slug
@@ -286,7 +286,7 @@ function bpeo_add_template_stack_to_content_event_template( $slug, $name ) {
 	// event-meta-single-event.php template with recurring events
 	add_action( 'loop_end', 'bpeo_catch_reset_postdata' );
 }
-add_action( 'get_template_part_content', 'bpeo_add_template_stack_to_content_event_template', 10, 2 );
+add_action( 'get_template_part_content-eo', 'bpeo_add_template_stack_to_content_event_template', 10, 2 );
 
 /**
  * Filter event taxonomy term links to match the current BP page.

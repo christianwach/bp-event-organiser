@@ -379,7 +379,7 @@ class BPEO_Component extends BP_Component {
 		bp_remove_all_filters( 'the_content' );
 
 		// output single event content
-		eo_get_template_part( 'content', 'event' );
+		eo_get_template_part( 'content-eo', 'event' );
 
 		// revert $post global
 		if ( ! empty( $_post ) ) {
