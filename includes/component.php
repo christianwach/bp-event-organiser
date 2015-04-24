@@ -122,7 +122,8 @@ class BPEO_Component extends BP_Component {
 
 		// query for the event
 		$event = eo_get_events( array(
-			'name' => bp_current_action()
+			'name' => bp_current_action(),
+			'post_status' => array( 'publish', 'pending', 'private', 'draft', 'future', 'trash' )
 		) );
 
 		// check if event exists
