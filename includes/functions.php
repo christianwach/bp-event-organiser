@@ -136,7 +136,7 @@ function bpeo_the_ical_link( $post_id ) {
  *
  * @param WP_Post|int $post The WP Post object or the post ID.
  */
-function bpeo_the_single_event_action_links( $post ) {
+function bpeo_the_single_event_action_links( $post = 0 ) {
 	echo bpeo_get_the_single_event_action_links( $post );
 }
 	/**
@@ -145,7 +145,7 @@ function bpeo_the_single_event_action_links( $post ) {
 	 * @param  WP_Post|int $post The WP Post object or the post ID.
 	 * @return string
 	 */
-	function bpeo_get_the_single_event_action_links( $post ) {
+	function bpeo_get_the_single_event_action_links( $post = 0 ) {
 		if ( false === $post instanceof WP_Post ) {
 			$post = get_post( $post );
 		}
