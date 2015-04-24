@@ -373,7 +373,14 @@ class BPEO_Component extends BP_Component {
 		// its filter.
 		//
 		// get_the_content() is weird and checks the $pages global for the content
-		$pages[-1] = apply_filters( 'the_content', $post->post_content );
+		if ( bp_use_theme_compat_with_current_theme() ) {
+			$key = 0;
+
+		// bp-default requires the key set to -1
+		} else {
+			$key = -1;
+		}
+		$pages[$key] = apply_filters( 'the_content', $post->post_content );
 
 		// remove all filters like before
 		bp_remove_all_filters( 'the_content' );
