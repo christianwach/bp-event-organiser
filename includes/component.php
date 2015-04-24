@@ -133,11 +133,21 @@ class BPEO_Component extends BP_Component {
 			return;
 		}
 
+		// Set up query args
+		$query_args = array();
+		$query_args['post_status'] = array( 'publish', 'pending', 'private', 'draft', 'future', 'trash' );
+
+		// this is a draft with no slug
+		if ( false !== strpos( bp_current_action(), 'draft-' ) ) {
+			$query_args['post__in'] = (array) str_replace( 'draft-', '', bp_current_action() );
+
+		// use post slug
+		} else {
+			$query_args['name'] = bp_current_action();
+		}
+
 		// query for the event
-		$event = eo_get_events( array(
-			'name' => bp_current_action(),
-			'post_status' => array( 'publish', 'pending', 'private', 'draft', 'future', 'trash' )
-		) );
+		$event = eo_get_events( $query_args );
 
 		// check if event exists
 		if ( empty( $event ) ) {
