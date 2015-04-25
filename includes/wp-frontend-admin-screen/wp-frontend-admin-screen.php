@@ -323,6 +323,8 @@ class WP_Frontend_Admin_Screen {
 			</div>
 			</div>
 
+			<?php do_action( 'edit_form_after_title', $post ); ?>
+
 			<div id="postdivrich" class="postarea<?php if ( $_wp_editor_expand ) { echo ' wp-editor-expand'; } ?>">
 				<?php // we have to change the ID element to something other than 'content' to prevent theme conflicts ?>
 				<?php wp_editor( $post->post_content, $this->editor_id, array(

@@ -187,6 +187,62 @@ function bpeo_the_single_event_action_links( $post = 0 ) {
 		return implode( ' | ', (array) apply_filters( 'bpeo_get_the_single_event_action_links', $links ) );
 	}
 
+/**
+ * Output the post status message for an event.
+ *
+ * @param WP_Post|int $post Either the WP post or the post ID.
+ */
+function bpeo_the_post_status_message( $post = 0 ) {
+	echo bpeo_get_the_post_status_message( $post = 0 );
+}
+
+	/**
+	 * Return the post status message for an event.
+	 *
+	 * @param  WP_Post|int $post Either the WP post or the post ID.
+	 * @return string
+	 */
+	function bpeo_get_the_post_status_message( $post ) {
+		if ( false === $post instanceof WP_Post ) {
+			$post = get_post( $post );
+		}
+
+		$message = '';
+
+		// if in admin area, stop now!
+		if ( defined( 'WP_NETWORK_ADMIN' ) ) {
+			return $message;
+		}
+
+		$post_type = get_post_type_object( $post->post_type );
+
+		switch ( $post->post_status ) {
+			case 'draft' :
+				$message = sprintf( __( 'This %1$s is a draft.  Please remember to publish this %1$s once you are ready.', 'bp-event-organizer' ), strtolower( $post_type->labels->singular_name ) );
+				break;
+
+			case 'future' :
+				$message = sprintf( __( 'This %1$s is scheduled to be published at <strong>%2$s</strong>.', 'bp-event-organizer' ),
+	strtolower( $post_type->labels->singular_name ),
+	/* translators: Date format for future event messages, see http://php.net/date */
+	date_i18n( __( 'M j, Y @ G:i', 'bp-event-organizer' ), strtotime( $post->post_date ) )
+				);
+				break;
+
+			case 'private' :
+				$message = sprintf( __( 'This %1$s is marked as private.  Only site moderators and yourself can view this %1$s.', 'bp-event-organizer' ), strtolower( $post_type->labels->singular_name ) );
+				break;
+		}
+
+		if ( ! empty( $message ) ) {
+			$id = false === bpeo_is_action( 'edit' ) ? 'id="message"' : '';
+			$message = '<div ' . $id . ' class="error"><p>' . wp_kses_post( $message ) . '</p></div>';
+		}
+
+		return $message;
+	}
+add_action( 'edit_form_after_title', 'bpeo_the_post_status_message' );
+
 /** HOOKS ***************************************************************/
 
 /**

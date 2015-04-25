@@ -414,6 +414,10 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			the_title( '<h2>', '</h2>' );
 		}
 
+		// do something after the title
+		// this is the same hook used in the admin area
+		do_action( 'edit_form_after_title', $post );
+
 		// BP removes all filters for 'the_content' during theme compat.
 		// bring it back and remove BP's content filter
 		bp_restore_all_filters( 'the_content' );
