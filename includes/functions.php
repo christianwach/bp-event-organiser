@@ -392,6 +392,10 @@ add_filter( 'term_links-event-category', 'bpeo_filter_term_list' );
  * Add iCal link to single event pages.
  */
 function bpeo_add_ical_link_to_eventmeta() {
+	// do not show for drafts
+	if ( 'draft' === get_post( get_the_ID() )->post_status ) {
+		return;
+	}
 ?>
 	<li><a class="bpeo-ical-link" href="<?php bpeo_the_ical_link( get_the_ID() ); ?>"><span class="icon"></span><?php esc_html_e( 'Download iCal file', 'bp-events-organizer' ); ?></a></li>
 
