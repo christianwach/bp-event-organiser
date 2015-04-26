@@ -279,7 +279,8 @@ class BuddyPress_Event_Organiser_EO {
 			<?php
 				foreach( $this->group_ids as $gid ) {
 					$group = groups_get_group( array( 'group_id' => $gid ) );
-					echo "<option value='{$gid}' selected='selected'>{$group->name}</option>";
+					$private = 'public' !== $group->status ? 'data-private="1"' : '';
+					echo "<option value='{$gid}' selected='selected' {$private}>{$group->name}</option>";
 				}
 			?>
 		</select>
@@ -289,6 +290,31 @@ class BuddyPress_Event_Organiser_EO {
 		<?php endif; ?>
 
 		<script type="text/javascript">
+			var bpeoPrivateFlag = 0,
+				bpeoToggleFlag = false;
+
+			bpeoSelect = jQuery('#bp_event_organiser_metabox select');
+			bpeoPrivateFlag = bpeoSelect.find('[data-private]').length;
+
+			if ( bpeoPrivateFlag ) {
+				bpeoToggleFlag = true;
+			}
+
+			bpeoToggle = function() {
+				if ( bpeoPrivateFlag === 1 ) {
+					bpeoToggleFlag = true;
+					jQuery("#visibility-radio-private").prop("checked", true);
+					jQuery('#visibility a').hide();
+					jQuery('#post-visibility-display').fadeOut('fast').text( postL10n.private ).fadeIn('fast');
+
+				} else if ( bpeoPrivateFlag === 0 && bpeoToggleFlag === true ) {
+					bpeoToggleFlag = false;
+					jQuery("#visibility-radio-public").prop("checked", true);
+					jQuery('#visibility a').show();
+					jQuery('#post-visibility-display').fadeOut('fast').text( postL10n.public ).fadeIn('fast');
+				}
+			}
+
 			bpeoFormatResponse = function(data) {
 				return data.name || data.text;
 			}
@@ -309,7 +335,7 @@ class BuddyPress_Event_Organiser_EO {
 				return markup;
 			}
 
-			jQuery('#bp_event_organiser_metabox select').select2({
+			bpeoSelect.select2({
 				ajax: {
 					method: 'POST',
 					url: ajaxurl,
@@ -337,6 +363,20 @@ class BuddyPress_Event_Organiser_EO {
 				minimumInputLength: 3,
 				templateResult: bpeoFormatResult,
 				templateSelection: bpeoFormatResponse
+			});
+
+			bpeoSelect.on("select2:unselecting", function (e) {
+				if ( 'data-private' === e.currentTarget.lastElementChild.attributes[0].name || true === e.params.args.data.private ) {
+					bpeoPrivateFlag--;
+					bpeoToggle();
+				}
+			});
+
+			bpeoSelect.on("select2:selecting", function (e) {
+				if ( true === e.params.args.data.private ) {
+					bpeoPrivateFlag++;
+					bpeoToggle();
+				}
 			});
 		</script>
 	<?php
@@ -373,6 +413,7 @@ class BuddyPress_Event_Organiser_EO {
 				) ),
 				'avatar' => bp_get_group_avatar_mini(),
 				'total_member_count' => $group->total_member_count,
+				'private' => $group->status !== 'public'
 			);
 		}
 
