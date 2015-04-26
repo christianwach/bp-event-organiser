@@ -89,6 +89,7 @@ function bpeo_get_group_events( $group_id, $args = array() ) {
 
 	$r['fields'] = 'ids';
 	$r['post_type'] = 'event';
+	$r['post_status'] = 'any';
 
 	$r['tax_query'] = array(
 		array(
