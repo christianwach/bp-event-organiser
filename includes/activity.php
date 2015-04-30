@@ -7,7 +7,7 @@
 /**
  * Create activity on event save.
  *
- * The 'eventorganiser_save_event' hook fires both on insert and update, so we use this function as a router.
+ * The 'save_post' hook fires both on insert and update, so we use this function as a router.
  *
  * Run late to ensure that group connections have been set.
  *
