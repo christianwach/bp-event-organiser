@@ -13,13 +13,19 @@
  *
  * @param int $event_id ID of the event.
  */
-function bpeo_create_activity_for_event( $event_id, $event, $update ) {
+function bpeo_create_activity_for_event( $event_id, $event = null, $update = null ) {
+	if ( is_null( $event ) ) {
+		$event = get_post( $event_id );
+	}
+
 	if ( 'event' !== $event->post_type ) {
 		return;
 	}
 
 	// Hack: distinguish 'create' from 'edit' by comparing post_date and post_modified.
-	if ( $event->post_date === $event->post_modified ) {
+	if ( 'before_delete_post' === current_action() ) {
+		$type = 'bpeo_delete_event';
+	} elseif ( $event->post_date === $event->post_modified ) {
 		$type = 'bpeo_create_event';
 	} else {
 		$type = 'bpeo_edit_event';
@@ -61,7 +67,17 @@ function bpeo_create_activity_for_event( $event_id, $event, $update ) {
 		}
 	}
 
-	$recorded_time = 'bpeo_create_event' === $type ? $event->post_date : $event->post_modified;
+	switch ( $type ) {
+		case 'bpeo_create_event' :
+			$recorded_time = $event->post_date;
+			break;
+		case 'bpeo_edit_event' :
+			$recorded_time = $event->post_modified;
+			break;
+		default :
+			$recorded_time = bp_core_current_time();
+			break;
+	}
 
 	$activity_args = array(
 		'component' => 'events',
@@ -77,6 +93,7 @@ function bpeo_create_activity_for_event( $event_id, $event, $update ) {
 	do_action( 'bpeo_create_event_activity', $activity_args, $event );
 }
 add_action( 'save_post', 'bpeo_create_activity_for_event', 20, 3 );
+add_action( 'before_delete_post', 'bpeo_create_activity_for_event' );
 
 /**
  * Get activity items associated with an event ID.
@@ -95,7 +112,7 @@ function bpeo_get_activity_by_event_id( $event_id ) {
 			),
 			array(
 				'column' => 'type',
-				'value' => array( 'bpeo_create_event', 'bpeo_edit_event' ),
+				'value' => array( 'bpeo_create_event', 'bpeo_edit_event', 'bpeo_delete_event' ),
 				'compare' => 'IN',
 			),
 			array(
@@ -131,6 +148,15 @@ function bpeo_register_activity_actions() {
 		__( 'Events edited', 'buddypress' ),
 		array( 'activity', 'member', 'group', 'member_groups' )
 	);
+
+	bp_activity_set_action(
+		'events',
+		'bpeo_delete_event',
+		__( 'Events deleted', 'bp-event-organiser' ),
+		'bpeo_activity_action_format',
+		__( 'Events deleted', 'buddypress' ),
+		array( 'activity', 'member', 'group', 'member_groups' )
+	);
 }
 add_action( 'bp_register_activity_actions', 'bpeo_register_activity_actions' );
 
@@ -151,6 +177,10 @@ function bpeo_activity_action_format( $action, $activity ) {
 			$base = __( '%1$s created the event %2$s', 'bp-event-organiser' );
 			break;
 		case 'bpeo_edit_event' :
+			/* translators: 1: link to user, 2: link to event */
+			$base = __( '%1$s edited the event %2$s', 'bp-event-organiser' );
+			break;
+		case 'bpeo_delete_event' :
 			/* translators: 1: link to user, 2: link to event */
 			$base = __( '%1$s edited the event %2$s', 'bp-event-organiser' );
 			break;

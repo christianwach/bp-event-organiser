@@ -326,6 +326,15 @@ function bpeo_register_activity_actions_for_groups() {
 		__( 'Events edited', 'buddypress' ),
 		array( 'activity', 'member', 'group', 'member_groups' )
 	);
+
+	bp_activity_set_action(
+		buddypress()->groups->id,
+		'bpeo_delete_event',
+		__( 'Events deleted', 'bp-event-organiser' ),
+		'bpeo_activity_action_format',
+		__( 'Events deleted', 'buddypress' ),
+		array( 'activity', 'member', 'group', 'member_groups' )
+	);
 }
 add_action( 'bp_register_activity_actions', 'bpeo_register_activity_actions_for_groups' );
 
@@ -390,6 +399,10 @@ function bpeo_activity_action_format_for_groups( $action, $activity ) {
 		case 'bpeo_edit_event' :
 			/* translators: 1: link to user, 2: link to event, 3: comma-separated list of group links */
 			$base = _n( '%1$s edited the event %2$s in the group %3$s.', '%1$s edited the event %2$s in the groups %3$s.', $group_count, 'bp-event-organiser' );
+			break;
+		case 'bpeo_delete_event' :
+			/* translators: 1: link to user, 2: link to event, 3: comma-separated list of group links */
+			$base = _n( '%1$s deleted the event %2$s in the group %3$s.', '%1$s deleted the event %2$s in the groups %3$s.', $group_count, 'bp-event-organiser' );
 			break;
 	}
 
