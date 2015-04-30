@@ -441,6 +441,26 @@ function bpeo_activity_action_format_for_groups( $action, $activity ) {
 }
 add_filter( 'bpeo_activity_action', 'bpeo_activity_action_format_for_groups', 10, 2 );
 
+/**
+ * Disable secondary avatars for event-related activity.
+ */
+function bpeo_disable_secondary_avatars( $avatar ) {
+	global $activities_template;
+
+	$a = $activities_template->activity;
+
+	if ( buddypress()->groups->id !== $a->component ) {
+		return $avatar;
+	}
+
+	if ( 'bpeo_' !== substr( $a->type, 0, 5 ) ) {
+		return $avatar;
+	}
+
+	return '';
+}
+add_filter( 'bp_get_activity_secondary_avatar', 'bpeo_disable_secondary_avatars' );
+
 /** TEMPLATE ************************************************************/
 
 /**
