@@ -32,7 +32,7 @@ class BPEO_Component extends BP_Component {
 	 * Set up navigation.
 	 */
 	public function setup_nav( $main_nav = array(), $sub_nav = array() ) {
-		$name = bp_is_my_profile() ? __( 'My Events', 'bp-event-organiser' ) : __( 'Events', 'bp-event-organiser' );
+		$name = __( 'Events', 'bp-event-organiser' );
 
 		$main_nav = array(
 			'name' => $name,
