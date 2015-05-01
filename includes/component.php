@@ -214,13 +214,14 @@ class BPEO_Component extends BP_Component {
 	public function select_template() {
 		$template_slug = bp_current_action();
 
-		// Ceci n'est pas un template stack.
-		$template = bp_locate_template( 'bp-event-organiser/' . $template_slug . '.php' );
-		if ( false === $template ) {
-			$template = BPEO_PATH . 'templates/' . $template_slug . '.php';
-		}
+		// use our template stack
+		add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
 
-		include $template;
+		// load our template part
+		eo_get_template_part( $template_slug );
+
+		// remove our template stack
+		remove_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
 	}
 
 	/**
