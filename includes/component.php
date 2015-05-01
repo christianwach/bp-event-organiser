@@ -53,6 +53,15 @@ class BPEO_Component extends BP_Component {
 		);
 
 		$sub_nav[] = array(
+			'name' => __( 'Upcoming', 'bp-event-organiser' ),
+			'slug' => 'upcoming', // @todo better l10n
+			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
+			'parent_slug' => $this->slug,
+			'user_has_access' => bp_core_can_edit_settings(),
+			'screen_function' => array( $this, 'template_loader' ),
+		);
+
+		$sub_nav[] = array(
 			'name' => __( 'New Event', 'bp-event-organizer' ),
 			'slug' => bpeo_get_events_new_slug(),
 			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
@@ -124,7 +133,8 @@ class BPEO_Component extends BP_Component {
 			return;
 		}
 
-		if ( bp_is_current_action( 'manage' ) ) {
+		$reserved_slugs = array( 'manage', 'calendar', 'upcoming' );
+		if ( in_array( bp_current_action(), $reserved_slugs ) ) {
 			return;
 		}
 
@@ -185,7 +195,7 @@ class BPEO_Component extends BP_Component {
 			add_action( 'bp_template_content', array( $this, 'display_manage_events' ) );
 
 		// single event
-		} elseif ( false === bp_is_current_action( 'calendar' ) ) {
+		} elseif ( false === bp_is_current_action( 'calendar' ) && false === bp_is_current_action( 'upcoming' ) ) {
 			$this->single_event_screen();
 			add_action( 'bp_template_title',   array( $this, 'display_single_event_title' ) );
 			add_action( 'bp_template_content', array( $this, 'display_single_event' ) );
@@ -199,15 +209,18 @@ class BPEO_Component extends BP_Component {
 	}
 
 	/**
-	 * Utility function for selecting the correct Docs template to be loaded in the component
+	 * Utility function for selecting the correct template to be loaded in the component
 	 */
 	public function select_template() {
+		$template_slug = bp_current_action();
 
-		$args = array(
-			'bp_displayed_user_id' => bp_displayed_user_id(),
-		);
+		// Ceci n'est pas un template stack.
+		$template = bp_locate_template( 'bp-event-organiser/' . $template_slug . '.php' );
+		if ( false === $template ) {
+			$template = BPEO_PATH . 'templates/' . $template_slug . '.php';
+		}
 
-		echo eo_get_event_fullcalendar( $args );
+		include $template;
 	}
 
 	/**

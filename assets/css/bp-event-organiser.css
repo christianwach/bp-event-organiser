@@ -55,3 +55,21 @@
 	padding-right: 5px;
 	vertical-align: bottom;
 }
+
+/* Upcoming Events list */
+ul.bpeo-upcoming-events {
+	list-style-type: none;
+}
+
+ul.bpeo-upcoming-events li {
+	margin-bottom: 1em;
+}
+
+.bpeo-upcoming-event-datetime {
+	float: left;
+	width: 180px;
+}
+
+.bpeo-upcoming-event-title {
+	font-weight: bold;
+}
