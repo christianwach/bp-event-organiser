@@ -16,22 +16,6 @@
 
 /** ABSTRACTION *********************************************************/
 
-if ( ! function_exists( 'get_current_screen' ) ) :
-/**
- * Pluggable version of get_current_screen().
- *
- * You should change 'id' to your custom post type.
- *
- * @return object
- */
-function get_current_screen() {
-	$object = new stdClass;
-	$object->id   = 'event';
-	$object->base = '';
-	return $object;
-}
-endif;
-
 if ( ! function_exists( 'convert_to_screen' ) ) :
 /**
  * Pluggable version of get_current_screen().
