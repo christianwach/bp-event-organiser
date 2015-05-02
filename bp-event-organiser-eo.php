@@ -240,7 +240,7 @@ class BuddyPress_Event_Organiser_EO {
 		// create it
 		add_meta_box(
 			'bp_event_organiser_metabox',
-			'BuddyPress Groups',
+			is_admin() ? __( 'BuddyPress Groups', 'bp-event-organizer' ) : __( 'Groups', 'bp-event-organizer' ),
 			array( $this, 'event_meta_box_render' ),
 			'event',
 			'side', //'normal',
@@ -273,7 +273,7 @@ class BuddyPress_Event_Organiser_EO {
 		<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css" rel="stylesheet" />
 		<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js"></script>
 
-		<p class="bp_event_organiser_desc"><?php _e( 'Enter the names of each group this event should belong to.', 'bp-event-organizer' ); ?></p>
+		<p class="bp_event_organiser_desc"><?php _e( 'Enter the names of each group this event should appear in.', 'bp-event-organizer' ); ?></p>
 
 		<select name="bp_group_organizer_groups[]" multiple="multiple" style="width:100%;">
 			<?php
