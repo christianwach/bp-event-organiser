@@ -210,7 +210,7 @@ function bpeo_activity_action_format( $action, $activity ) {
  * Remove event-related duplicates from activity streams.
  *
  */
-function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $do_backfill = true ) {
+function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $iterator = 0 ) {
 	// Get a list of queried activity IDs before we start removing.
 	$queried_activity_ids = wp_list_pluck( $activity['activities'], 'id' );
 
@@ -262,7 +262,7 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $do_backfil
 		}
 	}
 
-	if ( $removed && $do_backfill ) {
+	if ( $removed && $iterator <= 5 ) {
 		// Backfill to correct per_page.
 		$deduped_activity_count  = count( $activity['activities'] );
 		$original_activity_count = count( $queried_activity_ids );
@@ -274,7 +274,7 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $do_backfil
 			$backfill_args['exclude'] = array_merge( $exclude, $queried_activity_ids );
 
 			// In case of more reduction due to further duplication, fetch a generous number.
-			$backfill_args['per_page'] += $removed;
+			$backfill_args['per_page'] = $removed + 10;
 
 			$backfill = bp_activity_get( $backfill_args );
 
@@ -292,7 +292,7 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $do_backfil
 			$activity['total'] += $backfill['total'];
 
 			// Backfill may duplicate existing items, so we run the whole works through this function again.
-			$activity = bpeo_remove_duplicates_from_activity_stream( $activity, $r, ! $break_early );
+			$activity = bpeo_remove_duplicates_from_activity_stream( $activity, $r, $iterator + 1 );
 
 			// If we're left with more activity than we need, trim it down.
 			if ( count( $activity['activities'] > $original_activity_count ) ) {
@@ -304,7 +304,7 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $do_backfil
 				break;
 			}
 
-			$deduped_activity_count = count( $activity['activities'] );
+			$deduped_activity_count += count( $activity['activities'] );
 		}
 	}
 
