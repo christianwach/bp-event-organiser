@@ -68,26 +68,40 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
  * By default, subscribers and contributors do not have caps to post, edit or
  * delete events. This function injects these caps for users with these roles.
  *
- * @param array   $allcaps An array of all the user's capabilities.
- * @param array   $caps    Actual capabilities for meta capability.
- * @param array   $args    Optional parameters passed to has_cap(), typically object ID.
- * @param WP_User $user    The user object.
+ * @param  array  $caps    The mapped caps
+ * @param  string $cap     The cap being mapped
+ * @param  int    $user_id The user id in question
+ * @return array
  */
-function bpeo_user_has_cap( $allcaps, $caps, $args, $user ) {
-	// check if current user has the 'subscriber' or 'contributor' role
-	$is_role = array_intersect_key( array( 'subscriber' => 1, 'contributor' => 1 ), $user->caps );
-	if ( empty( $is_role ) ) {
-		return $allcaps;
+function bpeo_map_basic_meta_caps( $caps, $cap, $user_id ) {
+	switch ( $cap ) {
+		case 'publish_events' :
+		case 'edit_events' :
+		case 'delete_events' :
+			break;
+
+		default :
+			return $caps;
+			break;
 	}
 
-	// add our basic event caps
-	$allcaps['publish_events'] = 1;
-	$allcaps['edit_events']    = 1;
-	$allcaps['delete_events']  = 1;
+	// make sure user is valid
+	$user = new WP_User( $user_id );
+	if ( ! is_a( $user, 'WP_User' ) || empty( $user->ID ) ) {
+		return $caps;
+	}
 
-	return $allcaps;
+	/**
+	 * Filters BPEO basic meta caps.
+	 *
+	 * @param array   Pass 'exist' cap so users are able to manage events.
+	 * @param array   $caps The mapped caps
+	 * @param string  $cap The cap being mapped
+	 * @param WP_User The user being tested for the cap.
+	 */
+	return apply_filters( 'bpeo_map_basic_meta_caps', array( 'exist' ), $caps, $cap, $user );
 }
-add_filter( 'user_has_cap', 'bpeo_user_has_cap', 20, 4 );
+add_filter( 'map_meta_cap', 'bpeo_map_basic_meta_caps', 10, 3 );
 
 /**
  * Give users the 'upload_files' cap, when appropriate.
