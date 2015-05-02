@@ -214,6 +214,12 @@ class BPEO_Component extends BP_Component {
 	public function select_template() {
 		$template_slug = bp_current_action();
 
+		// show secondary title if filter is in use
+		$filter_title = bpeo_get_the_filter_title();
+		if ( ! empty( $filter_title ) ) {
+			echo "<h4>{$filter_title}</h4>";
+		}
+
 		// use our template stack
 		add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
 
