@@ -147,6 +147,13 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		), $default_params );
 
 		$sub_nav[] = array_merge( array(
+			'name'     => __( 'Upcoming', 'bp-event-organizer' ),
+			'slug'     => 'upcoming',
+			'position' => 0,
+			'link'     => bpeo_get_group_permalink() . 'upcoming/',
+		), $default_params );
+
+		$sub_nav[] = array_merge( array(
 			'name'     => __( 'New Event', 'bp-event-organizer' ),
 			'slug'     => bpeo_get_events_new_slug(),
 			'position' => 10,
@@ -183,6 +190,10 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			) );
 
 			add_action( 'bp_template_content', array( $this->create_event, 'display' ) );
+
+		// upcoming
+		} elseif ( bp_is_action_variable( 'upcoming', 0 ) ) {
+			add_action( 'bp_template_content', array( $this, 'call_display' ) );
 
 		// single event
 		} elseif ( ! empty( buddypress()->action_variables ) ) {
@@ -244,23 +255,18 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			delete_transient( 'eo_full_calendar_public' );
 		}
 
-		$cat = ! empty( $_GET['cat'] ) ? esc_attr( $_GET['cat'] ) : '';
-		$tag = ! empty( $_GET['tag'] ) ? esc_attr( $_GET['tag'] ) : '';
-
-		$args = array(
-			'headerright' => 'prev,next today,month,agendaWeek',
-		);
-
-		if ( ! empty( $cat ) ) {
-			$args['event-category'] = $cat;
+		$template_slug = bp_action_variable( 0 );
+		if ( empty( $template_slug ) ) {
+			$template_slug = 'calendar';
 		}
 
-		if ( ! empty( $tag ) ) {
-			$args['event-tag'] = $tag;
+		// Ceci n'est pas un template stack.
+		$template = bp_locate_template( 'bp-event-organiser/' . $template_slug . '.php' );
+		if ( false === $template ) {
+			$template = BPEO_PATH . 'templates/' . $template_slug . '.php';
 		}
 
-		// show events calendar, filtered by meta value in eo->intercept_calendar()
-		echo eo_get_event_fullcalendar( $args );
+		include $template;
 
 	}
 
