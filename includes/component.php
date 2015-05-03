@@ -307,7 +307,13 @@ class BPEO_Component extends BP_Component {
 				bp_core_add_message( __( 'Event deleted.', 'bp-event-organiser' ) );
 			}
 
-			bp_core_redirect( trailingslashit( bp_displayed_user_domain() . $this->slug ) );
+			// set up redirect URL
+			$redirect = trailingslashit( bp_displayed_user_domain() . $this->slug );
+			if ( false !== strpos( wp_get_referer(), '/manage/' ) ) {
+				$redirect .= 'manage/';
+			}
+
+			bp_core_redirect( $redirect );
 			die();
 		}
 	}
