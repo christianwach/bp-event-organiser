@@ -422,21 +422,17 @@ class BPEO_Component extends BP_Component {
 	 * Manage events screen handler.
 	 */
 	protected function manage_events_screen() {
-		$event_ids = bpeo_get_my_calendar_event_ids( bp_displayed_user_id(), array(
-			'friends' => false,
-			'show_unpublished' => true
-		) );
-
 		$this->events = new WP_Query( array(
+			'author' => bp_displayed_user_id(),
 			'post_type' => 'event',
 			'orderby' => 'eventstart',
 			'suppress_filters' => false,
+			'showpastevents' => true,
 			'showrepeats' => 0,
 			'order' => 'ASC',
-			'include' => $event_ids,
+			'nopaging' => true,
 			'post_status' => array( 'pending', 'private', 'draft', 'future', 'trash' )
 		) );
-
 	}
 
 	/**
