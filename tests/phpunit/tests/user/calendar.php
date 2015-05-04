@@ -2,6 +2,7 @@
 
 /**
  * @group user
+ * @group calendar
  */
 class BPEO_Tests_Calendar extends BPEO_UnitTestCase {
 	public function test_eo_get_event_fullcalendar_should_add_whitelisted_shortcode_attributes_to_script_params() {

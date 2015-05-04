@@ -22,12 +22,14 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
 	$event_args = array(
 		'post_type' => 'event',
 		'fields' => 'ids',
-		'showpastevents' => true
+		'showpastevents' => true,
+		'nopaging' => true,
+		'orderby' => 'none'
 	);
 
 	// Post status - Only applicable for user and groups, not friends
 	if ( true === $r['show_unpublished'] ) {
-		$post_status = array( 'pending', 'private', 'draft', 'future', 'trash' );
+		$post_status = array( 'pending', 'draft', 'future', 'trash' );
 	} else {
 		$post_status = array( 'private', 'publish' );
 	}
@@ -46,12 +48,20 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
 
 	// Events created by friends
 	if ( bp_is_active( 'friends' ) && true === (bool) $r['friends'] ) {
+		$friends = friends_get_friend_user_ids( $user_id );
+		if ( empty( $friends ) ) {
+			$friends = array();
+			$friends['post__in'] = array( 0 );
+		} else {
+			$friends = array( 'author__in' => $friends );
+		}
+
 		$eids_by_friends = get_posts( array_merge(
 			$event_args,
-			array(
-				'author__in'  => friends_get_friend_user_ids( $user_id ),
+			$friends,
 
-				// can only see public events for friends
+			// can only see public events for friends
+			array(
 				'post_status' => 'publish'
 			)
 		) );
@@ -63,19 +73,25 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
 	if ( bp_is_active( 'groups' ) ) {
 		$user_groups = groups_get_user_groups( $user_id );
 		$group_ids = $user_groups['groups'];
+		if ( empty( $group_ids ) ) {
+			$group_ids = array();
+			$group_ids['post__in'] = array( 0 );
+		} else {
+			$group_ids = array( 'bp_group' => $group_ids );
+		}
 
-		$eids_by_group = get_posts( array(
-			'post_type' => 'event',
-			'fields' => 'ids',
-			'showpastevents' => true,
-			'bp_group' => $group_ids,
-			'post_status' => $post_status
+		$eids_by_group = get_posts( array_merge(
+			$event_args,
+			$group_ids,
+			array(
+				'post_status' => $post_status,
+			)
 		) );
 
 		$event_ids = array_merge( $event_ids, $eids_by_group );
 	}
 
-	return $event_ids;
+	return array_unique( $event_ids );
 }
 
 /**
