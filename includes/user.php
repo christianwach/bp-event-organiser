@@ -186,6 +186,9 @@ function bpeo_filter_query_for_bp_displayed_user_id( $query ) {
 		$event_ids = array( 0 );
 	}
 	$query->set( 'post__in', $event_ids );
+
+	// Make sure private events are displayed
+	$query->set( 'post_status', array( 'publish', 'private' ) );
 }
 add_action( 'pre_get_posts', 'bpeo_filter_query_for_bp_displayed_user_id', 1000 );
 

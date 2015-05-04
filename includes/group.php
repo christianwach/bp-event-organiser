@@ -152,6 +152,9 @@ function bpeo_filter_query_for_bp_group( $query ) {
 		return;
 	}
 
+	// Make sure private events are displayed
+	$query->set( 'post_status', array( 'publish', 'private' ) );
+
 	// Convert group IDs to a tax query.
 	$tq = $query->get( 'tax_query' );
 	$group_terms = array();
