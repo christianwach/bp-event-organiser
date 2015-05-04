@@ -166,6 +166,12 @@ class BPEO_Component extends BP_Component {
 			die();
 		}
 
+		// Only those on their own profile or moderators can view single events
+		if ( false === bp_core_can_edit_settings() ) {
+			bp_core_no_access();
+			die();
+		}
+
 		// save queried event as property
 		$this->queried_event = $event[0];
 
