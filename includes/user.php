@@ -49,46 +49,38 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
 	// Events created by friends
 	if ( bp_is_active( 'friends' ) && true === (bool) $r['friends'] ) {
 		$friends = friends_get_friend_user_ids( $user_id );
-		if ( empty( $friends ) ) {
-			$friends = array();
-			$friends['post__in'] = array( 0 );
-		} else {
-			$friends = array( 'author__in' => $friends );
+		if ( ! empty( $friends ) ) {
+			$eids_by_friends = get_posts( array_merge(
+				$event_args,
+				array(
+					'author__in'  => $friends,
+
+					// can only see public events for friends
+					'post_status' => 'publish'
+				)
+			) );
+
+			$event_ids = array_merge( $event_ids, $eids_by_friends );
 		}
-
-		$eids_by_friends = get_posts( array_merge(
-			$event_args,
-			$friends,
-
-			// can only see public events for friends
-			array(
-				'post_status' => 'publish'
-			)
-		) );
-
-		$event_ids = array_merge( $event_ids, $eids_by_friends );
 	}
 
 	// Events connected to my groups.
 	if ( bp_is_active( 'groups' ) ) {
 		$user_groups = groups_get_user_groups( $user_id );
 		$group_ids = $user_groups['groups'];
-		if ( empty( $group_ids ) ) {
-			$group_ids = array();
-			$group_ids['post__in'] = array( 0 );
-		} else {
-			$group_ids = array( 'bp_group' => $group_ids );
+		if ( ! empty( $group_ids ) ) {
+			$eids_by_group = get_posts( array_merge(
+				$event_args,
+				array(
+					'bp_group'    => $group_ids,
+					'post_status' => $post_status,
+				)
+			) );
+
+			$event_ids = array_merge( $event_ids, $eids_by_group );
 		}
 
-		$eids_by_group = get_posts( array_merge(
-			$event_args,
-			$group_ids,
-			array(
-				'post_status' => $post_status,
-			)
-		) );
 
-		$event_ids = array_merge( $event_ids, $eids_by_group );
 	}
 
 	return array_unique( $event_ids );
