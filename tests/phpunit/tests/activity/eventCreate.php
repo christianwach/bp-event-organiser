@@ -12,6 +12,7 @@ class BPEO_Tests_Activity_EventCreate extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish'
 		) );
 
 		$a = bpeo_get_activity_by_event_id( $e );
@@ -35,6 +36,7 @@ class BPEO_Tests_Activity_EventCreate extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish'
 		) );
 
 		remove_action( 'save_post', array( $this, 'connect_events' ), 15 );
@@ -73,6 +75,7 @@ class BPEO_Tests_Activity_EventCreate extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish'
 		) );
 
 		$a = bpeo_get_activity_by_event_id( $e );
@@ -109,6 +112,7 @@ class BPEO_Tests_Activity_EventCreate extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish'
 		) );
 
 		remove_action( 'save_post', array( $this, 'connect_events' ), 15 );
@@ -196,6 +200,7 @@ class BPEO_Tests_Activity_EventCreate extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish'
 		) );
 
 		remove_action( 'save_post', array( $this, 'connect_events' ), 15 );

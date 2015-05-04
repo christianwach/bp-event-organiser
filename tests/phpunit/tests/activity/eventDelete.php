@@ -12,6 +12,7 @@ class BPEO_Tests_Activity_EventDelete extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish'
 		) );
 
 		wp_delete_post( $e );
@@ -36,6 +37,7 @@ class BPEO_Tests_Activity_EventDelete extends BPEO_UnitTestCase {
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish'
 		) );
 
 		remove_action( 'save_post', array( $this, 'connect_events' ), 15 );

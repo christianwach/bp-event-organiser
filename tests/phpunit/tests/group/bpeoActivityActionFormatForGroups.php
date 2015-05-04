@@ -16,6 +16,7 @@ class BPEO_Tests_Group_Bpeo_Activity_Action_Format_For_Groups extends BPEO_UnitT
 			'post_author' => $u,
 			'start' => new DateTime( date( 'Y-m-d H:i:s', $now - 60*60 ) ),
 			'end' => new DateTime( date( 'Y-m-d H:i:s' ) ),
+			'post_status' => 'publish'
 		) );
 
 		$a = bpeo_get_activity_by_event_id( $e );
