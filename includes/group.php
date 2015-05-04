@@ -277,20 +277,27 @@ add_action( 'wp_head', 'bpeo_rel_canonical_for_group', 9 );
  */
 function bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 	// @todo Need real caching in BP for group memberships.
-	if ( ! in_array( $cap, array( 'read_event' ) ) ) {
+	if ( false === strpos( $cap, '_event' ) ) {
 		return $caps;
 	}
 
-	$event = get_post( $args[0] );
-	if ( 'event' !== $event->post_type ) {
-		return $caps;
-	}
+	// Some caps do not expect a specific event to be passed to the filter.
+	if ( false === strpos( $cap, '_events' ) ) {
+		if ( ! isset( $args[0] ) ) {
+			var_Dump( func_get_args() ); die();
+		}
+		$event = get_post( $args[0] );
+		if ( 'event' !== $event->post_type ) {
+			return $caps;
+		}
 
-	$event_groups = bpeo_get_event_groups( $event->ID );
-	$user_groups = groups_get_user_groups( $user_id );
+		$event_groups = bpeo_get_event_groups( $event->ID );
+		$user_groups = groups_get_user_groups( $user_id );
+	}
 
 	switch ( $cap ) {
 		case 'read_event' :
+		case 'edit_event' :
 			if ( 'private' !== $event->post_status ) {
 				// EO uses 'read', which doesn't include non-logged-in users.
 				$caps = array( 'exist' );
