@@ -214,6 +214,12 @@ class BPEO_Component extends BP_Component {
 	public function select_template() {
 		$template_slug = bp_current_action();
 
+		// show secondary title if filter is in use
+		$filter_title = bpeo_get_the_filter_title();
+		if ( ! empty( $filter_title ) ) {
+			echo "<h4>{$filter_title}</h4>";
+		}
+
 		// use our template stack
 		add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
 
@@ -301,7 +307,13 @@ class BPEO_Component extends BP_Component {
 				bp_core_add_message( __( 'Event deleted.', 'bp-event-organiser' ) );
 			}
 
-			bp_core_redirect( trailingslashit( bp_displayed_user_domain() . $this->slug ) );
+			// set up redirect URL
+			$redirect = trailingslashit( bp_displayed_user_domain() . $this->slug );
+			if ( false !== strpos( wp_get_referer(), '/manage/' ) ) {
+				$redirect .= 'manage/';
+			}
+
+			bp_core_redirect( $redirect );
 			die();
 		}
 	}
@@ -416,21 +428,17 @@ class BPEO_Component extends BP_Component {
 	 * Manage events screen handler.
 	 */
 	protected function manage_events_screen() {
-		$event_ids = bpeo_get_my_calendar_event_ids( bp_displayed_user_id(), array(
-			'friends' => false,
-			'show_unpublished' => true
-		) );
-
 		$this->events = new WP_Query( array(
+			'author' => bp_displayed_user_id(),
 			'post_type' => 'event',
 			'orderby' => 'eventstart',
 			'suppress_filters' => false,
+			'showpastevents' => true,
 			'showrepeats' => 0,
 			'order' => 'ASC',
-			'include' => $event_ids,
+			'nopaging' => true,
 			'post_status' => array( 'pending', 'private', 'draft', 'future', 'trash' )
 		) );
-
 	}
 
 	/**

@@ -282,10 +282,21 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			return;
 		}
 
+		// Set up query args
+		$query_args = array();
+		$query_args['post_status'] = array( 'publish', 'pending', 'private', 'draft', 'future', 'trash' );
+
+		// this is a draft with no slug
+		if ( false !== strpos( bp_action_variable(), 'draft-' ) ) {
+			$query_args['post__in'] = (array) str_replace( 'draft-', '', bp_action_variable() );
+
+		// use post slug
+		} else {
+			$query_args['name'] = bp_action_variable();
+		}
+
 		// query for the event
-		$event = eo_get_events( array(
-			'name' => bp_action_variable()
-		) );
+		$event = eo_get_events( $query_args );
 
 		// check if event exists
 		if ( empty( $event ) ) {
@@ -376,6 +387,8 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// override the $post global so EO can use its functions
 		$post = $this->queried_event;
 
+		add_filter( 'protected_title_format', array( $this, 'no_post_status_title' ), 10, 2 );
+		add_filter( 'private_title_format',   array( $this, 'no_post_status_title' ), 10, 2 );
 		the_title();
 
 		// revert $post global
@@ -417,6 +430,8 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 
 		// output title if theme is not using the 'bp_template_title' hook
 		if ( ! did_action( 'bp_template_title' ) ) {
+			add_filter( 'protected_title_format', array( $this, 'no_post_status_title' ), 10, 2 );
+			add_filter( 'private_title_format',   array( $this, 'no_post_status_title' ), 10, 2 );
 			the_title( '<h2>', '</h2>' );
 		}
 
@@ -455,6 +470,17 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		if ( ! empty( $_post ) ) {
 			$post = $_post;
 		}
+	}
+
+	/**
+	 * Returns the post title without the post status prefixed to it.
+	 *
+	 * @param  string  $retval sprintf format for the title with the prefixed post status
+	 * @param  WP_Post $post   The queried post object.
+	 * @return string
+	 */
+	public function no_post_status_title( $retval, $post ) {
+		return $post->post_title;
 	}
 
 } // class ends

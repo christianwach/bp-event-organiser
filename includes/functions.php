@@ -230,7 +230,9 @@ function bpeo_the_post_status_message( $post = 0 ) {
 				break;
 
 			case 'private' :
-				$message = sprintf( __( 'This %1$s is marked as private.  Only site moderators and yourself can view this %1$s.', 'bp-event-organizer' ), strtolower( $post_type->labels->singular_name ) );
+				if ( ! bp_is_group() ) {
+					$message = sprintf( __( 'This %1$s is marked as private.  Only site moderators and yourself can view this %1$s.', 'bp-event-organizer' ), strtolower( $post_type->labels->singular_name ) );
+				}
 				break;
 		}
 

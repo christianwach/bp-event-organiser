@@ -18,30 +18,46 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
 		'show_unpublished' => false
 	) );
 
-	$event_ids = array();
+	// Common event args
+	$event_args = array(
+		'post_type' => 'event',
+		'fields' => 'ids',
+		'showpastevents' => true
+	);
 
-	// Events created by me, or by friends.
-	$authors = array( $user_id );
-
-	if ( bp_is_active( 'friends' ) && true === (bool) $r['friends'] ) {
-		$authors = array_merge( $authors, friends_get_friend_user_ids( $user_id ) );
-	}
-
+	// Post status - Only applicable for user and groups, not friends
 	if ( true === $r['show_unpublished'] ) {
 		$post_status = array( 'pending', 'private', 'draft', 'future', 'trash' );
 	} else {
-		$post_status = 'publish';
+		$post_status = array( 'private', 'publish' );
 	}
 
-	$eids_by_author = get_posts( array(
-		'post_type' => 'event',
-		'fields' => 'ids',
-		'showpastevents' => true,
-		'author__in' => $authors,
-		'post_status' => $post_status
-	) );
+	$event_ids = array();
 
-	$event_ids = array_merge( $event_ids, $eids_by_author );
+	// Events created by me
+	$eids_by_me = get_posts( array_merge(
+		$event_args,
+		array(
+			'author__in'  => array( $user_id ),
+			'post_status' => $post_status
+		)
+	) );
+	$event_ids = array_merge( $event_ids, $eids_by_me );
+
+	// Events created by friends
+	if ( bp_is_active( 'friends' ) && true === (bool) $r['friends'] ) {
+		$eids_by_friends = get_posts( array_merge(
+			$event_args,
+			array(
+				'author__in'  => friends_get_friend_user_ids( $user_id ),
+
+				// can only see public events for friends
+				'post_status' => 'publish'
+			)
+		) );
+
+		$event_ids = array_merge( $event_ids, $eids_by_friends );
+	}
 
 	// Events connected to my groups.
 	if ( bp_is_active( 'groups' ) ) {
@@ -68,26 +84,40 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
  * By default, subscribers and contributors do not have caps to post, edit or
  * delete events. This function injects these caps for users with these roles.
  *
- * @param array   $allcaps An array of all the user's capabilities.
- * @param array   $caps    Actual capabilities for meta capability.
- * @param array   $args    Optional parameters passed to has_cap(), typically object ID.
- * @param WP_User $user    The user object.
+ * @param  array  $caps    The mapped caps
+ * @param  string $cap     The cap being mapped
+ * @param  int    $user_id The user id in question
+ * @return array
  */
-function bpeo_user_has_cap( $allcaps, $caps, $args, $user ) {
-	// check if current user has the 'subscriber' or 'contributor' role
-	$is_role = array_intersect_key( array( 'subscriber' => 1, 'contributor' => 1 ), $user->caps );
-	if ( empty( $is_role ) ) {
-		return $allcaps;
+function bpeo_map_basic_meta_caps( $caps, $cap, $user_id ) {
+	switch ( $cap ) {
+		case 'publish_events' :
+		case 'edit_events' :
+		case 'delete_events' :
+			break;
+
+		default :
+			return $caps;
+			break;
 	}
 
-	// add our basic event caps
-	$allcaps['publish_events'] = 1;
-	$allcaps['edit_events']    = 1;
-	$allcaps['delete_events']  = 1;
+	// make sure user is valid
+	$user = new WP_User( $user_id );
+	if ( ! is_a( $user, 'WP_User' ) || empty( $user->ID ) ) {
+		return $caps;
+	}
 
-	return $allcaps;
+	/**
+	 * Filters BPEO basic meta caps.
+	 *
+	 * @param array   Pass 'exist' cap so users are able to manage events.
+	 * @param array   $caps The mapped caps
+	 * @param string  $cap The cap being mapped
+	 * @param WP_User The user being tested for the cap.
+	 */
+	return apply_filters( 'bpeo_map_basic_meta_caps', array( 'exist' ), $caps, $cap, $user );
 }
-add_filter( 'user_has_cap', 'bpeo_user_has_cap', 20, 4 );
+add_filter( 'map_meta_cap', 'bpeo_map_basic_meta_caps', 10, 3 );
 
 /**
  * Give users the 'upload_files' cap, when appropriate.

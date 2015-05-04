@@ -64,7 +64,7 @@ class WP_Frontend_Admin_Screen {
 		), $args );
 
 		// set some properties
-		self::$post_type    = $this->args['post_type'];
+		self::$post_type    = sanitize_title( $this->args['post_type'] );
 		$this->queried_post = $this->args['queried_post'];
 		$this->editor_id    = $this->args['editor_id'];
 		$this->url          = plugins_url( plugin_basename( dirname( __FILE__ ) ) );
@@ -113,34 +113,6 @@ class WP_Frontend_Admin_Screen {
 	 * Abstract some core WP admin functionality.
 	 */
 	final protected function setup_abstraction() {
-
-		if ( ! function_exists( 'get_current_screen' ) ) {
-			/**
-			 * Set our custom post type by plugging get_current_screen().
-			 *
-			 * This function is referenced a ton in the admin area.
-			 */
-			function get_current_screen() {
-				static $object = false;
-
-				if ( false === $object ) {
-					$object = new stdClass;
-					$object->base = '';
-
-					// ahh, goddamn it all to hell!
-					$trace = debug_backtrace();
-
-					// damn you, PHP 5.2!
-					$class = new ReflectionClass( $trace[1]['object'] );
-					$object->id = $class->getStaticPropertyValue( 'post_type' );
-
-					$trace = $class = null;
-				}
-
-				return $object;
-			}
-		}
-
 		// create a new post
 		if ( empty( $this->queried_post ) && 'new' === $this->args['type'] ) {
 			// try to grab an existing auto-draft
@@ -533,8 +505,8 @@ class WP_Frontend_Admin_Screen {
 	?>
 
 <script type="text/javascript">
-	var pagenow = '<?php echo get_current_screen()->id; ?>',
-		post_type = '<?php echo get_current_screen()->id; ?>';
+	var pagenow = '<?php echo self::$post_type; ?>',
+		typenow = '<?php echo self::$post_type; ?>';
 </script>
 
 	<?php

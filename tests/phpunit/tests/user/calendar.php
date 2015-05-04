@@ -40,6 +40,34 @@ class BPEO_Tests_Calendar extends BPEO_UnitTestCase {
 		$this->assertNotContains( $e2, $found );
 	}
 
+	/**
+	 * @group private
+	 */
+	public function test_bpeo_get_my_calendar_events_should_contain_public_friend_events() {
+		$users = $this->factory->user->create_many( 3 );
+
+		friends_add_friend( $users[0], $users[1], true );
+
+		$e1 = $this->event_factory->event->create( array(
+			'post_author' => $users[1],
+		) );
+
+		$e2 = $this->event_factory->event->create( array(
+			'post_author' => $users[1],
+			'post_status' => 'private'
+		) );
+
+		$e3 = $this->event_factory->event->create( array(
+			'post_author' => $users[2],
+		) );
+
+		$found = bpeo_get_my_calendar_event_ids( $users[0] );
+
+		$this->assertContains( $e1, $found );
+		$this->assertNotContains( $e2, $found );
+		$this->assertNotContains( $e3, $found );
+	}
+
 	public function test_bpeo_get_my_calendar_events_should_contain_own_events() {
 		$users = $this->factory->user->create_many( 3 );
 

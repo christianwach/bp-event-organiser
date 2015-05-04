@@ -42,4 +42,16 @@ class BPEO_Tests_User_BpeoEventMetaCap extends BPEO_UnitTestCase {
 
 		$this->assertTrue( current_user_can( 'delete_events' ) );
 	}
+
+	public function test_loggedin_user_with_no_role_can_publish_events() {
+		$this->user = $this->factory->user->create();
+
+		// remove default role
+		$user = new WP_User( $this->user );
+		$user->remove_role( 'subscriber' );
+
+		$this->set_current_user( $this->user );
+
+		$this->assertTrue( current_user_can( 'publish_events' ) );
+	}
 }
