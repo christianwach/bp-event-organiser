@@ -18,7 +18,7 @@ function bpeo_create_activity_for_event( $event_id, $event = null, $update = nul
 		$event = get_post( $event_id );
 	}
 
-	if ( 'event' !== $event->post_type ) {
+	if ( 'event' !== $event->post_type || 'publish' !== $event->post_status ) {
 		return;
 	}
 
