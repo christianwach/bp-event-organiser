@@ -276,10 +276,21 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			return;
 		}
 
+		// Set up query args
+		$query_args = array();
+		$query_args['post_status'] = array( 'publish', 'pending', 'private', 'draft', 'future', 'trash' );
+
+		// this is a draft with no slug
+		if ( false !== strpos( bp_action_variable(), 'draft-' ) ) {
+			$query_args['post__in'] = (array) str_replace( 'draft-', '', bp_action_variable() );
+
+		// use post slug
+		} else {
+			$query_args['name'] = bp_action_variable();
+		}
+
 		// query for the event
-		$event = eo_get_events( array(
-			'name' => bp_action_variable()
-		) );
+		$event = eo_get_events( $query_args );
 
 		// check if event exists
 		if ( empty( $event ) ) {
