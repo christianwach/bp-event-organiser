@@ -48,8 +48,8 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 		$u = $this->factory->user->create();
 		$this->groups = $this->factory->group->create_many( 3 );
 
-		// Group connections happen on 'eventorganiser_save_event'. Whee!
-		add_action( 'eventorganiser_save_event', array( $this, 'connect_events' ) );
+		// Group connections happen on 'save_post'. Whee!
+		add_action( 'save_post', array( $this, 'connect_events' ), 15 );
 
 		$now = time();
 		$e = $this->event_factory->event->create( array(
@@ -60,7 +60,7 @@ class BPEO_Tests_Activity_EventEdit extends BPEO_UnitTestCase {
 			'post_status' => 'publish',
 		) );
 
-		remove_action( 'eventorganiser_save_event', array( $this, 'connect_events' ) );
+		remove_action( 'save_post', array( $this, 'connect_events' ), 15 );
 
 		$before = bpeo_get_activity_by_event_id( $e );
 
