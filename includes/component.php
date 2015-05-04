@@ -443,7 +443,7 @@ class BPEO_Component extends BP_Component {
 			'showrepeats' => 0,
 			'order' => 'ASC',
 			'nopaging' => true,
-			'post_status' => array( 'pending', 'private', 'draft', 'future', 'trash' )
+			'post_status' => array( 'pending', 'draft', 'future', 'trash' )
 		) );
 	}
 
