@@ -293,19 +293,25 @@ function bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 		}
 
 		$event_groups = bpeo_get_event_groups( $event->ID );
+		if ( empty( $event_groups ) ) {
+			return $caps;
+		}
+
 		$user_groups = groups_get_user_groups( $user_id );
 	}
 
 	switch ( $cap ) {
 		case 'read_event' :
-		case 'edit_event' :
 			if ( 'private' !== $event->post_status ) {
 				// EO uses 'read', which doesn't include non-logged-in users.
 				$caps = array( 'exist' );
+
 			} elseif ( array_intersect( $user_groups['groups'], $event_groups ) ) {
 				$caps = array( 'read' );
 			}
 
+		// @todo group admins / mods permissions
+		case 'edit_event' :
 			break;
 	}
 

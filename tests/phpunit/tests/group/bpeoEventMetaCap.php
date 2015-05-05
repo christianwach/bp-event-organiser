@@ -16,24 +16,6 @@ class BPEO_Tests_Group_BpeoEventMetaCap extends BPEO_UnitTestCase {
 		$this->set_current_user( $this->current_user );
 	}
 
-	public function test_non_loggedin_user_can_read_public_event() {
-		$e = $this->event_factory->event->create( array(
-			'post_status' => 'publish',
-		) );
-
-		$this->set_current_user( 0 );
-		$this->assertTrue( current_user_can( 'read_event', $e ) );
-	}
-
-	public function test_non_loggedin_user_cannot_read_private_event() {
-		$e = $this->event_factory->event->create( array(
-			'post_status' => 'private',
-		) );
-
-		$this->set_current_user( 0 );
-		$this->assertFalse( current_user_can( 'read_event', $e ) );
-	}
-
 	public function test_loggedin_non_group_member_can_read_public_event() {
 		$e = $this->event_factory->event->create( array(
 			'post_status' => 'public',

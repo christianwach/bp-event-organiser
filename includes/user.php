@@ -95,13 +95,38 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
  * @param  array  $caps    The mapped caps
  * @param  string $cap     The cap being mapped
  * @param  int    $user_id The user id in question
+ * @param  array  $args    Optional parameters passed to has_cap(). For us, this means the post ID.
  * @return array
  */
-function bpeo_map_basic_meta_caps( $caps, $cap, $user_id ) {
+function bpeo_map_basic_meta_caps( $caps, $cap, $user_id, $args ) {
 	switch ( $cap ) {
+		// primitive caps
 		case 'publish_events' :
-		case 'edit_events' :
-		case 'delete_events' :
+			break;
+
+		// meta caps
+		case 'edit_event' :
+		case 'delete_event' :
+			// bail if someone else's event
+			if ( false !== strpos( $caps[0], 'others' ) ) {
+				return $caps;
+			}
+
+			// if this is a group event, bail
+			// group events are handled separately
+			$group_events = bpeo_get_event_groups( $args[0] );
+			if ( ! empty( $group_events ) ) {
+				return $caps;
+			}
+
+			break;
+
+		case 'read_event' :
+			if ( get_post( $args[0] )->post_status === 'publish' ) {
+				return array( 'exist' );
+			} else {
+				return $caps;
+			}
 			break;
 
 		default :
@@ -125,7 +150,7 @@ function bpeo_map_basic_meta_caps( $caps, $cap, $user_id ) {
 	 */
 	return apply_filters( 'bpeo_map_basic_meta_caps', array( 'exist' ), $caps, $cap, $user );
 }
-add_filter( 'map_meta_cap', 'bpeo_map_basic_meta_caps', 10, 3 );
+add_filter( 'map_meta_cap', 'bpeo_map_basic_meta_caps', 15, 4 );
 
 /**
  * Give users the 'upload_files' cap, when appropriate.
