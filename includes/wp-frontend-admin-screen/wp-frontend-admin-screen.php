@@ -270,7 +270,7 @@ class WP_Frontend_Admin_Screen {
 		$this->before_display();
 	?>
 
-		<h2><?php esc_html_e( $title  ); ?></h2>
+		<h2 class="admin-page-title"><?php esc_html_e( $title  ); ?></h2>
 
 		<div id="post-body">
 		<form id="post" method="post" action="" name="post">
