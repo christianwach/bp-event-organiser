@@ -93,7 +93,7 @@ function bpeo_create_activity_for_event( $event_id, $event = null, $update = nul
 	do_action( 'bpeo_create_event_activity', $activity_args, $event );
 }
 add_action( 'save_post', 'bpeo_create_activity_for_event', 20, 3 );
-add_action( 'before_delete_post', 'bpeo_create_activity_for_event' );
+//add_action( 'before_delete_post', 'bpeo_create_activity_for_event' );
 
 /**
  * Get activity items associated with an event ID.
