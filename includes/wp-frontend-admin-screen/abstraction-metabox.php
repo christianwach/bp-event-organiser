@@ -16,6 +16,17 @@
 
 /** ABSTRACTION *********************************************************/
 
+if ( ! function_exists( 'get_current_screen' ) ) :
+/**
+ * Pluggable version of get_current_screen().
+ *
+ * This is used by WP admin in some spots.
+ */
+function get_current_screen() {
+	return $GLOBALS['current_screen'];
+}
+endif;
+
 if ( ! function_exists( 'convert_to_screen' ) ) :
 /**
  * Pluggable version of get_current_screen().
