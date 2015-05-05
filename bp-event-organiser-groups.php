@@ -75,7 +75,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	public function __construct() {
 
 		// init vars with filters applied
-		$name = apply_filters( 'bpeo_extension_title', __( 'Events', 'bp-event-organizer' ) );
+		$name = apply_filters( 'bpeo_extension_title', __( 'Events', 'bp-event-organiser' ) );
 		$slug = apply_filters( 'bpeo_extension_slug', bpeo_get_events_slug() );
 		$pos = apply_filters( 'bpeo_extension_pos', 31 );
 
@@ -140,21 +140,21 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		);
 
 		$sub_nav[] = array_merge( array(
-			'name'     => __( 'Calendar', 'bp-event-organizer' ),
+			'name'     => __( 'Calendar', 'bp-event-organiser' ),
 			'slug'     => 'calendar',
 			'position' => 0,
 			'link'     => bpeo_get_group_permalink(),
 		), $default_params );
 
 		$sub_nav[] = array_merge( array(
-			'name'     => __( 'Upcoming', 'bp-event-organizer' ),
+			'name'     => __( 'Upcoming', 'bp-event-organiser' ),
 			'slug'     => 'upcoming',
 			'position' => 0,
 			'link'     => bpeo_get_group_permalink() . 'upcoming/',
 		), $default_params );
 
 		$sub_nav[] = array_merge( array(
-			'name'     => __( 'New Event', 'bp-event-organizer' ),
+			'name'     => __( 'New Event', 'bp-event-organiser' ),
 			'slug'     => bpeo_get_events_new_slug(),
 			'position' => 10,
 		), $default_params );
@@ -239,7 +239,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	 */
 	public function display( $group_id = null ) {
 		// show header
-		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organizer' ) ).'</h3>';
+		echo '<h3>'.apply_filters( 'bpeo_extension_title', __( 'Group Events', 'bp-event-organiser' ) ).'</h3>';
 
 		// show secondary title if filter is in use
 		$filter_title = bpeo_get_the_filter_title();

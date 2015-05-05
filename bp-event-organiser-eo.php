@@ -240,7 +240,7 @@ class BuddyPress_Event_Organiser_EO {
 		// create it
 		add_meta_box(
 			'bp_event_organiser_metabox',
-			is_admin() ? __( 'BuddyPress Groups', 'bp-event-organizer' ) : __( 'Groups', 'bp-event-organizer' ),
+			is_admin() ? __( 'BuddyPress Groups', 'bp-event-organiser' ) : __( 'Groups', 'bp-event-organiser' ),
 			array( $this, 'event_meta_box_render' ),
 			'event',
 			'side', //'normal',
@@ -273,7 +273,7 @@ class BuddyPress_Event_Organiser_EO {
 		<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css" rel="stylesheet" />
 		<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js"></script>
 
-		<p class="bp_event_organiser_desc"><?php _e( 'Enter the names of each group this event should appear in.', 'bp-event-organizer' ); ?></p>
+		<p class="bp_event_organiser_desc"><?php _e( 'Enter the names of each group this event should appear in.', 'bp-event-organiser' ); ?></p>
 
 		<select name="bp_group_organizer_groups[]" multiple="multiple" style="width:100%;">
 			<?php
@@ -286,11 +286,11 @@ class BuddyPress_Event_Organiser_EO {
 		</select>
 
 		<?php if ( ! empty( $this->group_ids ) ) : ?>
-			<p class="howto"><?php _e( 'To remove a group, click on the "x" link.', 'bp-event-organizer' ); ?></p>
+			<p class="howto"><?php _e( 'To remove a group, click on the "x" link.', 'bp-event-organiser' ); ?></p>
 		<?php endif; ?>
 
 		<script type="text/javascript">
-			var bpeoGroupMsg = '<?php echo esc_js( __( 'You have added a group to this event.  Since groups have their own privacy settings, we have removed the ability to set the status for this event.', 'bp-event-organizer' ) ); ?>',
+			var bpeoGroupMsg = '<?php echo esc_js( __( 'You have added a group to this event.  Since groups have their own privacy settings, we have removed the ability to set the status for this event.', 'bp-event-organiser' ) ); ?>',
 				bpeoToggleFlag = false,
 				bpeoCurrStatus = '';
 

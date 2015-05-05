@@ -62,7 +62,7 @@ class BPEO_Component extends BP_Component {
 		);
 
 		$sub_nav[] = array(
-			'name' => __( 'New Event', 'bp-event-organizer' ),
+			'name' => __( 'New Event', 'bp-event-organiser' ),
 			'slug' => bpeo_get_events_new_slug(),
 			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
 			'parent_slug' => $this->slug,
@@ -71,7 +71,7 @@ class BPEO_Component extends BP_Component {
 		);
 
 		$sub_nav[] = array(
-			'name' => __( 'Manage', 'bp-event-organizer' ),
+			'name' => __( 'Manage', 'bp-event-organiser' ),
 			'slug' => 'manage',
 			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
 			'parent_slug' => $this->slug,
@@ -196,7 +196,7 @@ class BPEO_Component extends BP_Component {
 		} elseif ( bpeo_is_action( 'manage' ) ) {
 			$this->manage_events_screen();
 			add_action( 'bp_template_title',   create_function( '', "
-				_e( 'Manage Events', 'bp-event-organizer' );
+				_e( 'Manage Events', 'bp-event-organiser' );
 			" ) );
 			add_action( 'bp_template_content', array( $this, 'display_manage_events' ) );
 
@@ -479,10 +479,10 @@ class BPEO_Component extends BP_Component {
 
 		<table>
 			<thead>
-				<th class="post-status"><?php _e( 'Status', 'bp-event-organizer' ); ?></th>
-				<th class="post-title"><?php _ex( 'Event', 'Manage events header', 'bp-event-organizer' ); ?></th>
-				<th class="event-date"><?php _e( 'Event Date', 'bp-event-organizer' ); ?></th>
-				<th class="post-date"><?php _e( 'Publish Date', 'bp-event-organizer' ); ?></th>
+				<th class="post-status"><?php _e( 'Status', 'bp-event-organiser' ); ?></th>
+				<th class="post-title"><?php _ex( 'Event', 'Manage events header', 'bp-event-organiser' ); ?></th>
+				<th class="event-date"><?php _e( 'Event Date', 'bp-event-organiser' ); ?></th>
+				<th class="post-date"><?php _e( 'Publish Date', 'bp-event-organiser' ); ?></th>
 			</thead>
 
 			<tbody>
@@ -496,22 +496,22 @@ class BPEO_Component extends BP_Component {
 				// @todo maybe break this out into a function
 				$links = array();
 				if ( 'trash' !== $status ) {
-					$links['edit'] = '<a href="' . esc_url( bp_displayed_user_domain() . bpeo_get_events_slug() . '/' . $slug . '/edit/' ) .'">' . __( 'Edit', 'bp-event-organizer' ) . '</a>';
+					$links['edit'] = '<a href="' . esc_url( bp_displayed_user_domain() . bpeo_get_events_slug() . '/' . $slug . '/edit/' ) .'">' . __( 'Edit', 'bp-event-organiser' ) . '</a>';
 				} else {
-					$links['restore'] = '<a href="' . esc_url( bp_displayed_user_domain() . bpeo_get_events_slug() . '/' . $slug . '/restore/' . wp_create_nonce( "bpeo_restore_event_{$this->events->post->ID}" ) ) . '/">' . __( 'Restore', 'bp-event-organizer' ) . '</a>';
+					$links['restore'] = '<a href="' . esc_url( bp_displayed_user_domain() . bpeo_get_events_slug() . '/' . $slug . '/restore/' . wp_create_nonce( "bpeo_restore_event_{$this->events->post->ID}" ) ) . '/">' . __( 'Restore', 'bp-event-organiser' ) . '</a>';
 				}
 
-				$links['delete'] = '<a class="confirm" href="' . esc_url( bp_displayed_user_domain() . bpeo_get_events_slug() . '/' . $slug . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$this->events->post->ID}" ) ) . '/">' . __( 'Delete', 'bp-event-organizer' ) . '</a>';
+				$links['delete'] = '<a class="confirm" href="' . esc_url( bp_displayed_user_domain() . bpeo_get_events_slug() . '/' . $slug . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$this->events->post->ID}" ) ) . '/">' . __( 'Delete', 'bp-event-organiser' ) . '</a>';
 	?>
 
 			<tr>
-				<td class="post-status status-<?php esc_attr_e( $status ); ?>" data-label="<?php esc_attr_e( 'Status', 'bp-event-organizer' ); ?>"><span><?php esc_html_e( $status ); ?></span></td>
-				<td class="post-title" data-label="<?php esc_attr_e( 'Event', 'bp-event-organizer' ); ?>"><strong><?php the_title(); ?></strong> &ndash; <?php echo implode( ' &middot; ', $links ); ?></td>
-				<td class="event-date" data-label="<?php esc_attr_e( 'Event Date', 'bp-event-organizer' ); ?>">
+				<td class="post-status status-<?php esc_attr_e( $status ); ?>" data-label="<?php esc_attr_e( 'Status', 'bp-event-organiser' ); ?>"><span><?php esc_html_e( $status ); ?></span></td>
+				<td class="post-title" data-label="<?php esc_attr_e( 'Event', 'bp-event-organiser' ); ?>"><strong><?php the_title(); ?></strong> &ndash; <?php echo implode( ' &middot; ', $links ); ?></td>
+				<td class="event-date" data-label="<?php esc_attr_e( 'Event Date', 'bp-event-organiser' ); ?>">
 					<?php eo_the_start( 'M j, Y, ' . get_option( 'time_format' ) ); ?> to <?php eo_the_end( 'M j, Y, ' . get_option( 'time_format' ) ); ?>
 					<p>(<?php eo_display_reoccurence( get_the_ID() ); ?>)</p>
 				</td>
-				<td class="post-date" data-label="<?php esc_attr_e( 'Publish Date', 'bp-event-organizer' ); ?>"><?php the_date(); ?></td>
+				<td class="post-date" data-label="<?php esc_attr_e( 'Publish Date', 'bp-event-organiser' ); ?>"><?php the_date(); ?></td>
 			</tr>
 	<?php
 			endwhile;
@@ -519,7 +519,7 @@ class BPEO_Component extends BP_Component {
 			echo '</tbody></table>';
 
 		else :
-			_e( 'Looks like you have no unpublished events to manage.  To create a new event, click on the "New Event" link above.', 'bp-event-organizer' );
+			_e( 'Looks like you have no unpublished events to manage.  To create a new event, click on the "New Event" link above.', 'bp-event-organiser' );
 
 		endif;
 

@@ -97,11 +97,11 @@ function bpeo_the_filter_title() {
 		}
 
 		if ( ! empty( $cat ) && ! empty( $tag ) ) {
-			return sprintf( __( "Filtered by category '%1$s' and tag '%2$s'", 'bp-event-organizer' ), $cat, $tag );
+			return sprintf( __( "Filtered by category '%1$s' and tag '%2$s'", 'bp-event-organiser' ), $cat, $tag );
 		} elseif ( ! empty( $cat ) ) {
-			return sprintf( __( "Filtered by category '%s'", 'bp-event-organizer' ), $cat );
+			return sprintf( __( "Filtered by category '%s'", 'bp-event-organiser' ), $cat );
 		} elseif ( ! empty( $tag ) ) {
-			return sprintf( __( "Filtered by tag '%s'", 'bp-event-organizer' ), $tag );
+			return sprintf( __( "Filtered by tag '%s'", 'bp-event-organiser' ), $tag );
 		} else {
 			return '';
 		}
@@ -172,16 +172,16 @@ function bpeo_the_single_event_action_links( $post = 0 ) {
 
 		$links = array();
 
-		$links['back'] = '<a href="' . esc_url( $back ) . '">' . __( '&larr; Back', 'bp-events-organizer' ). '</a>';
+		$links['back'] = '<a href="' . esc_url( $back ) . '">' . __( '&larr; Back', 'bp-events-organiser' ). '</a>';
 
 		// @todo make 'edit' slug changeable
 		if ( current_user_can( 'edit_event', $post->ID ) ) {
-			$links['edit'] = '<a href="' . esc_url( $root ) . $post->post_name . '/edit/">' . __( 'Edit', 'bp-events-organizer' ). '</a>';
+			$links['edit'] = '<a href="' . esc_url( $root ) . $post->post_name . '/edit/">' . __( 'Edit', 'bp-events-organiser' ). '</a>';
 		}
 
 		// @todo make 'delete' slug changeable
 		if ( current_user_can( 'delete_event', $post->ID ) ) {
-			$links['delete'] = '<a class="confirm" href="' . esc_url( $root ) . $post->post_name . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$post->ID}" ). '/">' . __( 'Delete', 'bp-events-organizer' ). '</a>';
+			$links['delete'] = '<a class="confirm" href="' . esc_url( $root ) . $post->post_name . '/delete/' . wp_create_nonce( "bpeo_delete_event_{$post->ID}" ). '/">' . __( 'Delete', 'bp-events-organiser' ). '</a>';
 		}
 
 		return implode( ' | ', (array) apply_filters( 'bpeo_get_the_single_event_action_links', $links ) );
@@ -218,20 +218,20 @@ function bpeo_the_post_status_message( $post = 0 ) {
 
 		switch ( $post->post_status ) {
 			case 'draft' :
-				$message = sprintf( __( 'This %1$s is a draft.  Please remember to publish this %1$s once you are ready.', 'bp-event-organizer' ), strtolower( $post_type->labels->singular_name ) );
+				$message = sprintf( __( 'This %1$s is a draft.  Please remember to publish this %1$s once you are ready.', 'bp-event-organiser' ), strtolower( $post_type->labels->singular_name ) );
 				break;
 
 			case 'future' :
-				$message = sprintf( __( 'This %1$s is scheduled to be published at <strong>%2$s</strong>.', 'bp-event-organizer' ),
+				$message = sprintf( __( 'This %1$s is scheduled to be published at <strong>%2$s</strong>.', 'bp-event-organiser' ),
 	strtolower( $post_type->labels->singular_name ),
 	/* translators: Date format for future event messages, see http://php.net/date */
-	date_i18n( __( 'M j, Y @ G:i', 'bp-event-organizer' ), strtotime( $post->post_date ) )
+	date_i18n( __( 'M j, Y @ G:i', 'bp-event-organiser' ), strtotime( $post->post_date ) )
 				);
 				break;
 
 			case 'private' :
 				if ( ! bp_is_group() ) {
-					$message = sprintf( __( 'This %1$s is marked as private.  Only site moderators and yourself can view this %1$s.', 'bp-event-organizer' ), strtolower( $post_type->labels->singular_name ) );
+					$message = sprintf( __( 'This %1$s is marked as private.  Only site moderators and yourself can view this %1$s.', 'bp-event-organiser' ), strtolower( $post_type->labels->singular_name ) );
 				}
 				break;
 		}
@@ -399,7 +399,7 @@ function bpeo_add_ical_link_to_eventmeta() {
 		return;
 	}
 ?>
-	<li><a class="bpeo-ical-link" href="<?php bpeo_the_ical_link( get_the_ID() ); ?>"><span class="icon"></span><?php esc_html_e( 'Download iCal file', 'bp-events-organizer' ); ?></a></li>
+	<li><a class="bpeo-ical-link" href="<?php bpeo_the_ical_link( get_the_ID() ); ?>"><span class="icon"></span><?php esc_html_e( 'Download iCal file', 'bp-events-organiser' ); ?></a></li>
 
 <?php
 }

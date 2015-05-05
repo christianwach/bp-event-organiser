@@ -1,5 +1,5 @@
 
-	<h4><?php _e( 'Event Description', 'bp-event-organizer' ); ?></h4>
+	<h4><?php _e( 'Event Description', 'bp-event-organiser' ); ?></h4>
 
 	<?php the_content(); ?>
 
