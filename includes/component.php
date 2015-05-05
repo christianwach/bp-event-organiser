@@ -62,8 +62,8 @@ class BPEO_Component extends BP_Component {
 		);
 
 		$sub_nav[] = array(
-			'name' => __( 'New Event', 'bp-event-organiser' ),
-			'slug' => bpeo_get_events_new_slug(),
+			'name' => __( 'Manage', 'bp-event-organiser' ),
+			'slug' => 'manage',
 			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
 			'parent_slug' => $this->slug,
 			'user_has_access' => bp_core_can_edit_settings() && current_user_can( 'publish_events' ),
@@ -71,12 +71,13 @@ class BPEO_Component extends BP_Component {
 		);
 
 		$sub_nav[] = array(
-			'name' => __( 'Manage', 'bp-event-organiser' ),
-			'slug' => 'manage',
+			'name' => __( 'New Event', 'bp-event-organiser' ),
+			'slug' => bpeo_get_events_new_slug(),
 			'parent_url' => bp_displayed_user_domain() . trailingslashit( $this->slug ),
 			'parent_slug' => $this->slug,
 			'user_has_access' => bp_core_can_edit_settings() && current_user_can( 'publish_events' ),
 			'screen_function' => array( $this, 'template_loader' ),
+			'position' => 99,
 		);
 
 		parent::setup_nav( $main_nav, $sub_nav );

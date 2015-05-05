@@ -156,7 +156,7 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		$sub_nav[] = array_merge( array(
 			'name'     => __( 'New Event', 'bp-event-organiser' ),
 			'slug'     => bpeo_get_events_new_slug(),
-			'position' => 10,
+			'position' => 99,
 		), $default_params );
 
 		foreach( (array) $sub_nav as $nav ) {
