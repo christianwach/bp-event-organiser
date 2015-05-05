@@ -529,3 +529,34 @@ function bpeo_catch_reset_postdata( $q ) {
 	// when wp_reset_postdata() is used
 	$GLOBALS['wp_query']->post = null;
 }
+
+/**
+ * Filter attachments when selecting a "Featured Image" on the frontend.
+ *
+ * By default, the "Featured Image" metabox shows all available attachments
+ * across the site.  We do not want to do this due to privacy issues. Instead,
+ * this function filters the attachments query to only list attachments
+ * uploaded by the logged-in user.
+ *
+ * @see https://github.com/cuny-academic-commons/bp-event-organiser/issues/17#issuecomment-99083587
+ *
+ * @param array $retval Current attachment query arguments
+ * @return array
+ */
+function bpeo_filter_ajax_query_attachments( $retval ) {
+	// don't do this in the admin area or if user isn't logged in
+	if ( defined( 'WP_NETWORK_ADMIN' ) || false === is_user_logged_in() ) {
+		return $retval;
+	}
+
+	// check if the post is our event type
+	$post = get_post( $_POST['post_id'] );
+	if ( 'event' !== $post->post_type ) {
+		return $retval;
+	}
+
+	// modify the attachments query to filter by the logged-in user
+	$retval['author'] = bp_loggedin_user_id();
+	return $retval;
+}
+add_filter( 'ajax_query_attachments_args', 'bpeo_ajax_query_attachments' );
