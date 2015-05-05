@@ -276,7 +276,7 @@ class WP_Frontend_Admin_Screen {
 		<form id="post" method="post" action="" name="post">
 			<?php wp_nonce_field( 'update-post_' . $post->ID ); ?>
 			<input type="hidden" id="post_ID" name="post_ID" value="<?php echo esc_attr( $post->ID ); ?>" />
-			<input type="hidden" id="post_author" name="post_author" value="<?php echo esc_attr( get_current_user_id() ); ?>" />
+			<input type="hidden" id="post_author" name="post_author" value="<?php echo esc_attr( empty( $post->post_author ) ? get_current_user_id() : $post->post_author ); ?>" />
 			<input type="hidden" id="post_type" name="post_type" value="<?php echo esc_attr( $post->post_type ) ?>" />
 
 			<div id="titlediv">
