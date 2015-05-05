@@ -113,6 +113,9 @@ class WP_Frontend_Admin_Screen {
 	 * Abstract some core WP admin functionality.
 	 */
 	final protected function setup_abstraction() {
+		// override get_current_screen()
+		$GLOBALS['current_screen'] = new WPFAS_Dummy_Screen( self::$post_type );
+
 		// create a new post
 		if ( empty( $this->queried_post ) && 'new' === $this->args['type'] ) {
 			// try to grab an existing auto-draft
@@ -573,5 +576,23 @@ class WP_Frontend_Admin_Screen {
 	 * re-enqueue any scripts or styles for the frontend.
 	 */
 	protected function enqueue_scripts() {}
+}
+
+/**
+ * Dummy class to override {@link get_current_screen()}.
+ */
+class WPFAS_Dummy_Screen {
+	/**
+	 * Constructor.
+	 */
+	public function __construct( $post_type = '' ) {
+		$this->id   = $post_type;
+		$this->base = 'post';
+	}
+
+	/**
+	 * Bye bye, fatal error!
+	 */
+	public function in_admin() {}
 }
 endif;
