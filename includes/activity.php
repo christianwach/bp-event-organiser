@@ -171,18 +171,26 @@ function bpeo_activity_action_format( $action, $activity ) {
 		return $action;
 	}
 
+	$user_url = bp_core_get_user_domain( $activity->user_id );
+	$user_name = bp_core_get_user_displayname( $activity->user_id );
+	$event_url = get_permalink( $event );
+	$event_name = $event->post_title;
+
 	switch ( $activity->type ) {
 		case 'bpeo_create_event' :
 			/* translators: 1: link to user, 2: link to event */
 			$base = __( '%1$s created the event %2$s', 'bp-event-organiser' );
+			$event_text = sprintf( '<a href="%s">%s</a>', esc_url( $event_url ), esc_html( $event_name ) );
 			break;
 		case 'bpeo_edit_event' :
 			/* translators: 1: link to user, 2: link to event */
 			$base = __( '%1$s edited the event %2$s', 'bp-event-organiser' );
+			$event_text = sprintf( '<a href="%s">%s</a>', esc_url( $event_url ), esc_html( $event_name ) );
 			break;
 		case 'bpeo_delete_event' :
 			/* translators: 1: link to user, 2: link to event */
 			$base = __( '%1$s edited the event %2$s', 'bp-event-organiser' );
+			$event_text = esc_html( $event_name );
 			break;
 	}
 
@@ -190,8 +198,8 @@ function bpeo_activity_action_format( $action, $activity ) {
 
 	$action = sprintf(
 		$base,
-		sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $activity->user_id ) ), esc_html( bp_core_get_user_displayname( $activity->user_id ) ) ),
-		sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) )
+		sprintf( '<a href="%s">%s</a>', esc_url( $user_url ), esc_html( $user_name ) ),
+		$event_text
 	);
 
 	/**

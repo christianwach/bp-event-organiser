@@ -371,6 +371,13 @@ function bpeo_create_group_activity_items( $activity_args, $event ) {
 }
 add_action( 'bpeo_create_event_activity', 'bpeo_create_group_activity_items', 10, 2 );
 
+/**
+ * Format activity items related to groups.
+ *
+ * @param string $action
+ * @param object $activity
+ * @return string
+ */
 function bpeo_activity_action_format_for_groups( $action, $activity ) {
 	$groups = bpeo_get_event_groups( $activity->secondary_item_id );
 
@@ -404,19 +411,28 @@ function bpeo_activity_action_format_for_groups( $action, $activity ) {
 		return $action;
 	}
 
+	$event = get_post( $activity->secondary_item_id );
+	$user_url = bp_core_get_user_domain( $activity->user_id );
+	$user_name = bp_core_get_user_displayname( $activity->user_id );
+	$event_url = get_permalink( $event );
+	$event_name = $event->post_title;
+
 	$group_count = count( $groups );
 	switch ( $activity->type ) {
 		case 'bpeo_create_event' :
 			/* translators: 1: link to user, 2: link to event, 3: comma-separated list of group links */
 			$base = _n( '%1$s created the event %2$s in the group %3$s.', '%1$s created the event %2$s in the groups %3$s.', $group_count, 'bp-event-organiser' );
+			$event_text = sprintf( '<a href="%s">%s</a>', esc_url( $event_url ), esc_html( $event_name ) );
 			break;
 		case 'bpeo_edit_event' :
 			/* translators: 1: link to user, 2: link to event, 3: comma-separated list of group links */
 			$base = _n( '%1$s edited the event %2$s in the group %3$s.', '%1$s edited the event %2$s in the groups %3$s.', $group_count, 'bp-event-organiser' );
+			$event_text = sprintf( '<a href="%s">%s</a>', esc_url( $event_url ), esc_html( $event_name ) );
 			break;
 		case 'bpeo_delete_event' :
 			/* translators: 1: link to user, 2: link to event, 3: comma-separated list of group links */
 			$base = _n( '%1$s deleted the event %2$s in the group %3$s.', '%1$s deleted the event %2$s in the groups %3$s.', $group_count, 'bp-event-organiser' );
+			$event_text = esc_html( $event_name );
 			break;
 	}
 
@@ -446,8 +462,8 @@ function bpeo_activity_action_format_for_groups( $action, $activity ) {
 
 	$action = sprintf(
 		$base,
-		sprintf( '<a href="%s">%s</a>', esc_url( bp_core_get_user_domain( $activity->user_id ) ), esc_html( bp_core_get_user_displayname( $activity->user_id ) ) ),
-		sprintf( '<a href="%s">%s</a>', esc_url( get_permalink( $event ) ), esc_html( $event->post_title ) ),
+		sprintf( '<a href="%s">%s</a>', esc_url( $user_url ), esc_html( $user_name ) ),
+		$event_text,
 		implode( ', ', $group_links )
 	);
 
