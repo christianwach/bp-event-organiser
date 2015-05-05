@@ -559,4 +559,4 @@ function bpeo_filter_ajax_query_attachments( $retval ) {
 	$retval['author'] = bp_loggedin_user_id();
 	return $retval;
 }
-add_filter( 'ajax_query_attachments_args', 'bpeo_ajax_query_attachments' );
+add_filter( 'ajax_query_attachments_args', 'bpeo_filter_ajax_query_attachments' );
