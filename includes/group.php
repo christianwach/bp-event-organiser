@@ -531,3 +531,44 @@ function bpeo_list_connected_groups() {
 	echo sprintf( '<li>' . wp_filter_kses( $base ) . '</li>', implode( ', ', $markup ) );
 }
 add_action( 'eventorganiser_additional_event_meta', 'bpeo_list_connected_groups' );
+
+/** BuddyPress Group Email Subscription integration **************************/
+
+/**
+ * Ensure that GES does not send multiple emails to a given user for a given event.
+ *
+ * @since 1.0.0
+ *
+ * @param bool   $send_it  Whether to send to the given user.
+ * @param object $activity Activity object.
+ * @param int    $user_id  User ID.
+ * @return bool
+ */
+function bpeo_send_bpges_notification_for_user( $send_it, $activity, $user_id ) {
+	global $_bpeo_bpges_sent;
+
+	if ( 'groups' !== $activity->component || 0 !== strpos( $activity->type, 'bpeo_' ) ) {
+		return $send_it;
+	}
+
+	if ( ! isset( $_bpeo_bpges_sent ) ) {
+		$_bpeo_bpges_sent = array();
+	}
+
+	if ( ! isset( $_bpeo_bpges_sent[ $user_id ] ) ) {
+		$_bpeo_bpges_sent[ $user_id ] = array();
+	}
+
+	foreach ( $_bpeo_bpges_sent[ $user_id ] as $a ) {
+		// A duplicate is one with the same type + secondary_item_id + date_recorded.
+		if ( $a->type === $activity->type && $a->secondary_item_id === $activity->secondary_item_id && $a->date_recorded === $activity->date_recorded ) {
+			$send_it = false;
+			break;
+		}
+	}
+
+	$_bpeo_bpges_sent[ $user_id ][] = $activity;
+
+	return $send_it;
+}
+add_filter( 'bp_ass_send_activity_notification_for_user', 'bpeo_send_bpges_notification_for_user', 10, 3 );
