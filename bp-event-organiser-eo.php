@@ -268,7 +268,7 @@ class BuddyPress_Event_Organiser_EO {
 			$this->group_ids = array_unique( array_merge( $this->group_ids, (array) bp_get_current_group_id() ) );
 		}
 
-		wp_enqueue_style( 'bpeo-select-2' );
+		wp_enqueue_style( 'bpeo-select2' );
 		wp_enqueue_script( 'bpeo-group-select' );
 
 	?>
