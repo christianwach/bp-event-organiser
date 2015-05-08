@@ -379,6 +379,12 @@ add_action( 'bpeo_create_event_activity', 'bpeo_create_group_activity_items', 10
  * @return string
  */
 function bpeo_activity_action_format_for_groups( $action, $activity ) {
+	global $_bpeo_recursing_activity;
+
+	if ( ! empty( $_bpeo_recursing_activity ) ) {
+		return $action;
+	}
+
 	$groups = bpeo_get_event_groups( $activity->secondary_item_id );
 
 	if ( empty( $groups ) ) {

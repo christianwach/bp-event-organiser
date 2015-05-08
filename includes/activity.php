@@ -164,6 +164,12 @@ add_action( 'bp_register_activity_actions', 'bpeo_register_activity_actions' );
  * Format activity action strings.
  */
 function bpeo_activity_action_format( $action, $activity ) {
+	global $_bpeo_recursing_activity;
+
+	if ( ! empty( $_bpeo_recursing_activity ) ) {
+		return $action;
+	}
+
 	$event = get_post( $activity->secondary_item_id );
 
 	// Sanity check - mainly for unit tests.
@@ -219,6 +225,8 @@ function bpeo_activity_action_format( $action, $activity ) {
  *
  */
 function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $iterator = 0 ) {
+	global $_bpeo_recursing_activity;
+
 	// Get a list of queried activity IDs before we start removing.
 	$queried_activity_ids = wp_list_pluck( $activity['activities'], 'id' );
 
@@ -284,7 +292,17 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $iterator =
 			// In case of more reduction due to further duplication, fetch a generous number.
 			$backfill_args['per_page'] = $removed + 10;
 
+			$backfill_args['update_meta_cache'] = false;
+			$backfill_args['display_comments'] = false;
+
+			$_bpeo_recursing_activity = true;
+			add_filter( 'bp_activity_set_' . $r['scope'] . '_scope_args', 'bpeo_override_activity_scope_args', 20, 2 );
+
 			$backfill = bp_activity_get( $backfill_args );
+
+			unset( $_bpeo_recursing_activity );
+			remove_filter( 'bp_activity_set_' . $r['scope'] . '_scope_args', 'bpeo_override_activity_scope_args', 20, 2 );
+
 
 			/*
 			 * If the number of backfill items returned is less than the number requested, it means there
@@ -317,6 +335,12 @@ function bpeo_remove_duplicates_from_activity_stream( $activity, $r, $iterator =
 	}
 
 	return $activity;
+}
+
+function bpeo_override_activity_scope_args( $args, $r ) {
+	$args['override']['display_comments'] = false;
+	$args['override']['update_meta_cache'] = false;
+	return $args;
 }
 
 /**
