@@ -102,6 +102,7 @@ function bpeo_map_basic_meta_caps( $caps, $cap, $user_id, $args ) {
 	switch ( $cap ) {
 		// primitive caps
 		case 'publish_events' :
+		case 'manage_venues' :
 			break;
 
 		// meta caps
