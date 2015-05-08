@@ -309,3 +309,16 @@ function bpeo_add_author_info_to_calendar_event( $event, $event_id, $occurrence_
 	return $event;
 }
 add_filter( 'eventorganiser_fullcalendar_event', 'bpeo_add_author_info_to_calendar_event', 10, 3 );
+
+/**
+ * Display the event author on single event pages.
+ */
+function bpeo_list_author() {
+	$event = get_post( get_the_ID() );
+	$author_id = $event->post_author;
+
+	$base = __( '<strong>Author:</strong> %s', 'bp-event-organiser' );
+
+	echo sprintf( '<li>' . wp_filter_kses( $base ) . '</li>', bp_core_get_userlink( $author_id ) );
+}
+add_action( 'eventorganiser_additional_event_meta', 'bpeo_list_author' );
