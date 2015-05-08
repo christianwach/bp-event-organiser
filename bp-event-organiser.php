@@ -187,17 +187,7 @@ class BuddyPress_Event_Organiser {
 	 * @return nothing
 	 */
 	public function enqueue_scripts() {
-
-		// enqueue script to amend EO Calendar
-		wp_enqueue_script(
-
-			'bp_event_organiser_js',
-			BUDDYPRESS_EVENT_ORGANISER_URL . 'assets/js/bp-event-organiser.js',
-			array( 'jquery' ),
-			BUDDYPRESS_EVENT_ORGANISER_VERSION,
-			true // in footer
-
-		);
+		wp_enqueue_script( 'bp_event_organiser_js' );
 
 		// get vars
 		$vars = array(
@@ -205,6 +195,7 @@ class BuddyPress_Event_Organiser {
 			'calendar_author_filter_title' => __( 'By Author', 'bp-event-calendar' ),
 			'calendar_group_filter_title' => __( 'By Group', 'bp-event-calendar' ),
 			'loggedin_user_id' => bp_loggedin_user_id(),
+			'group_privacy_message' => __( 'You have added a group to this event.  Since groups have their own privacy settings, we have removed the ability to set the status for this event.', 'bp-event-organiser' ),
 		);
 
 		// localise with wp function

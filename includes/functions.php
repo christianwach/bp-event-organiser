@@ -18,6 +18,19 @@ function bpeo_get_events_new_slug() {
 }
 
 /**
+ * Register common assets.
+ */
+function bpeo_register_assets() {
+	// Styles.
+	wp_register_style( 'bpeo-select2', set_url_scheme( 'http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css' ) );
+
+	wp_register_script( 'bp_event_organiser_js', BUDDYPRESS_EVENT_ORGANISER_URL . 'assets/js/bp-event-organiser.js', array( 'jquery' ), BUDDYPRESS_EVENT_ORGANISER_VERSION, true );
+	wp_register_script( 'bpeo-select2', set_url_scheme( 'http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.js', array( 'jquery' ) ) );
+	wp_register_script( 'bpeo-group-select', BUDDYPRESS_EVENT_ORGANISER_URL . 'assets/js/group-select.js', array( 'jquery', 'bpeo-select2' ), BUDDYPRESS_EVENT_ORGANISER_VERSION, true );
+}
+add_action( 'wp_enqueue_scripts', 'bpeo_register_assets', 5 );
+
+/**
  * Normalize EO action conditional checks across BP components.
  *
  * The BP groups component shifts the current path over by 1, which can make

@@ -267,11 +267,11 @@ class BuddyPress_Event_Organiser_EO {
 		if ( bp_is_group() ) {
 			$this->group_ids = array_unique( array_merge( $this->group_ids, (array) bp_get_current_group_id() ) );
 		}
-	?>
 
-		<!-- todo properly enqueue these -->
-		<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css" rel="stylesheet" />
-		<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js"></script>
+		wp_enqueue_style( 'bpeo-select-2' );
+		wp_enqueue_script( 'bpeo-group-select' );
+
+	?>
 
 		<p class="bp_event_organiser_desc"><?php _e( 'Enter the names of each group this event should appear in.', 'bp-event-organiser' ); ?></p>
 
@@ -288,126 +288,6 @@ class BuddyPress_Event_Organiser_EO {
 		<?php if ( ! empty( $this->group_ids ) ) : ?>
 			<p class="howto"><?php _e( 'To remove a group, click on the "x" link.', 'bp-event-organiser' ); ?></p>
 		<?php endif; ?>
-
-		<script type="text/javascript">
-			var bpeoGroupMsg = '<?php echo esc_js( __( 'You have added a group to this event.  Since groups have their own privacy settings, we have removed the ability to set the status for this event.', 'bp-event-organiser' ) ); ?>',
-				bpeoToggleFlag = false,
-				bpeoCurrStatus = '';
-
-			jQuery(function($){
-				bpeoCurrStatus = $('#post-status-display').text();
-				bpeoCurrVisibility = $('#post-visibility-display').text();
-				bpeoSelect = $('#bp_event_organiser_metabox select');
-				bpeoPrivateFlag = bpeoSelect.find('[title]').length;
-				bpeoSubmit = $('#submitdiv .inside');
-
-				bpeoToggle = function() {
-					var notice = bpeoSubmit.find('.updated');
-
-					if ( false === $.isEmptyObject( bpeoSelect.val() ) ) {
-						bpeoToggleFlag = true;
-
-						if ( bpeoPrivateFlag === 1 ) {
-							$("#visibility-radio-private").prop("checked", true);
-							$('#post-status-display').fadeOut('fast').text( postL10n.privatelyPublished ).fadeIn('fast');
-							$('#post-visibility-display').fadeOut('fast').text( postL10n.private ).fadeIn('fast');
-						}
-
-						$('.misc-pub-post-status, .misc-pub-visibility').hide();
-						$('#save-post').hide();
-						$('#submitdiv .inside .error').show();
-
-						if ( ! notice.length && typeof adminpage === 'undefined' ) {
-							bpeoSubmit.prepend('<div class="updated"><p>' + bpeoGroupMsg + '</p></div>');
-						} else {
-							notice.fadeIn('fast');
-						}
-
-					} else if ( bpeoPrivateFlag === 0 && bpeoToggleFlag === true ) {
-						bpeoToggleFlag = false;
-						$("#visibility-radio-public").prop("checked", true);
-						$('.misc-pub-post-status, .misc-pub-visibility').show();
-						$('#post-status-display').fadeOut('fast').text( bpeoCurrStatus ).fadeIn('fast');
-						$('.edit-post-status').show();
-						$('#post-visibility-display').fadeOut('fast').text( bpeoCurrVisibility ).fadeIn('fast');
-						$('#save-post').show();
-						$('#submitdiv .inside .error').hide();
-
-						if ( notice.length ) {
-							notice.fadeOut('fast');
-						}
-					}
-				}
-
-				bpeoToggle();
-
-				bpeoFormatResponse = function(data) {
-					return data.name || data.text;
-				}
-
-				bpeoFormatResult = function(data) {
-					if (data.loading) return data.name;
-
-					var markup = '<div style="clear:both;">' +
-					'<div style="float:left;margin-right:8px;">' + data.avatar + '</div>' +
-					'<div><span style="font-weight:600;">' + data.name + '</span> <em>(' + data.type + ')</em></div>';
-
-					if (data.description) {
-						markup += '<div style="font-size:.9em;line-height:1.9;">' + data.description + '</div>';
-					}
-
-					markup += '</div>';
-
-					return markup;
-				}
-
-				bpeoSelect.select2({
-					ajax: {
-						method: 'POST',
-						url: ajaxurl,
-						dataType: 'json',
-						delay: 500,
-						data: function (params) {
-							return {
-								s: params.term, // search term
-								action: 'bpeo_get_groups',
-								nonce: $('#bp_event_organiser_nonce_field').val(),
-								page: params.page
-							};
-						},
-						cache: true,
-						processResults: function (data, page) {
-							// parse the results into the format expected by Select2.
-							// since we are using custom formatting functions we do not need to
-							// alter the remote JSON data
-							return {
-								results: data
-							};
-						},
-					},
-					escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-					minimumInputLength: 3,
-					templateResult: bpeoFormatResult,
-					templateSelection: bpeoFormatResponse
-				});
-
-				bpeoSelect.on("select2:unselecting", function (e) {
-					if ( 'Private' == e.params.args.data.title ) {
-						bpeoPrivateFlag--;
-					}
-				});
-
-				bpeoSelect.on("select2:selecting", function (e) {
-					if ( 'Private' == e.params.args.data.title ) {
-						bpeoPrivateFlag++;
-					}
-				});
-
-				bpeoSelect.on("select2:unselect select2:select", function (e) {
-					bpeoToggle();
-				});
-			});
-		</script>
 	<?php
 	}
 
