@@ -344,6 +344,32 @@ function bpeo_override_activity_scope_args( $args, $r ) {
 }
 
 /**
+ * Prefetch event data into the cache at the beginning of an activity loop.
+ *
+ * @param array $activities
+ */
+function bpeo_prefetch_event_data( $activities ) {
+	$event_ids = array();
+
+	if ( empty( $activities ) ) {
+		return $activities;
+	}
+
+	foreach ( $activities as $activity ) {
+		if ( 0 === strpos( $activity->type, 'bpeo_' ) ) {
+			$event_ids[] = $activity->secondary_item_id;
+		}
+	}
+
+	if ( ! empty( $event_ids ) ) {
+		_prime_post_caches( $event_ids, true, true );
+	}
+
+	return $activities;
+}
+add_action( 'bp_activity_prefetch_object_data', 'bpeo_prefetch_event_data' );
+
+/**
  * Hook the duplicate-removing logic.
  */
 function bpeo_hook_duplicate_removing_for_activity_template( $args ) {
