@@ -114,13 +114,6 @@ function bpeo_map_basic_meta_caps( $caps, $cap, $user_id, $args ) {
 				return $caps;
 			}
 
-			// if this is a group event, bail
-			// group events are handled separately
-			$group_events = bpeo_get_event_groups( $args[0] );
-			if ( ! empty( $group_events ) ) {
-				return $caps;
-			}
-
 			break;
 
 		case 'read_event' :

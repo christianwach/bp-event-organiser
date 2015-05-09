@@ -312,9 +312,6 @@ function bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 
 		// @todo group admins / mods permissions
 		case 'edit_event' :
-			if ( array_intersect( $user_groups['groups'], $event_groups ) ) {
-				$caps = array( 'exist' );
-			}
 			break;
 	}
 

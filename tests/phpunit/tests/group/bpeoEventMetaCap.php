@@ -2,6 +2,7 @@
 
 /**
  * @group group
+ * @group cap
  */
 class BPEO_Tests_Group_BpeoEventMetaCap extends BPEO_UnitTestCase {
 	protected $current_user;
@@ -73,5 +74,77 @@ class BPEO_Tests_Group_BpeoEventMetaCap extends BPEO_UnitTestCase {
 		$this->add_user_to_group( $this->user, $groups[1] );
 
 		$this->assertTrue( current_user_can( 'read_event', $e ) );
+	}
+
+	public function test_loggedin_group_member_can_edit_own_event() {
+		$this->user = $this->factory->user->create();
+
+		$e = $this->event_factory->event->create( array(
+			'post_author' => $this->user,
+			'post_status' => 'public',
+		) );
+
+		$g = $this->factory->group->create();
+		bpeo_connect_event_to_group( $e, $g );
+
+		$this->set_current_user( $this->user );
+		$this->add_user_to_group( $this->user, $g );
+
+		$this->assertTrue( current_user_can( 'edit_event', $e ) );
+	}
+
+	public function test_loggedin_group_member_cannot_edit_another_group_event() {
+		$this->user = $this->factory->user->create();
+		$u = $this->factory->user->create();
+
+		$e = $this->event_factory->event->create( array(
+			'post_author' => $u,
+			'post_status' => 'public',
+		) );
+
+		$g = $this->factory->group->create();
+		bpeo_connect_event_to_group( $e, $g );
+
+		$this->set_current_user( $this->user );
+		$this->add_user_to_group( $this->user, $g );
+		$this->add_user_to_group( $u, $g );
+
+		$this->assertFalse( current_user_can( 'edit_event', $e ) );
+	}
+
+	public function test_loggedin_group_member_can_delete_own_event() {
+		$this->user = $this->factory->user->create();
+
+		$e = $this->event_factory->event->create( array(
+			'post_author' => $this->user,
+			'post_status' => 'public',
+		) );
+
+		$g = $this->factory->group->create();
+		bpeo_connect_event_to_group( $e, $g );
+
+		$this->set_current_user( $this->user );
+		$this->add_user_to_group( $this->user, $g );
+
+		$this->assertTrue( current_user_can( 'delete_event', $e ) );
+	}
+
+	public function test_loggedin_group_member_cannot_delete_another_group_event() {
+		$this->user = $this->factory->user->create();
+		$u = $this->factory->user->create();
+
+		$e = $this->event_factory->event->create( array(
+			'post_author' => $u,
+			'post_status' => 'public',
+		) );
+
+		$g = $this->factory->group->create();
+		bpeo_connect_event_to_group( $e, $g );
+
+		$this->set_current_user( $this->user );
+		$this->add_user_to_group( $this->user, $g );
+		$this->add_user_to_group( $u, $g );
+
+		$this->assertFalse( current_user_can( 'delete_event', $e ) );
 	}
 }
