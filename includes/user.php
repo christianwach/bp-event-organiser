@@ -100,9 +100,10 @@ function bpeo_get_my_calendar_event_ids( $user_id, $args = array() ) {
  */
 function bpeo_map_basic_meta_caps( $caps, $cap, $user_id, $args ) {
 	switch ( $cap ) {
-		// primitive caps
+		// give user these caps
 		case 'publish_events' :
 		case 'manage_venues' :
+		case 'edit_events' : // handles adding tags/categories
 			break;
 
 		// meta caps
