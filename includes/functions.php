@@ -28,7 +28,8 @@ function bpeo_register_assets() {
 	wp_register_script( 'bpeo-select2', set_url_scheme( 'http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js', array( 'jquery' ) ) );
 	wp_register_script( 'bpeo-group-select', BUDDYPRESS_EVENT_ORGANISER_URL . 'assets/js/group-select.js', array( 'jquery', 'bpeo-select2' ), BUDDYPRESS_EVENT_ORGANISER_VERSION, true );
 }
-add_action( 'wp_enqueue_scripts', 'bpeo_register_assets', 5 );
+add_action( 'wp_enqueue_scripts',    'bpeo_register_assets', 5 );
+add_action( 'admin_enqueue_scripts', 'bpeo_register_assets', 5 );
 
 /**
  * Check if we're on a BPEO events page.
