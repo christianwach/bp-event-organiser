@@ -31,33 +31,50 @@ function bpeo_register_assets() {
 add_action( 'wp_enqueue_scripts', 'bpeo_register_assets', 5 );
 
 /**
- * Normalize EO action conditional checks across BP components.
+ * Check if we're on a BPEO events page.
  *
- * The BP groups component shifts the current path over by 1, which can make
- * conditional checks a little uneven.  This function normalizes these
- * conditional checks.
+ * This function is needed to normalize how conditional checks are done
+ * across the members and groups components. Why? Because the BP groups
+ * component shifts the current path over by 1. So, instead of doing two
+ * different checks, we do it with one in this function.
  *
- * @param string $action The action to check. eg. 'new', 'edit', or 'delete'.
+ * @return bool
+ */
+function bpeo_is_component() {
+	$retval = false;
+
+	if ( bp_is_user() ) {
+		$is_component = 'bp_is_current_component';
+	} elseif( bp_is_group() ) {
+		$is_component = 'bp_is_current_action';
+	} else {
+		return $retval;
+	}
+
+	return $is_component( bpeo_get_events_slug() );
+}
+
+/**
+ * Check if we're on a BPEO action page.
  *
+ * @param string $action The action to check. eg. 'new', 'edit', 'delete' or 'manage'.
  * @return bool
  */
 function bpeo_is_action( $action = '' ) {
 	$retval = false;
 
 	if ( bp_is_user() ) {
-		$is_component = 'bp_is_current_component';
-		$is_new = 'bp_is_current_action';
+		$is_action = 'bp_is_current_action';
 		$pos = 0;
 	} elseif( bp_is_group() ) {
-		$is_component = 'bp_is_current_action';
-		$is_new = 'bp_is_action_variable';
+		$is_action = 'bp_is_action_variable';
 		$pos = 1;
 	} else {
 		return $retval;
 	}
 
 	// not on an events page, so stop!
-	if ( false === $is_component( bpeo_get_events_slug() ) ) {
+	if ( false === bpeo_is_component() ) {
 		return $retval;
 	}
 
@@ -66,12 +83,12 @@ function bpeo_is_action( $action = '' ) {
 
 	// check if we're on a 'new event' page
 	if ( bpeo_get_events_new_slug() === $action ) {
-		return $is_new( $action );
+		return $is_action( $action );
 	}
 
 	// check if we're on a 'manage events' page
 	if ( 'manage' === $action ) {
-		return $is_new( $action );
+		return $is_action( $action );
 	}
 
 	// all other actions - 'edit', 'delete'
