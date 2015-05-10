@@ -302,6 +302,11 @@ function bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 
 	switch ( $cap ) {
 		case 'read_event' :
+			// we've already parsed this logic in bpeo_map_basic_meta_caps()
+			if ( 'exist' === $caps[0] ) {
+				return $caps;
+			}
+
 			if ( 'private' !== $event->post_status ) {
 				// EO uses 'read', which doesn't include non-logged-in users.
 				$caps = array( 'exist' );
