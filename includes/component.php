@@ -14,6 +14,10 @@ class BPEO_Component extends BP_Component {
 			BPEO_PATH,
 			array( 'adminbar_myaccount_order' => 36 )
 		);
+
+		// setup single event screen
+		// run on 'bp_parse_query' to allow EO's post type to register
+		add_action( 'bp_parse_query', array( $this, 'setup_single_event_screen' ) );
 	}
 
 	/**
@@ -24,8 +28,6 @@ class BPEO_Component extends BP_Component {
 			'slug' => bpeo_get_events_slug(),
 			'has_directory' => false,
 		) );
-
-		$this->setup_single_event_screen();
 	}
 
 	/**
@@ -121,7 +123,7 @@ class BPEO_Component extends BP_Component {
 	/**
 	 * Set up single event screen.
 	 */
-	protected function setup_single_event_screen() {
+	public function setup_single_event_screen() {
 		if ( ! bp_is_user() ) {
 			return;
 		}
