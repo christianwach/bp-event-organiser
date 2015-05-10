@@ -122,7 +122,7 @@ function bpeo_map_basic_meta_caps( $caps, $cap, $user_id, $args ) {
 			}
 
 			// Make sure authors can view their own post
-			if ( get_post( $args[0] )->post_author === $user_id ) {
+			if ( (int) get_post( $args[0] )->post_author === $user_id ) {
 				return array( 'exist' );
 			}
 
