@@ -69,10 +69,10 @@ function bpeo_create_activity_for_event( $event_id, $event = null, $update = nul
 
 	switch ( $type ) {
 		case 'bpeo_create_event' :
-			$recorded_time = $event->post_date;
+			$recorded_time = $event->post_date_gmt;
 			break;
 		case 'bpeo_edit_event' :
-			$recorded_time = $event->post_modified;
+			$recorded_time = $event->post_modified_gmt;
 			break;
 		default :
 			$recorded_time = bp_core_current_time();
