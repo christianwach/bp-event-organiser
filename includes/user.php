@@ -119,9 +119,14 @@ function bpeo_map_basic_meta_caps( $caps, $cap, $user_id, $args ) {
 		case 'read_event' :
 			if ( get_post( $args[0] )->post_status === 'publish' ) {
 				return array( 'exist' );
-			} else {
-				return $caps;
 			}
+
+			// Make sure authors can view their own post
+			if ( get_post( $args[0] )->post_author === $user_id ) {
+				return array( 'exist' );
+			}
+
+			return $caps;
 			break;
 
 		default :
