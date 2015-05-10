@@ -148,6 +148,8 @@ class BPEO_Component extends BP_Component {
 
 		// Set up query args
 		$query_args = array();
+		$query_args['suppress_filters'] = true;
+		$query_args['orderby'] = 'none';
 		$query_args['post_status'] = array( 'publish', 'pending', 'private', 'draft', 'future', 'trash' );
 
 		// this is a draft with no slug
