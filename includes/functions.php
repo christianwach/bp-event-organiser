@@ -276,6 +276,33 @@ function bpeo_the_post_status_message( $post = 0 ) {
 	}
 add_action( 'edit_form_after_title', 'bpeo_the_post_status_message' );
 
+/**
+ * Determine if the post thumbnail has already displayed.
+ *
+ * @return bool
+ */
+function bpeo_has_thumbnail_shown() {
+	// has to be greater than one due to post CSS class
+	return _bpeo_thumbnail_counter() > 1;
+}
+
+/**
+ * Count the number of times get_the_post_thumbnail() is called.
+ *
+ * @return int
+ */
+function _bpeo_thumbnail_counter() {
+	static $counter = 0;
+
+	if ( in_the_loop() ) {
+		++$counter;
+	}
+
+	return $counter;
+}
+add_action( 'begin_fetch_post_thumbnail_html',  '_bpeo_thumbnail_counter' );
+
+
 /** HOOKS ***************************************************************/
 
 /**

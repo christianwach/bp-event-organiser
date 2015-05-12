@@ -4,7 +4,11 @@
 	<?php the_content(); ?>
 
 	<?php if ( false === post_password_required() )  : ?>
-		<?php the_post_thumbnail( 'medium' ); ?>
+		<?php
+			if ( false === bpeo_has_thumbnail_shown() ) {
+				the_post_thumbnail( 'medium' );
+			}
+		 ?>
 		<?php eo_get_template_part( 'event-meta', 'event-single' ); ?>
 	<?php endif; ?>
 
