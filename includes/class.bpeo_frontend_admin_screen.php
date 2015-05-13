@@ -20,7 +20,7 @@ class BPEO_Frontend_Admin_Screen extends WP_Frontend_Admin_Screen {
 		return array(
 			'created' => __( 'Event successfully created', 'bp-event-organiser' ),
 			'updated' => __( 'Event updated', 'bp-event-organiser' ),
-			'title_placeholder' => __( 'Enter Event Title' ),
+			'title_placeholder' => __( 'Enter Event Title', 'bp-event-organiser' ),
 		);
 	}
 
