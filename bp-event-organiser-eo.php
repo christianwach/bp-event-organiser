@@ -300,7 +300,9 @@ class BuddyPress_Event_Organiser_EO {
 
 		$groups = groups_get_groups( array(
 			'user_id' => is_super_admin() ? 0 : bp_loggedin_user_id(),
-			'search_terms' => $_POST['s']
+			'search_terms' => $_POST['s'],
+			'show_hidden' => true,
+			'populate_extras' => false
 		) );
 
 		$json = array();
