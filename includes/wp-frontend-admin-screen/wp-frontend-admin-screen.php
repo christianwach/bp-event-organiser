@@ -102,6 +102,7 @@ class WP_Frontend_Admin_Screen {
 			'tag_delimiter'     => _x( ',', 'tag delimiter' ),
 			'featured_image'    => __( 'Featured Image' ),
 			'title_publish'     => __( 'Publish' ),
+			'media_insert_into_post' => __( 'Insert into post' ),
 
 			/* translators: If your word count is based on single characters (East Asian characters),
 			   enter 'characters'. Otherwise, enter 'words'. Do not translate into your own language. */
@@ -454,7 +455,9 @@ class WP_Frontend_Admin_Screen {
 		// post thumbnail requires a few assets
 		if ( current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' ) ) {
 			add_thickbox();
+			add_filter( 'media_view_strings', array( $this, 'media_view_strings' ) );
 			wp_enqueue_media( array( 'post' => $post->ID ) );
+			remove_filter( 'media_view_strings', array( $this, 'media_view_strings' ) );
 		}
 
 		// localization
@@ -532,6 +535,17 @@ class WP_Frontend_Admin_Screen {
 	</script>
 
 	<?php
+	}
+
+	/**
+	 * Override strings used in {@link wp_enqueue_media()}.
+	 *
+	 * @param  array $retval Current strings
+	 * @return array
+	 */
+	public function media_view_strings( $retval ) {
+		$retval['insertIntoPost'] = $this->strings['media_insert_into_post'];
+		return $retval;
 	}
 
 	/** EXTENDABLE METHODS *************************************************/
