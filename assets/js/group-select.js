@@ -100,13 +100,13 @@ jQuery(function($){
 	});
 
 	bpeoSelect.on("select2:unselecting", function (e) {
-		if ( 'Private' == e.params.args.data.title ) {
+		if ( 'Private' == e.params.args.data.title || true === e.params.args.data.private ) {
 			bpeoPrivateFlag--;
 		}
 	});
 
 	bpeoSelect.on("select2:selecting", function (e) {
-		if ( 'Private' == e.params.args.data.title ) {
+		if ( 'Private' == e.params.args.data.title || true === e.params.args.data.private ) {
 			bpeoPrivateFlag++;
 		}
 	});
