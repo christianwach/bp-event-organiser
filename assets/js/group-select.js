@@ -49,6 +49,16 @@ jQuery(function($){
 
 	bpeoToggle();
 
+	// do not show "Save Draft" button for public groups when clicking on the
+	// "Cancel" button when toggled from the "Publish immediately" option
+	//
+	// overrides WP's updateText() function
+	bpeoSubmit.on( "click", ".cancel-timestamp", function() {
+		if ( bpeoSubmit.find('.updated').is(':visible') ) {
+			$('#save-post').hide();
+		}
+	});
+
 	bpeoFormatResponse = function(data) {
 		return data.name || data.text;
 	}
