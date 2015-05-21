@@ -321,7 +321,9 @@
 		$week_content_div.height( event_height );
 
 		// Align the event with the top of the content cell.
-		eo_event_link.css( 'top', $week_content_div.position().top );
+		if ( $week_content_div.length ) {
+			eo_event_link.css( 'top', $week_content_div.position().top );
+		}
 	};
 
 	$( document ).ready( function() {
