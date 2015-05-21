@@ -255,18 +255,14 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			delete_transient( 'eo_full_calendar_public' );
 		}
 
-		$template_slug = bp_action_variable( 0 );
-		if ( empty( $template_slug ) ) {
-			$template_slug = 'calendar';
-		}
+		// use our template stack
+		add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
 
-		// Ceci n'est pas un template stack.
-		$template = bp_locate_template( 'bp-event-organiser/' . $template_slug . '.php' );
-		if ( false === $template ) {
-			$template = BPEO_PATH . 'templates/' . $template_slug . '.php';
-		}
+		// load our template part
+		eo_get_template_part( bp_action_variable( 0 ) );
 
-		include $template;
+		// remove our template stack
+		remove_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
 
 	}
 
