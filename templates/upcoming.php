@@ -17,16 +17,13 @@ $events = eo_get_events( $eo_get_events_args ); ?>
 
 <?php if ( ! empty( $events ) ) : ?>
 	<ul class="bpeo-upcoming-events">
-	<?php foreach ( $events as $event ) : ?>
-		<li class="bpeo-upcoming-event-<?php echo esc_attr( $event->ID ) ?>">
-			<div class="bpeo-upcoming-event-datetime">
-				<span class="bpeo-upcoming-event-date"><?php echo date( 'M j, Y', strtotime( $event->StartDate ) ) ?></span> &middot; <span class="bpeo-upcoming-event-time"><?php echo date( 'g:ia', strtotime( $event->StartTime ) ) ?></span>
-			</div>
-
-			<a class="bpeo-upcoming-event-title" href="<?php echo esc_url( apply_filters( 'eventorganiser_calendar_event_link', get_permalink( $event->ID ), $event->ID ) ) ?>"><?php echo esc_html( $event->post_title ) ?></a>
-
-		</li>
-	<?php endforeach; ?>
+	<?php
+		$_post = $GLOBALS['post'];
+		foreach ( $events as $post ) {
+			eo_get_template_part( 'content-eo', 'upcoming' );
+		}
+		$GLOBALS['post'] = $_post;
+	?>
 	</ul>
 <?php else : // ! empty( $events ) ?>
 	<p><?php _e( 'No upcoming events found.', 'bp-event-organiser' ) ?></p>
