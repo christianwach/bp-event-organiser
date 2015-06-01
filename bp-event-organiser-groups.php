@@ -258,8 +258,13 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		// use our template stack
 		add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
 
+		$action = bp_action_variable( 0 );
+		if ( ! $action ) {
+			$action = 'calendar';
+		}
+
 		// load our template part
-		eo_get_template_part( bp_action_variable( 0 ) );
+		eo_get_template_part( $action );
 
 		// remove our template stack
 		remove_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
