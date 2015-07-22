@@ -612,6 +612,10 @@ function bpeo_filter_ajax_query_attachments( $retval ) {
 		return $retval;
 	}
 
+	if ( empty( $_POST['post_id'] ) )  {
+		return $retval;
+	}
+
 	// check if the post is our event type
 	$post = get_post( $_POST['post_id'] );
 	if ( 'event' !== $post->post_type ) {
