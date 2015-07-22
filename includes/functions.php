@@ -457,7 +457,12 @@ function bpeo_add_ical_link_to_eventmeta() {
 		return;
 	}
 ?>
-	<li><a class="bpeo-ical-link" href="<?php bpeo_the_ical_link( get_the_ID() ); ?>"><span class="icon"></span><?php esc_html_e( 'Download iCal file', 'bp-events-organiser' ); ?></a></li>
+	<li><?php
+		printf(
+		__( "%sDownload iCalendar file%s to save this event to your preferred calendar application", 'bp-event-organiser' ),
+		'<a class="bpeo-ical-link" href="' . bpeo_get_the_ical_link( get_the_ID() ) . '"><span class="icon"></span>',
+		'</a>'
+	); ?></li>
 
 <?php
 }
