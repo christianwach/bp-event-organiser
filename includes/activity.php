@@ -18,7 +18,13 @@ function bpeo_create_activity_for_event( $event_id, $event = null, $update = nul
 		$event = get_post( $event_id );
 	}
 
-	if ( 'event' !== $event->post_type || 'publish' !== $event->post_status ) {
+	// Skip auto-drafts and other post types.
+	if ( 'event' !== $event->post_type ) {
+		return;
+	}
+
+	// Skip post statuses other than 'publish' and 'private' (the latter is for non-public groups).
+	if ( ! in_array( $event->post_status, array( 'publish', 'private' ), true ) ) {
 		return;
 	}
 
