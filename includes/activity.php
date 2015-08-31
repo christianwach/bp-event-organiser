@@ -85,6 +85,8 @@ function bpeo_create_activity_for_event( $event_id, $event = null, $update = nul
 			break;
 	}
 
+	$hide_sitewide = 'public' !== $event->post_status;
+
 	$activity_args = array(
 		'component' => 'events',
 		'type' => $type,
@@ -92,6 +94,7 @@ function bpeo_create_activity_for_event( $event_id, $event = null, $update = nul
 		'primary_link' => get_permalink( $event ),
 		'secondary_item_id' => $event_id, // Leave 'item_id' blank for groups.
 		'recorded_time' => $recorded_time,
+		'hide_sitewide' => $hide_sitewide,
 	);
 
 	bp_activity_add( $activity_args );
