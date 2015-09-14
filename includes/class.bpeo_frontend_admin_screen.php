@@ -48,8 +48,6 @@ class BPEO_Frontend_Admin_Screen extends WP_Frontend_Admin_Screen {
 		// load up EO's metabox
 		if ( function_exists( 'eventorganiser_edit_init' ) ) {
 			eventorganiser_edit_init();
-		} elseif ( function_exists( '_eventorganiser_event_metaboxes_init' ) ) {
-			_eventorganiser_event_metaboxes_init();
 		}
 	}
 
