@@ -425,7 +425,22 @@ function bpeo_activity_action_format_for_groups( $action, $activity ) {
 	$event = get_post( $activity->secondary_item_id );
 	$user_url = bp_core_get_user_domain( $activity->user_id );
 	$user_name = bp_core_get_user_displayname( $activity->user_id );
+
+	// The URL should correspond to the current group, or the first group that the user is a member of.
 	$event_url = get_permalink( $event );
+	if ( bp_is_group() ) {
+		$event_url = bpeo_get_group_permalink( groups_get_current_group() ) . $event->post_name;
+	} else {
+		foreach ( $groups as $group ) {
+			if ( groups_is_user_member( bp_loggedin_user_id(), $group->id ) ) {
+				$event_url = bpeo_get_group_permalink( $group ) . $event->post_name;
+				break;
+			}
+		}
+	}
+
+	$event_url = trailingslashit( $event_url );
+
 	$event_name = $event->post_title;
 
 	$group_count = count( $groups );
