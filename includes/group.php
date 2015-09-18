@@ -580,6 +580,62 @@ function bpeo_list_connected_groups() {
 }
 add_action( 'eventorganiser_additional_event_meta', 'bpeo_list_connected_groups' );
 
+/** iCal *********************************************************************/
+
+/**
+ * Allow iCal feeds to be populated for group members.
+ *
+ * By default, WordPress limits private posts to the author of the post. This
+ * doesn't work for us as group members should be able to view the post item
+ * in iCal feeds.
+ *
+ * This function modifies the WP query to check if the event is connected to
+ * any groups and if the logged-in user is a member of those groups. If so, we
+ * allow the user to view the iCal feed as intended.
+ *
+ * @param WP_Query $q
+ */
+function bpeo_ical_modify_query_for_group_permissions( $q ) {
+	// make sure we're checking an EO feed
+	if ( false === $q->is_feed( 'eo-events' ) ) {
+		return;
+	}
+
+	// make sure there's a post slug and user is logged in
+	if ( empty( $q->query_vars['name'] ) || false === is_user_logged_in() ) {
+		return;
+	}
+
+	// query for the event by page slug
+	$post = get_page_by_path( $q->query_vars['name'], 'OBJECT', 'event' );
+	if ( empty( $post ) ) {
+		return;
+	}
+
+	// check if any groups are attached to this event
+	$group_ids = bpeo_get_event_groups( $post->ID );
+	if ( empty( $group_ids ) ) {
+		return;
+	}
+
+	// make sure the logged-in user is a part of the group
+	$groups = bp_has_groups( array(
+		'user_id' => bp_loggedin_user_id(),
+		'include' => $group_ids,
+		'populate_extras' => false,
+		'update_meta_cache' => false,
+		'per_page' => false,
+	) );
+	if ( empty( $groups ) ) {
+		return;
+	}
+
+	// make sure logged-in user can see feed
+	$q->set( 'post_status', array( 'publish', 'private' ) );
+
+}
+add_action( 'pre_get_posts', 'bpeo_ical_modify_query_for_group_permissions', 99 );
+
 /** BuddyPress Group Email Subscription integration **************************/
 
 /**
