@@ -676,3 +676,31 @@ function bpeo_send_bpges_notification_for_user( $send_it, $activity, $user_id ) 
 	return $send_it;
 }
 add_filter( 'bp_ass_send_activity_notification_for_user', 'bpeo_send_bpges_notification_for_user', 10, 3 );
+
+/**
+ * Append iCal link to BP Group Email notifications.
+ *
+ * Requires the BP Group Email Subscription plugin.
+ *
+ * @param  string $content  Email content
+ * @param  object $activity Activity object
+ * @return string
+ */
+function bpeo_ges_add_ical_link( $content, $activity ) {
+	// not a BPEO item, so bail!
+	if ( 0 !== strpos( $activity->type, 'bpeo_' ) ) {
+		return $content;
+	}
+
+	$ical_link = __( 'Download iCalendar file:', 'bp-event-organiser' );
+	$ical_link .= "\n";
+
+	if ( ! empty( $activity->hide_sidewide ) ) {
+		$ical_link .= ass_get_login_redirect_url( bpeo_get_the_ical_link( $activity->secondary_item_id ), 'bpeo_event' );
+	} else {
+		$ical_link .= bpeo_get_the_ical_link( $activity->secondary_item_id );
+	}
+
+	return $content . $ical_link;
+}
+add_filter( 'bp_ass_activity_notification_content', 'bpeo_ges_add_ical_link', 20, 2 );
