@@ -720,7 +720,7 @@ function bpeo_group_events_embed_remove_all_assets() {
  */
 function bpeo_get_the_group_private_ical_hash( $group_id = 0, $reset = false ) {
 	if ( empty( $group_id ) ) {
-		$user_id = bp_get_current_group_id();
+		$group_id = bp_get_current_group_id();
 	}
 
 	if ( empty( $group_id ) ) {
@@ -774,7 +774,7 @@ function bpeo_the_group_private_ical_url( $group_id = 0 ) {
 			) );
 		}
 
-		return trailingslashit( esc_url( bpeo_get_group_permalink( $group ) . bpeo_get_the_user_private_ical_hash( $group_id ) . '/ical' ) );
+		return trailingslashit( esc_url( bpeo_get_group_permalink( $group ) . bpeo_get_the_group_private_ical_hash( $group_id ) . '/ical' ) );
 	}
 
 /**
