@@ -1,3 +1,21 @@
+.bpeo-calendar-filter {
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	padding: 1em;
+}
+
+.bpeo-calendar-filter::after {
+	clear: both;
+	content: "";
+	display: table;
+}
+
+.bpeo-calendar-filter h3,
+.bpeo-calendar-filter h4,
+.bpeo-calendar-filter ul {
+	margin: 0;
+}
+
 .bpeo-calendar-filter-type {
 	float: left;
 	width: 40%;
