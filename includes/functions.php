@@ -219,8 +219,9 @@ function bpeo_do_ical_download( $r = array() ) {
 	unset( $r['filename'], $r['name'] );
 	$GLOBALS['wp_query'] = new WP_Query( $r );
 
-	// Prevent browsers from caching
+	// Set proper headers
 	nocache_headers();
+	status_header( 200 );
 
 	// iCal time!
 	Event_Organiser_Im_Export::get_object()->export_events( $filename, null );
