@@ -459,8 +459,8 @@ class BPEO_Component extends BP_Component {
 		// inline CSS for now during dev period
 	?>
 		<style type="text/css">
-		#manage-events .post-status {width:80px;}
-		#manage-events .event-date {width:160px;}
+		#manage-events .post-status {width:5.5em;}
+		#manage-events .event-date {width:11.5em;}
 		#manage-events .post-date {width:94px; padding-right:0;}
 
 		#manage-events td {vertical-align:top; padding-top:15px;}
