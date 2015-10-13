@@ -197,6 +197,11 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		} elseif ( bp_is_action_variable( 'upcoming', 0 ) ) {
 			add_action( 'bp_template_content', array( $this, 'call_display' ) );
 
+		// iCal
+		} elseif ( bp_is_action_variable( 'ical' ) || true === ctype_xdigit( bp_action_variable() ) ) {
+			$this->ical_action();
+			return;
+
 		// single event
 		} elseif ( ! empty( buddypress()->action_variables ) ) {
 			$this->single_event_screen();
@@ -475,6 +480,42 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 		if ( ! empty( $_post ) ) {
 			$post = $_post;
 		}
+	}
+
+	/**
+	 * Validate iCalendar download.
+	 */
+	protected function ical_action() {
+		$args = array(
+			'filename' => bp_get_group_slug( groups_get_current_group() ),
+			'bp_group' => bp_get_current_group_id(),
+			'url'      => bpeo_get_group_permalink()
+		);
+
+		// public iCal
+		if ( bp_is_action_variable( 'ical' ) && 'public' === bp_get_group_status( groups_get_current_group() ) ) {
+			$args['name'] = bp_get_group_name( groups_get_current_group() );
+
+		// private iCal
+		} else {
+			if ( false === bp_is_action_variable( bpeo_get_the_group_private_ical_hash() ) ) {
+				return;
+			}
+
+			if ( false === bp_is_action_variable( 'ical', 1 ) ) {
+				return;
+			}
+
+			$args['name'] = sprintf( __( '%s (Private)', 'bp-event-organiser' ), bp_get_group_name( groups_get_current_group() ) );
+		}
+
+		// Sanity check
+		if ( empty( $args['name' ]) ) {
+			return;
+		}
+
+		// iCal time!
+		bpeo_do_ical_download( $args );
 	}
 
 	/**
