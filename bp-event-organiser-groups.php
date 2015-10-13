@@ -89,6 +89,15 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 				'slug' => $slug,
 				'nav_item_position' => $pos,
 				'enable_create_step' => false,
+				'screens' => array(
+					'edit' => array(
+						'enabled' => true,
+						'slug' => 'events',
+						'name' => __( 'Events', 'bp-event-organiser' ),
+						'screen_callback' => array( $this, 'edit_screen_callback' ),
+						'screen_save_callback' => array( $this, 'edit_screen_save_callback' ),
+					),
+				),
 			);
 
 			// init
@@ -527,6 +536,53 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 	 */
 	public function no_post_status_title( $retval, $post ) {
 		return $post->post_title;
+	}
+
+	/**
+	 * Custom hook on "Manage Events" screen to catch "Reset private URL" action.
+	 */
+	public function call_edit_screen_template_loader( $group_id = null ) {
+		// 'Reset Private URL' action
+		if ( ! empty( $_GET['bpeo-reset'] ) ) {
+			check_admin_referer( 'bpeo_group_reset_private_ical', 'bpeo-reset' );
+
+			// reset hash
+			bpeo_get_the_group_private_ical_hash( bp_get_current_group_id(), true );
+
+			bp_core_add_message( __( 'Private iCalendar URL has been reset. Please copy the new link below to use in your calendar application.', 'bp-event-organiser' ) );
+			bp_core_redirect( trailingslashit( bp_get_group_permalink( groups_get_current_group() ) . 'admin/' . $this->slug ) );
+			die();
+		}
+
+		// Do what the parent extension does.
+		parent::call_edit_screen_template_loader( $group_id );
+	}
+
+	/**
+	 * Renders the content of the Manage subscreen.
+	 *
+	 * @param int $group_id ID of the group.
+	 */
+	public function edit_screen_callback( $group_id = null ) {
+
+		if ( 'public' !== bp_get_group_status( groups_get_current_group() ) ) {
+			// use our template stack
+			add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
+
+			// load our template part
+			eo_get_template_part( 'buddypress/events/manage-group-ical' );
+
+			// remove our template stack
+			remove_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
+		}
+	}
+
+	/**
+	 * Processes the saved Manage subscreen.
+	 *
+	 * @param int $group_id ID of the group.
+	 */
+	public function edit_screen_save_callback( $group_id = null ) {
 	}
 
 } // class ends
