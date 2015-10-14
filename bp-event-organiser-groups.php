@@ -144,28 +144,44 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			'parent_slug'       => buddypress()->groups->current_group->slug . '_events',
 
 			'screen_function'   => array( $this, '_display_hook' ),
-			'user_has_access'   => buddypress()->groups->current_group->is_user_member,
 			'show_in_admin_bar' => true,
 		);
 
 		$sub_nav[] = array_merge( array(
-			'name'     => __( 'Calendar', 'bp-event-organiser' ),
-			'slug'     => 'calendar',
-			'position' => 0,
-			'link'     => bpeo_get_group_permalink(),
+			'name'            => __( 'Calendar', 'bp-event-organiser' ),
+			'slug'            => 'calendar',
+			'user_has_access' => buddypress()->groups->current_group->is_user_member,
+			'position'        => 0,
+			'link'            => bpeo_get_group_permalink(),
 		), $default_params );
 
 		$sub_nav[] = array_merge( array(
-			'name'     => __( 'Upcoming', 'bp-event-organiser' ),
-			'slug'     => 'upcoming',
-			'position' => 0,
-			'link'     => bpeo_get_group_permalink() . 'upcoming/',
+			'name'            => __( 'Upcoming', 'bp-event-organiser' ),
+			'slug'            => 'upcoming',
+			'user_has_access' => buddypress()->groups->current_group->is_user_member,
+			'position'        => 0,
+			'link'            => bpeo_get_group_permalink() . 'upcoming/',
 		), $default_params );
 
+		// Show 'Manage' tab if group is not public
+		if ( 'public' !== bp_get_group_status( groups_get_current_group() ) ) {
+			// We only allow group admins to see this tab
+			$admin_ids = bp_group_admin_ids( groups_get_current_group(), 'array' );
+
+			$sub_nav[] = array_merge( array(
+				'name'            => __( 'Manage', 'bp-event-organiser' ),
+				'slug'            => 'manage',
+				'user_has_access' => in_array( bp_loggedin_user_id(), $admin_ids ),
+				'position'        => 0,
+				'link'            => trailingslashit( bp_get_group_permalink( groups_get_current_group() ) . 'admin/' . $this->params['slug'] ),
+			), $default_params );
+		}
+
 		$sub_nav[] = array_merge( array(
-			'name'     => __( 'New Event', 'bp-event-organiser' ),
-			'slug'     => bpeo_get_events_new_slug(),
-			'position' => 99,
+			'name'            => __( 'New Event', 'bp-event-organiser' ),
+			'slug'            => bpeo_get_events_new_slug(),
+			'user_has_access' => buddypress()->groups->current_group->is_user_member,
+			'position'        => 99,
 		), $default_params );
 
 		foreach( (array) $sub_nav as $nav ) {
