@@ -604,7 +604,7 @@ function bpeo_groups_event_embed_override_template() {
 		return false;
 	}
 
-	if ( empty( $_GET['embed'] ) ) {
+	if ( empty( $_GET['embedded'] ) ) {
 		return false;
 	}
 
