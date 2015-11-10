@@ -101,7 +101,7 @@ class BPEO_Group_Widget extends WP_Widget {
 		<iframe src="<?php echo esc_url( $link ); ?>" width="100%" <?php echo $height; ?>></iframe>
 
 	<?php
-		echo $args['after_widget'];		
+		echo $args['after_widget'];
 	}
 
 	/**
