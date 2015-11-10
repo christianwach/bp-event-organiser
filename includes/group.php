@@ -704,6 +704,8 @@ function bpeo_group_events_embed_remove_all_assets() {
 
 	$scripts = wp_scripts();
 	$scripts->queue = array();
+
+	wp_enqueue_style( 'dashicons' );
 }
 
 /** iCal *********************************************************************/
