@@ -166,8 +166,7 @@ class BPEO_Group_Widget extends WP_Widget {
 
 			<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e( 'Title:', 'bpeo-group-widget' ); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></p>
 
-			<p><label for="<?php echo $this->get_field_id('group_id'); ?>"><?php _e( 'Group:', 'bpeo-group-widget' ); ?></label>
-
+			<p><label for="<?php echo $this->get_field_id('group_id'); ?>" title="<?php esc_attr_e( 'Select the group you want to display events for.', 'bpeo-group-widget' ); ?>"><?php _e( 'Group:', 'bpeo-group-widget' ); ?></label>
 			<select class="widefat" name="<?php echo esc_attr( $this->get_field_name( 'group_id' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'group_id' ) ); ?>">
 				<option value="" <?php selected( $instance['group_id'], '' ); ?>><?php esc_html_e( '--- Select a group ---', 'bpeo-group-widget' ); ?></option>
 
@@ -176,7 +175,7 @@ class BPEO_Group_Widget extends WP_Widget {
 				<?php endforeach; ?>
 			</select></p>
 
-			<p><label for="<?php echo $this->get_field_id('type'); ?>"><?php _e( 'Embed Type:', 'bpeo-group-widget' ); ?></label>
+			<p><label for="<?php echo $this->get_field_id('type'); ?>" title="<?php esc_attr_e( 'Embed type. Note: Calendar type only works well for large widget areas', 'bpeo-group-widget' ); ?>"><?php _e( 'Embed Type:', 'bpeo-group-widget' ); ?></label>
 
 			<select class="widefat" name="<?php echo esc_attr( $this->get_field_name( 'type' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'type' ) ); ?>">
 				<option value="list" <?php selected( $instance['type'], 'list' ); ?>><?php esc_html_e( 'List of upcoming events', 'bpeo-group-widget' ); ?></option>
