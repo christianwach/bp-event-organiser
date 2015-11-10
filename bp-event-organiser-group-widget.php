@@ -141,7 +141,6 @@ class BPEO_Group_Widget extends WP_Widget {
 	public function form( $instance ) {
 		// Defaults
 		$instance = wp_parse_args( (array) $instance, array(
-			'sortby' => 'post_title',
 			'title' => '',
 			'group_id' => '',
 			'height' => ''
