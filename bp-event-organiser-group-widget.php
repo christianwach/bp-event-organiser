@@ -133,7 +133,7 @@ class BPEO_Group_Widget extends WP_Widget {
 		if ( ! empty( $new_instance['height'] ) ) {
 			$instance['height'] = (int) $new_instance['height'];
 		} else {
-			$instance['height'] = 0;
+			$instance['height'] = 300;
 		}
 
 		return $instance;
@@ -147,7 +147,7 @@ class BPEO_Group_Widget extends WP_Widget {
 		$instance = wp_parse_args( (array) $instance, array(
 			'title' => '',
 			'group_id' => '',
-			'height' => ''
+			'height' => 300
 		) );
 
 		$title = esc_attr( $instance['title'] );
@@ -192,7 +192,7 @@ class BPEO_Group_Widget extends WP_Widget {
 			</select></p>
 
 			<p><label for="<?php echo $this->get_field_id( 'height' ); ?>" title="<?php esc_attr_e( 'Height of the group widget. Set this to a larger number if desired.', 'bpeo-group-widget' ); ?>"><?php _e( 'Height:' ); ?></label>
-			<input id="<?php echo $this->get_field_id( 'height' ); ?>" name="<?php echo $this->get_field_name( 'height' ); ?>" type="text" value="<?php echo empty( $instance['height'] ) ? '' :  $instance['height']; ?>" size="3" /></p>
+			<input id="<?php echo $this->get_field_id( 'height' ); ?>" name="<?php echo $this->get_field_name( 'height' ); ?>" type="text" value="<?php echo $instance['height']; ?>" size="3" /></p>
 
 <?php
 		} else {
