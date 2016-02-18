@@ -852,6 +852,11 @@ function bpeo_send_bpges_notification_for_user( $send_it, $activity, $user_id ) 
 		return $send_it;
 	}
 
+	if ( isset( $_POST['bpeo-silent'] ) ) {
+		$send_it = false;
+		return $send_it;
+	}
+
 	if ( ! isset( $_bpeo_bpges_sent ) ) {
 		$_bpeo_bpges_sent = array();
 	}
