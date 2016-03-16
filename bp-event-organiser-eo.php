@@ -246,14 +246,6 @@ class BuddyPress_Event_Organiser_EO {
 			'side', //'normal',
 			'core' //'high'
 		);
-		add_meta_box(
-			'bp_event_organiser_silent_metabox',
-			__( 'Create silently', 'bp-event-organiser' ),
-			array( $this, 'silent_event_meta_box_render' ),
-			'event',
-			'side',
-			'core'
-		);
 	}
 
 
@@ -293,12 +285,6 @@ class BuddyPress_Event_Organiser_EO {
 			<p class="howto"><?php _e( 'To remove a group, click on the "x" link.', 'bp-event-organiser' ); ?></p>
 		<?php endif; ?>
 	<?php
-	}
-
-	public function silent_event_meta_box_render( $event ){
-		?>
-		<label><input type="checkbox" name="bpeo-silent" value="silent"></input> Create this event without sending email notifications to members of groups it's been added to</label>
-		<?php
 	}
 
 	/**
