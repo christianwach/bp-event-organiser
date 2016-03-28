@@ -3,11 +3,14 @@ var bpeoGroupMsg = BpEventOrganiserSettings.group_privacy_message,
 	bpeoCurrStatus = '';
 
 jQuery(function($){
+	var select2obj;
+
 	bpeoCurrStatus = $('#post-status-display').text();
 	bpeoCurrVisibility = $('#post-visibility-display').text();
 	bpeoSelect = $('#bp_event_organiser_metabox select');
 	bpeoPrivateFlag = bpeoSelect.find('[title]').length;
 	bpeoSubmit = $('#submitdiv .inside');
+
 
 	bpeoToggle = function() {
 		var notice = bpeoSubmit.find('.updated');
@@ -79,7 +82,7 @@ jQuery(function($){
 		return markup;
 	}
 
-	bpeoSelect.select2({
+	select2obj = bpeoSelect.select2({
 		ajax: {
 			method: 'POST',
 			url: ajaxurl,
@@ -125,38 +128,29 @@ jQuery(function($){
 		bpeoToggle();
 	});
 
-	//	For adding the silent event creation option
-	var searchField = document.getElementsByClassName( 'select2-search__field' )[0];
-	if ( searchField ) {
-		// Get the container for selected groups (the hidden input, not the visible search/select form)
-		var groupOrganizerGroups = $( 'select[name="bp_group_organizer_groups[]"]' )[0];
+	bpeoSelect.on( 'change', function() {
+		checkGroupOrganizer();
+	} );
+
+	if ( select2obj ) {
+		var $silent_wrapper = $( '#bpeo-silent-wrapper' );
+
+		// Move the silent checkbox to where it belongs.
+		$silent_wrapper.insertBefore( '#publishing-action' );
+
 		function checkGroupOrganizer() {
 			// If a group has been selected, and we haven't already added the silent-ness
 			// checkbox, then add it
-			if ( groupOrganizerGroups.options.length >=1 && document.getElementById( "bp_event_organiser_silent" ) == null ) {
-				addSilentForm();
-			}
-			// If no group is selected, remove the form
-			if ( document.getElementsByClassName( 'select2-selection__choice' ).length == 0 ) {
-				removeSilentForm();
+			var groups = select2obj.val();
+			if ( groups && groups.length >= 1 ) {
+				console.log('ok');
+				$silent_wrapper.show();
+			} else {
+				console.log('bye');
+				$silent_wrapper.hide();
 			}
 		}
-		function addSilentForm() {
-			var publishing = document.getElementById( 'publishing-action' );
-			var actionString = 'create';
-			var pageTitle = document.getElementsByClassName('admin-page-title')[0].innerHTML;
-			if ( pageTitle == 'Edit Event' ) {
-				actionString = 'update';
-			}
-			$( publishing ).before( '<p id="bpeo-silent-wrapper"><input type="checkbox" value="silent" id="bp_event_organiser_silent" name="bpeo-silent"></input> <strong>Silent ' +  actionString + '</strong> (notifications will not be sent to subscribed group members)</p>' );
-		}
-		function removeSilentForm() {
-			$( '#bpeo-silent-wrapper' ).remove();
-		}
-		// Check for selected groups on page load
+
 		checkGroupOrganizer();
-		// Check for selected groups when the user clicks into and out of the group search input
-		searchField.addEventListener( 'focus', checkGroupOrganizer );
-		searchField.addEventListener( 'blur', checkGroupOrganizer );
 	}
 });
