@@ -143,10 +143,8 @@ jQuery(function($){
 			// checkbox, then add it
 			var groups = select2obj.val();
 			if ( groups && groups.length >= 1 ) {
-				console.log('ok');
 				$silent_wrapper.show();
 			} else {
-				console.log('bye');
 				$silent_wrapper.hide();
 			}
 		}
