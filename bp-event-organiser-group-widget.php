@@ -40,14 +40,125 @@ function bpeo_get_user_public_groups( $user_id = 0 ) {
 
 /** SHORTCODE ************************************************************/
 
-// Add our shortcode support.
-add_action( 'init', 'bpeo_group_shortcode_init' );
+/**
+ * Load Shortcake.
+ */
+function bpeo_load_shortcake() {
+	// Do not proceed if BuddyPress is not available.
+	if ( false === function_exists( 'buddypress' ) ) {
+		return;
+	}
+
+	// Check if Shortcake is installed. If not, bail.
+	$shortcode_ui = WP_PLUGIN_DIR . '/shortcode-ui/shortcode-ui.php';
+	if ( false === file_exists( $shortcode_ui ) ) {
+		return;
+	}
+
+	// Shortcake isn't activated on this site, so include it now.
+	if ( false === defined( 'SHORTCODE_UI_VERSION' ) ) {
+		require $shortcode_ui;
+	}
+
+	// Add our shortcode support.
+	add_action( 'init', 'bpeo_group_shortcode_init' );
+}
+add_action( 'plugins_loaded', 'bpeo_load_shortcake' );
 
 /**
  * Shortcode initializer.
  */
 function bpeo_group_shortcode_init() {
 	add_shortcode( 'bpeo-events', 'bpeo_group_events_shortcode' );
+
+	// Bail if no Shortcake.
+	if ( false === function_exists( 'shortcode_ui_register_for_shortcode' ) ) {
+		return;
+	}
+
+	// BP Groupblog fallback support.
+	$group_id = function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : '';
+
+	// Query for logged-in user's groups.
+	$groups = bpeo_get_user_public_groups();
+
+	// Set up shortcake attributes.
+	if ( ! empty( $groups ) ) {
+		// Add placeholder.
+		$groups = array( '--' ) + $groups;
+
+		$attrs = array(
+			array(
+				'label'       => __( 'Group', 'bpeo-group-widget' ),
+				'attr'        => 'id',
+				'type'        => 'select',
+				'value'       => $group_id,
+				'options'     => $groups,
+				'description' => esc_html__( 'Select the group you want to display events for.', 'bpeo-group-widget' )
+			),
+
+			array(
+				'label'   => __( 'Embed Type', 'bpeo-group-widget' ),
+				'attr'    => 'type',
+				'type'    => 'select',
+				'value'   => 'list',
+				'options' => array(
+					'list'     => esc_html__( 'List of upcoming events', 'bpeo-group-widget' ),
+					'calendar' => esc_html__( 'Calendar from group', 'bpeo-group-widget' ),
+				),
+			),
+
+			array(
+				'label' => __( 'Width', 'bpeo-group-widget' ),
+				'attr'  => 'width',
+				'type'  => 'number',
+				'value' => $GLOBALS['content_width'],
+				'meta' => array(
+					'style' => 'width:75px'
+				),
+				'description' => __( "Enter width in pixels. Defaults to the current theme's width.", 'bpeo-group-widget' )
+			),
+
+			array(
+				'label' => __( 'Height', 'bpeo-group-widget' ),
+				'attr'  => 'height',
+				'type'  => 'number',
+				'value' => 300,
+				'meta' => array(
+					'style' => 'width:75px'
+				),
+				'description' => __( "Enter height in pixels.", 'bpeo-group-widget' )
+			)
+		);
+
+	// Abuse a Shortcake field to add some descriptive 'no group' message.
+	} else {
+		$attrs = array(
+			array(
+				'label' => __( "You are not a member of any groups.  Please join a group before attempting to embed a group's event list.", 'bpeo-group-widget' ),
+				'attr'  => 'placeholder',
+				'type'  => 'number',
+				'meta'  => array(
+					'style' => 'display:none'
+				),
+			)
+		);
+
+	}
+
+	/*
+	 * Shortcake support.
+	 */
+	shortcode_ui_register_for_shortcode(
+		'bpeo-events',
+		array(
+
+			'label'         => __( 'Group Events', 'bpeo-group-widget' ),
+			'listItemImage' => 'dashicons-calendar-alt',
+			'attrs'         => $attrs
+
+		)
+	);
 }
 
 /**
