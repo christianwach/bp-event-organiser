@@ -7,6 +7,39 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
+/** HELPERS **************************************************************/
+
+/**
+ * Get a user's public groups.
+ *
+ * @param  int   $user_id User ID
+ * @return array Array with group ID as key and group name as value.
+ */
+function bpeo_get_user_public_groups( $user_id = 0 ) {
+	$groups = groups_get_groups( array(
+		'user_id'           => ! empty( $user_id ) ? (int) $user_id : bp_loggedin_user_id(),
+		'per_page'          => null,
+		'page'              => null,
+		'update_meta_cache' => false,
+	) );
+
+	$retval = array();
+
+	foreach ( $groups['groups'] as $i => $group ) {
+		if ( 'public' !== $group->status ) {
+			continue;
+		}
+
+		$retval[ $group->id ] = apply_filters( 'bp_get_group_name', $group->name, $group );
+	}
+
+	unset( $groups );
+
+	return $retval;
+}
+
+/** WIDGET ***************************************************************/
+
 /**
  * Registers our widget with WordPress.
  */
@@ -159,16 +192,9 @@ class BPEO_Group_Widget extends WP_Widget {
 
 		$group_id = ! empty( $group_id ) ? $group_id : '';
 
-		$groups = groups_get_groups( array(
-			'type' => 'alphabetical',
-			'order' => 'ASC',
-			'user_id' => bp_loggedin_user_id(),
-			'per_page' => null,
-			'page' => null,
-			'update_meta_cache' => false,
-		) );
+		$groups = bpeo_get_user_public_groups();
 
-		if ( ! empty( $groups['groups'] ) ) {
+		if ( ! empty( $groups ) ) {
 	?>
 
 			<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e( 'Title:', 'bpeo-group-widget' ); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" /></p>
@@ -177,10 +203,8 @@ class BPEO_Group_Widget extends WP_Widget {
 			<select class="widefat" name="<?php echo esc_attr( $this->get_field_name( 'group_id' ) ); ?>" id="<?php echo esc_attr( $this->get_field_id( 'group_id' ) ); ?>">
 				<option value="" <?php selected( $group_id, '' ); ?>><?php esc_html_e( '--- Select a group ---', 'bpeo-group-widget' ); ?></option>
 
-				<?php foreach ( $groups['groups'] as $i => $group ) : ?>
-					<?php if ( 'public' !== $group->status ) { continue; } ?>
-
-					<option value="<?php echo esc_attr( $group->id ); ?>" <?php selected( $group_id, $group->id ); ?>><?php echo esc_html( apply_filters( 'bp_get_group_name', $group->name ) ); ?></option>
+				<?php foreach ( $groups as $i => $group_name ) : ?>
+					<option value="<?php echo esc_attr( $i ); ?>" <?php selected( $group_id, $i ); ?>><?php echo esc_html( $group->name ); ?></option>
 				<?php endforeach; ?>
 			</select></p>
 
