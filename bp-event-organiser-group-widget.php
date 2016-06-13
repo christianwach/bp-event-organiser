@@ -38,6 +38,74 @@ function bpeo_get_user_public_groups( $user_id = 0 ) {
 	return $retval;
 }
 
+/** SHORTCODE ************************************************************/
+
+// Add our shortcode support.
+add_action( 'init', 'bpeo_group_shortcode_init' );
+
+/**
+ * Shortcode initializer.
+ */
+function bpeo_group_shortcode_init() {
+	add_shortcode( 'bpeo-events', 'bpeo_group_events_shortcode' );
+}
+
+/**
+ * Add shortcode for group events.
+ *
+ * @param  array $r Shortcode attributes.
+ * @return string
+ */
+function bpeo_group_events_shortcode( $r = array() ) {
+	global $content_width;
+
+	$r = shortcode_atts( array(
+		'id' => 0,
+
+		// Type.
+		'type' => 'list',
+
+		// Dimensions.
+		'width'  => ! empty( $content_width ) ? $content_width : '100%',
+		'height' => 300,   // default height is set to 300
+	), $r );
+
+	// BP Groupblog fallback support.
+	$group_id = empty( $r['group_id'] ) && function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : $group_id;
+
+	if ( empty( $group_id ) ) {
+		return;
+	}
+
+	$group = groups_get_group( array(
+		'group_id'        => $group_id,
+		'populate_extras' => false,
+	) );
+
+	// Sanity check!
+	if ( empty( $group ) ) {
+		return;
+	}
+
+	// Group calendar
+	if ( 'calendar' === $r['type'] ) {
+		$link = bp_get_group_permalink( $group ) . 'events/?embedded=true';
+
+	// Upcoming events
+	} else {
+		$link = bp_get_group_permalink( $group ) . 'events/upcoming/?embedded=true';
+	}
+
+	$height = ! empty( $r['height'] ) ? 'height="' . (int) $r['height'] . '"' : '';
+
+	return sprintf(
+		'<iframe src="%1$s" frameborder="0" width="%2$s"%3$s></iframe>',
+		esc_url( $link ),
+		esc_attr( $r['width'] ),
+		$height
+	);
+}
+
 /** WIDGET ***************************************************************/
 
 /**
@@ -99,45 +167,18 @@ class BPEO_Group_Widget extends WP_Widget {
 		 */
 		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'My Events', 'bpeo-group-widget' ) : $instance['title'], $instance, $this->id_base );
 
-		$height = ! empty( $instance['height'] ) ? 'height="' . (int) $instance['height'] . '"' : '';
-
-		$group_id = ! empty( $instance['group_id'] ) ? (int) $instance['group_id'] : false;
-
-		// BP Groupblog fallback support
-		$group_id = empty( $group_id ) && function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : $group_id;
-
-		if ( empty( $group_id ) ) {
-			return;
-		}
-
-		$group = groups_get_group( array(
-		    'group_id' => $group_id,
-		    'populate_extras' => false,
-		) );
-
-		// Sanity check!
-		if ( empty( $group ) ) {
-			return;
-		}
-
-		// Group calendar
-		if ( 'calendar' === $instance['type'] ) {
-			$link = bp_get_group_permalink( $group ) . 'events/?embedded=true';
-
-		// Upcoming events
-		} else {
-			$link = bp_get_group_permalink( $group ) . 'events/upcoming/?embedded=true';
-		}
-
 		echo $args['before_widget'];
 		if ( $title ) {
 			echo $args['before_title'] . $title . $args['after_title'];
 		}
-	?>
 
-		<iframe src="<?php echo esc_url( $link ); ?>" frameborder="0" width="100%" <?php echo $height; ?>></iframe>
+		echo bpeo_group_events_shortcode( array(
+			'id'     => $group_id,
+			'type'   => $instance['type'],
+			'width'  => '100%',
+			'height' => $instance['height']
+		) );
 
-	<?php
 		echo $args['after_widget'];
 	}
 
