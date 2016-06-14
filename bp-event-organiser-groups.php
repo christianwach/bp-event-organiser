@@ -255,8 +255,14 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			buddypress()->action_variables[] = 'calendar';
 		}
 
-		bp_register_template_stack( 'bpeo_register_template_stack', 13 );
-		bp_get_template_part( 'buddypress/groups/single/subnav-events' );
+		// Use our template stack.
+		add_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
+
+		// Load our template part.
+		eo_get_template_part( 'buddypress/groups/single/subnav-events' );
+
+		// Remove our template stack.
+		remove_filter( 'eventorganiser_template_stack', 'bpeo_register_template_stack' );
 
 		buddypress()->action_variables = $_action_variables;
 	}
