@@ -182,7 +182,7 @@ function bpeo_group_events_shortcode( $r = array() ) {
 	), $r );
 
 	// BP Groupblog fallback support.
-	$group_id = empty( $r['group_id'] ) && function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : $group_id;
+	$group_id = empty( $r['group_id'] ) && function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : 0;
 
 	if ( empty( $group_id ) ) {
 		return;
@@ -277,6 +277,14 @@ class BPEO_Group_Widget extends WP_Widget {
 		 * @param mixed  $id_base  The widget ID.
 		 */
 		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'My Events', 'bpeo-group-widget' ) : $instance['title'], $instance, $this->id_base );
+
+		$group_id = ! empty( $instance['group_id'] ) ? (int) $instance['group_id'] : false;
+
+		// BP Groupblog fallback support
+		$group_id = empty( $group_id ) && function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : $group_id;
+		if ( empty( $group_id ) ) {
+			return;
+		}
 
 		echo $args['before_widget'];
 		if ( $title ) {
