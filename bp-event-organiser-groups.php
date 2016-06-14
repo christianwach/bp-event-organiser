@@ -255,15 +255,9 @@ class BP_Event_Organiser_Group_Extension extends BP_Group_Extension {
 			buddypress()->action_variables[] = 'calendar';
 		}
 
-	?>
+		bp_register_template_stack( 'bpeo_register_template_stack', 13 );
+		bp_get_template_part( 'buddypress/groups/single/subnav-events' );
 
-		<div class="item-list-tabs no-ajax" id="subnav" role="navigation">
-			<ul>
-				<?php bp_get_options_nav( buddypress()->groups->current_group->slug . '_events' ); ?>
-			</ul>
-		</div><!-- .item-list-tabs -->
-
-	<?php
 		buddypress()->action_variables = $_action_variables;
 	}
 
