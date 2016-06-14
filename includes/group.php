@@ -318,8 +318,8 @@ function bpeo_group_event_meta_cap( $caps, $cap, $user_id, $args ) {
 				$can_access = false;
 
 				// If on a group page, use already-queried data.
-				if ( bp_is_group() && $args[0] == bp_get_current_group_id() && buddypress()->groups->current_group->is_user_member ) {
-					$can_access = true;
+				if ( bp_is_group() && $args[0] == bp_get_current_group_id() && isset( buddypress()->groups->current_group->is_user_member ) ) {
+					$can_access = buddypress()->groups->current_group->is_user_member;
 
 				} elseif ( groups_is_user_member( bp_loggedin_user_id(), $group->id ) ) {
 					$can_access = true;
