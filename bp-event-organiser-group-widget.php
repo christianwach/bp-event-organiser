@@ -182,7 +182,7 @@ function bpeo_group_events_shortcode( $r = array() ) {
 	), $r );
 
 	// BP Groupblog fallback support.
-	$group_id = empty( $r['group_id'] ) && function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : 0;
+	$group_id = empty( $r['id'] ) && function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : $r['id'];
 
 	if ( empty( $group_id ) ) {
 		return;
