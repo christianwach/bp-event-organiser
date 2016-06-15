@@ -648,6 +648,16 @@ add_action( 'do_meta_boxes', 'bpeo_render_silent_checkbox', 10, 3 );
 /** Embed ********************************************************************/
 
 /**
+ * Loads our group events oEmbed component.
+ */
+function bpeo_group_setup_oembed() {
+	if ( version_compare( $GLOBALS['wp_version'], '4.4', '>=' ) && function_exists( 'bp_rest_api_init' ) && true === apply_filters( 'bpeo_groups_enable_oembed', true ) ) {
+		$GLOBALS['buddypress_event_organiser']->group_oembed = new BPEO_Group_oEmbed_Extension;
+	}
+}
+add_action( 'bp_loaded', 'bpeo_group_setup_oembed' );
+
+/**
  * Should we load our override template for embedding group events?
  *
  * We only override if we're on a group events page and if '?embedded=true' is
