@@ -2,10 +2,6 @@
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
-if ( ! buddypress()->do_autoload ) {
-	require BP_PLUGIN_DIR . '/bp-core/classes/class-bp-core-oembed-extension.php';
-}
-
 /**
  * oEmbed handler to respond and render group events.
  */
