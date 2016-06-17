@@ -126,6 +126,11 @@ function bpeo_group_shortcode_init() {
 		return;
 	}
 
+	// Only do Shortcake stuff in the admin area.
+	if ( false === defined( 'WP_NETWORK_ADMIN' ) ) {
+		return;
+	}
+
 	// BP Groupblog fallback support.
 	$group_id = function_exists( 'get_groupblog_group_id' ) ? get_groupblog_group_id( get_current_blog_id() ) : '';
 
