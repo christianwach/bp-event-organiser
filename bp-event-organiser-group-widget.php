@@ -99,6 +99,17 @@ function bpeo_load_shortcake() {
 		return;
 	}
 
+	// Make sure groups component is active.
+	if ( false === bp_is_active( 'groups' ) ) {
+		return;
+	}
+
+	// Check if BPEO is registered on the root blog.
+	$active_plugins = get_blog_option( bp_get_root_blog_id(), 'active_plugins' );
+	if( false === in_array( 'bp-event-organiser/bp-event-organiser.php', $active_plugins, true ) ) {
+		return;
+	}
+
 	// Check if Shortcake is installed. If not, bail.
 	$shortcode_ui = WP_PLUGIN_DIR . '/shortcode-ui/shortcode-ui.php';
 	if ( false === file_exists( $shortcode_ui ) ) {
