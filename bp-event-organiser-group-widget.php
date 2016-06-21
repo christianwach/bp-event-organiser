@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: BP Event Organiser - Group Shortcode and Widget
+Plugin Name: Group Events Shortcode and Widget
 Description: Embed events from one of your groups that you are a member of with a shortcode or a widget.
 Author: CUNY Academic Commons Team
 License: GPLv2 or later
