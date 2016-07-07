@@ -38,6 +38,7 @@ class BPEO_Frontend_Admin_Screen extends WP_Frontend_Admin_Screen {
 	 */
 	protected function before_save() {
 		// add EO save hook
+		add_action( 'save_post', 'eventorganiser_admin_init', 5 );
 		add_action( 'save_post', 'eventorganiser_details_save' );
 	}
 
