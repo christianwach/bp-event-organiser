@@ -75,7 +75,7 @@ function bpeo_purge_public_group_cache_on_group_save( $group ) {
 		wp_cache_delete( "{$group->id}:public", 'bp_groups' );
 	}
 }
-add_action( 'groups_group_after_save', 'bpeo_purge_public_group_cache' );
+add_action( 'groups_group_after_save', 'bpeo_purge_public_group_cache_on_group_save' );
 
 /**
  * Purge public group cache on any group member change.
