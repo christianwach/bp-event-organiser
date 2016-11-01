@@ -124,7 +124,7 @@ function bpeo_load_shortcake() {
 	// Add our shortcode support.
 	add_action( 'init', 'bpeo_group_shortcode_init' );
 }
-add_action( 'plugins_loaded', 'bpeo_load_shortcake' );
+add_action( 'bp_loaded', 'bpeo_load_shortcake' );
 
 /**
  * Shortcode initializer.
