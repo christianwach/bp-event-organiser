@@ -14,59 +14,52 @@ jQuery(function($){
 	bpeoToggle = function() {
 		var notice = bpeoSubmit.find('.updated');
 
-		if ( false === $.isEmptyObject( bpeoSelect.val() ) ) {
-			bpeoToggleFlag = true;
-
-			if ( bpeoIsPrivate ) {
-				$("#visibility-radio-private" ).prop("checked", true);
-				$('#post-status-display').fadeOut('fast').text( postL10n.privatelyPublished ).fadeIn('fast');
-				$('#post-visibility-display').fadeOut('fast').text( postL10n.private ).fadeIn('fast');
-			} else {
-				$("#visibility-radio-public" ).prop("checked", true);
-				$('#post-status-display').fadeOut('fast').text( postL10n.published ).fadeIn('fast');
-				$('#post-visibility-display').fadeOut('fast').text( postL10n.public ).fadeIn('fast');
-			}
-			bpeoGroupMsg = BpEventOrganiserSettings.group_privacy_message;
-
-			$('.misc-pub-post-status, .misc-pub-visibility').hide();
-			$('#save-post').hide();
-			$('#submitdiv .inside .error').show();
-
-			if ( ! notice.length && typeof adminpage === 'undefined' ) {
-				bpeoSubmit.prepend('<div class="updated"><p>' + bpeoGroupMsg + '</p></div>');
-			} else {
-				notice.fadeOut('fast');
-				notice.find('p').html( bpeoGroupMsg );
-				notice.fadeIn('fast');
-			}
-
-		} else if ( bpeoPublicFlag === 0 && bpeoToggleFlag === true ) {
-			bpeoToggleFlag = false;
-
-			if ( bpeoIsPrivate ) {
-				$("#visibility-radio-private" ).prop("checked", true);
-				$('#post-status-display').fadeOut('fast').text( postL10n.privatelyPublished ).fadeIn('fast');
-				$('#post-visibility-display').fadeOut('fast').text( postL10n.private ).fadeIn('fast');
-			} else {
-				$("#visibility-radio-public" ).prop("checked", true);
-				$('#post-status-display').fadeOut('fast').text( postL10n.published ).fadeIn('fast');
-				$('#post-visibility-display').fadeOut('fast').text( postL10n.public ).fadeIn('fast');
-			}
-			bpeoGroupMsg = BpEventOrganiserSettings.group_privacy_message;
-
+		if ( true === $.isEmptyObject( bpeoSelect.val() ) ) {
 			$('.misc-pub-post-status, .misc-pub-visibility').show();
 			$('.edit-post-status').show();
 			$('#save-post').show();
 			$('#submitdiv .inside .error').hide();
+			notice.fadeOut();
+		} else {
+			$('.misc-pub-post-status, .misc-pub-visibility').hide();
+			$('#save-post').hide();
+			$('#submitdiv .inside .error').show();
+
+			if ( bpeoPublicFlag > 0 ) {
+				bpeoGroupMsg = BpEventOrganiserSettings.group_public_message;
+
+				$("#visibility-radio-public" ).prop("checked", true);
+				$('#post-status-display').fadeOut('fast').text( postL10n.published ).fadeIn('fast');
+				$('#post-visibility-display').fadeOut('fast').text( postL10n.public ).fadeIn('fast');
+			} else {
+				bpeoGroupMsg = BpEventOrganiserSettings.group_privacy_message;
+
+				$("#visibility-radio-private" ).prop("checked", true);
+				$('#post-status-display').fadeOut('fast').text( postL10n.privatelyPublished ).fadeIn('fast');
+				$('#post-visibility-display').fadeOut('fast').text( postL10n.private ).fadeIn('fast');
+			}
 
 			if ( notice.length ) {
+				bpeoToggleFlag = false;
+
 				notice.fadeOut('fast');
 				notice.find('p').html( bpeoGroupMsg );
+				notice.fadeIn();
+			} else {
+				bpeoSubmit.prepend('<div class="updated"><p>' + bpeoGroupMsg + '</p></div>');
 			}
+
 		}
 	}
 
-	bpeoToggle();
+	$('#post-status-select, #post-visibility-select, #timestampdiv').hide();
+
+	if ( ! $( 'body' ).hasClass( 'bp-user' ) ) {
+		if ( ! bpeoSubmit.find('.updated').length && typeof adminpage === 'undefined' ) {
+			bpeoSubmit.prepend('<div class="updated"><p>' + bpeoGroupMsg + '</p></div>');
+		}
+		bpeoToggle();
+	}
 
 	// do not show "Save Draft" button for public groups when clicking on the
 	// "Cancel" button when toggled from the "Publish immediately" option
@@ -141,6 +134,7 @@ jQuery(function($){
 	});
 
 	bpeoSelect.on("select2:unselect select2:select", function (e) {
+		bpeoToggleFlag = true;
 		bpeoToggle();
 	});
 

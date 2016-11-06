@@ -54,6 +54,10 @@ function bpeo_enqueue_assets() {
 
 	wp_localize_script( 'bpeo-group-select', 'BpEventOrganiserSettings', array(
 		'group_privacy_message' => __( 'You have added a group to this event.  Since groups have their own privacy settings, we have removed the ability to set the status for this event.', 'bp-event-organiser' ),
+		'group_public_message' => sprintf( __( 'You have added a %1$s to this event. Since the added group is %2$s, be aware that your event will also be publicized on the sitewide event calendar.', 'bp-event-organiser' ),
+			'<strong>' . __( 'public group', 'bp-event-organiser' ) . '</strong>',
+			'<strong>' . __( 'public', 'bp-event-organiser' ) . '</strong>'
+		),
 	) );
 }
 
