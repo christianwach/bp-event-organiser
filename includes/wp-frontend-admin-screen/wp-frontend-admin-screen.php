@@ -212,7 +212,10 @@ class WP_Frontend_Admin_Screen {
 
 			// redirect
 			if ( empty( $this->args['redirect_root'] ) ) {
-				$url = get_permalink ( $post_id );
+				$url = add_query_arg(
+					array( 'p' => $post_id ),
+					get_home_url()
+				);
 			} else {
 				// refetch post to grab slug
 				$post = get_post( $post_id );
