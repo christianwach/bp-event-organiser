@@ -55,6 +55,11 @@ class BPEO_Frontend_Admin_Screen extends WP_Frontend_Admin_Screen {
 		if ( function_exists( 'eventorganiser_edit_init' ) ) {
 			eventorganiser_edit_init();
 		}
+
+		// Shortcake - Remove 'Add Post Element' button.
+		if ( class_exists( 'Shortcode_UI', false ) && is_callable( array( Shortcode_UI::get_instance(), 'action_media_buttons' ) ) ) {
+			remove_action( 'media_buttons', array( Shortcode_UI::get_instance(), 'action_media_buttons' ) );
+		}
 	}
 
 	/**
