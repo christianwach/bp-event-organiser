@@ -31,9 +31,11 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 * @see Walker_Nav_Menu::start_lvl()
 	 * @since 3.0.0
 	 *
-	 * @param string $output Passed by reference.
+	 * @param string   $output Passed by reference. Used to append additional content.
+	 * @param int      $depth  Depth of menu item. Used for padding.
+	 * @param stdClass $args   An object of wp_nav_menu() arguments.
 	 */
-	function start_lvl( &$output ) {}
+	function start_lvl( &$output, $depth = 0, $args = array() ) {}
 	
 	
 	
@@ -41,9 +43,11 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 * @see Walker_Nav_Menu::end_lvl()
 	 * @since 3.0.0
 	 *
-	 * @param string $output Passed by reference.
+	 * @param string   $output Passed by reference. Used to append additional content.
+	 * @param int      $depth  Depth of menu item. Used for padding.
+	 * @param stdClass $args   An object of wp_nav_menu() arguments.
 	 */
-	function end_lvl( &$output ) {
+	function end_lvl( &$output, $depth = 0, $args = array() ) {
 	}
 	
 	
@@ -52,12 +56,13 @@ class Walker_BPEO_Group extends Walker_BPEO  {
 	 * @see Walker::start_el()
 	 * @since 3.0.0
 	 *
-	 * @param string $output Passed by reference. Used to append additional content.
-	 * @param object $item Menu item data object.
-	 * @param int $depth Depth of menu item. Used for padding.
-	 * @param object $args
+	 * @param string   $output Passed by reference. Used to append additional content.
+	 * @param WP_Post  $item   Menu item data object.
+	 * @param int      $depth  Depth of menu item. Used for padding.
+	 * @param stdClass $args   An object of wp_nav_menu() arguments.
+	 * @param int      $id     Current item ID.
 	 */
-	function start_el( &$output, $item, $depth, $args ) {
+	function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
 	
 		// if the user is not an admin
 		if ( !is_super_admin() OR !current_user_can( 'manage_options' ) ) {
