@@ -437,14 +437,47 @@ function bpeo_remove_default_canonical_event_content( $retval ) {
 		return $retval;
 	}
 
-	if( is_singular('event') && false === eventorganiser_is_event_template( '', 'event' ) ) {
-		remove_filter( 'the_content', '_eventorganiser_single_event_content' );
+	// check context
+	if ( is_singular('event') && false === eventorganiser_is_event_template( '', 'event' ) ) {
+
+		// EO always hooks in to 'template_include' last, so delay until 'get_header'
+		add_action( 'get_header', 'bpeo_remove_eo_event_content_filter' );
+
+		// add BPEO's content filter
 		add_filter( 'the_content', 'bpeo_canonical_event_content', 999 );
+
 	}
 
 	return $retval;
 }
 add_filter( 'template_include', 'bpeo_remove_default_canonical_event_content', 20 );
+
+/**
+ * Callback to remove BPEO's content filter.
+ *
+ * @see bpeo_remove_default_canonical_event_content()
+ */
+function bpeo_remove_eo_event_content_filter() {
+	remove_filter( 'the_content', '_eventorganiser_single_event_content' );
+
+	/**
+	 * Allow plugins to act when the content filters have been switched.
+	 *
+	 * Some plugins may want to use the existing EO template which places the
+	 * event meta at the top of the event rather than the foot.
+	 *
+	 * At it's simplest, this can be done with:
+	 *
+	 * add_action( 'bpeo_removed_default_canonical_event_content', 'my_keep_eo_templates' );
+	 * function my_keep_eo_templates() {
+	 *  	remove_filter( 'the_content', 'bpeo_canonical_event_content', 999 );
+	 * 		add_filter( 'the_content', '_eventorganiser_single_event_content' );
+	 * }
+	 *
+	 * @since 0.2
+	 */
+	do_action( 'bpeo_removed_default_canonical_event_content' );
+}
 
 /**
  * Callback filter to use BPEO's content for the canonical event page.
